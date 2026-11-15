@@ -810,6 +810,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "hideFromList": MessageLookupByLibrary.simpleMessage("목록에서 숨기기"),
     "hideIp": MessageLookupByLibrary.simpleMessage("IP 숨기기"),
     "hidePassword": MessageLookupByLibrary.simpleMessage("비밀번호 숨기기"),
+    "hidePort": MessageLookupByLibrary.simpleMessage("로컬 프록시 포트 숨기기"),
+    "hidePortDesc": MessageLookupByLibrary.simpleMessage(
+      "다른 앱이 7890 포트로 프록시를 찾을 수 없습니다",
+    ),
     "hideTimeoutProxies": MessageLookupByLibrary.simpleMessage(
       "시간 초과된 프록시 숨기기",
     ),

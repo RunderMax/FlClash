@@ -754,6 +754,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "hideFromList": MessageLookupByLibrary.simpleMessage("从列表中隐藏"),
     "hideIp": MessageLookupByLibrary.simpleMessage("隐藏 IP"),
     "hidePassword": MessageLookupByLibrary.simpleMessage("隐藏密码"),
+    "hidePort": MessageLookupByLibrary.simpleMessage("隐藏本地代理端口"),
+    "hidePortDesc": MessageLookupByLibrary.simpleMessage(
+      "别的 app 扫不到 7890 端口，看不出你在用代理",
+    ),
     "hideTimeoutProxies": MessageLookupByLibrary.simpleMessage("隐藏超时代理"),
     "hopInterval": MessageLookupByLibrary.simpleMessage("跳跃间隔"),
     "host": MessageLookupByLibrary.simpleMessage("主机"),

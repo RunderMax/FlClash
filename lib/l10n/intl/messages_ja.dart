@@ -818,6 +818,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "hideFromList": MessageLookupByLibrary.simpleMessage("リストから隠す"),
     "hideIp": MessageLookupByLibrary.simpleMessage("IP を隠す"),
     "hidePassword": MessageLookupByLibrary.simpleMessage("パスワードを隠す"),
+    "hidePort": MessageLookupByLibrary.simpleMessage("ローカルのプロキシポートを隠す"),
+    "hidePortDesc": MessageLookupByLibrary.simpleMessage(
+      "他のアプリがポート 7890 でプロキシを見つけられなくなります",
+    ),
     "hideTimeoutProxies": MessageLookupByLibrary.simpleMessage(
       "タイムアウトしたプロキシを隠す",
     ),

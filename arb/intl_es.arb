@@ -1122,5 +1122,7 @@
   "blockAds": "Bloquear anuncios y rastreadores",
   "blockAdsDesc": "Rechaza sitios conocidos de anuncios y rastreo",
   "secureWindow": "Ocultar en apps recientes",
-  "secureWindowDesc": "La app aparece en blanco en recientes y se bloquean las capturas"
+  "secureWindowDesc": "La app aparece en blanco en recientes y se bloquean las capturas",
+  "hidePort": "Ocultar el puerto del proxy local",
+  "hidePortDesc": "Otras apps ya no encuentran el proxy en el puerto 7890"
 }

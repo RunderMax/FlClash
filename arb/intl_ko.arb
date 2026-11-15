@@ -1122,5 +1122,7 @@
   "blockAds": "광고와 추적기 차단",
   "blockAdsDesc": "알려진 광고·추적 사이트를 거부합니다",
   "secureWindow": "최근 앱에서 화면 숨기기",
-  "secureWindowDesc": "최근 앱에 빈 화면으로 보이고 스크린샷도 막습니다"
+  "secureWindowDesc": "최근 앱에 빈 화면으로 보이고 스크린샷도 막습니다",
+  "hidePort": "로컬 프록시 포트 숨기기",
+  "hidePortDesc": "다른 앱이 7890 포트로 프록시를 찾을 수 없습니다"
 }

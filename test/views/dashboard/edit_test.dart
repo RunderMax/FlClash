@@ -110,7 +110,7 @@ void main() {
     expect(current, lessThan(groups));
     expect(groups, lessThan(speed));
     expect(speed, lessThan(top(tester, find.text('Available to add'))));
-    expect(find.byTooltip('Add Memory info'), findsOneWidget);
+    expect(find.byTooltip('Add Outbound mode'), findsOneWidget);
     expect(find.byType(SortHandle), findsNothing);
     // The desktop-only card has no row on a phone.
     expect(find.byTooltip('Add Traffic takeover'), findsNothing);
@@ -222,6 +222,7 @@ void main() {
       DashboardWidget.proxyGroups,
       DashboardWidget.serviceStatus,
       DashboardWidget.fastestNodes,
+      DashboardWidget.privacyHardening,
     ]);
     await pumpEditor(tester, size: const Size(412, 700));
     final position = positionOf(tester);

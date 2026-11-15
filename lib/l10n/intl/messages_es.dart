@@ -1045,6 +1045,12 @@ class MessageLookup extends MessageLookupByLibrary {
     "hideFromList": MessageLookupByLibrary.simpleMessage("Ocultar de la lista"),
     "hideIp": MessageLookupByLibrary.simpleMessage("Ocultar IP"),
     "hidePassword": MessageLookupByLibrary.simpleMessage("Ocultar contraseña"),
+    "hidePort": MessageLookupByLibrary.simpleMessage(
+      "Ocultar el puerto del proxy local",
+    ),
+    "hidePortDesc": MessageLookupByLibrary.simpleMessage(
+      "Otras apps ya no encuentran el proxy en el puerto 7890",
+    ),
     "hideTimeoutProxies": MessageLookupByLibrary.simpleMessage(
       "Ocultar proxies sin respuesta",
     ),

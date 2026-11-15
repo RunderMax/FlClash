@@ -1,4 +1,7 @@
+import 'dart:math';
+
 import 'package:fl_clash/common/common.dart';
+import 'package:fl_clash/models/models.dart';
 import 'package:fl_clash/plugins/app.dart';
 import 'package:fl_clash/providers/providers.dart';
 import 'package:fl_clash/ui/icons/icons.dart';
@@ -10,6 +13,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'card.dart';
 
 const _rowPadding = EdgeInsets.fromLTRB(10, 10, 12, 10);
+
+/// Out of the range proxy apps are known to listen on.
+int _randomPort() => 20000 + Random.secure().nextInt(30000);
 const _rowIcon = 38.0;
 
 class PrivacyHardeningCard extends ConsumerWidget {
@@ -40,6 +46,29 @@ class PrivacyHardeningCard extends ConsumerWidget {
     void setSecureWindow(bool value) => ref
         .read(appSettingProvider.notifier)
         .update((state) => state.copyWith(secureWindow: value));
+    final mixedPort = ref.watch(
+      patchClashConfigProvider.select((state) => state.mixedPort),
+    );
+    final systemProxy = ref.watch(
+      vpnSettingProvider.select((state) => state.systemProxy),
+    );
+    final hidePort = mixedPort != defaultMixedPort && !systemProxy;
+
+    /// The system proxy hands the port to every app that asks, so hiding the
+    /// port turns it off; the VPN still carries all traffic.
+    void setHidePort(bool hide) {
+      ref
+          .read(patchClashConfigProvider.notifier)
+          .update(
+            (state) => state.copyWith(
+              mixedPort: hide ? _randomPort() : defaultMixedPort,
+            ),
+          );
+      ref
+          .read(vpnSettingProvider.notifier)
+          .update((state) => state.copyWith(systemProxy: !hide));
+    }
+
     void setBlockAds(bool value) => ref
         .read(patchClashConfigProvider.notifier)
         .update((state) => state.copyWith(slothBlockAds: value));
@@ -89,6 +118,20 @@ class PrivacyHardeningCard extends ConsumerWidget {
             onTap: () => setBlockAds(!blockAds),
             onChanged: setBlockAds,
           ),
+          if (plugin != null)
+            DashboardSwitchRow(
+              glyph: AppGlyphs.key,
+              title: appLocalizations.hidePort,
+              subtitle: hidePort
+                  ? appLocalizations.portValue(mixedPort)
+                  : appLocalizations.hidePortDesc,
+              value: hidePort,
+              iconSize: _rowIcon,
+              padding: _rowPadding,
+              radius: AppCorner.md,
+              onTap: () => setHidePort(!hidePort),
+              onChanged: setHidePort,
+            ),
           if (plugin != null)
             DashboardSwitchRow(
               glyph: AppGlyphs.eyeOff,

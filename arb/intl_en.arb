@@ -1122,5 +1122,7 @@
   "blockAds": "Block ads and trackers",
   "blockAdsDesc": "Refuses known ad and tracking sites",
   "secureWindow": "Hide from recent apps",
-  "secureWindowDesc": "The app shows blank in recents, and screenshots are blocked"
+  "secureWindowDesc": "The app shows blank in recents, and screenshots are blocked",
+  "hidePort": "Hide the local proxy port",
+  "hidePortDesc": "Other apps can no longer find the proxy on port 7890"
 }

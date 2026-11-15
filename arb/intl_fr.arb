@@ -1122,5 +1122,7 @@
   "blockAds": "Bloquer pubs et traqueurs",
   "blockAdsDesc": "Refuse les sites connus de pub et de pistage",
   "secureWindow": "Masquer dans les apps récentes",
-  "secureWindowDesc": "L’app apparaît vide dans les récentes et les captures sont bloquées"
+  "secureWindowDesc": "L’app apparaît vide dans les récentes et les captures sont bloquées",
+  "hidePort": "Masquer le port du proxy local",
+  "hidePortDesc": "Les autres apps ne trouvent plus le proxy sur le port 7890"
 }

@@ -9444,6 +9444,26 @@ class AppLocalizations {
       args: [],
     );
   }
+
+  /// `Hide the local proxy port`
+  String get hidePort {
+    return Intl.message(
+      'Hide the local proxy port',
+      name: 'hidePort',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Other apps can no longer find the proxy on port 7890`
+  String get hidePortDesc {
+    return Intl.message(
+      'Other apps can no longer find the proxy on port 7890',
+      name: 'hidePortDesc',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<AppLocalizations> {

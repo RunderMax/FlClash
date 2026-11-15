@@ -41,7 +41,6 @@ final _toggleCases = <_ToggleCase>[
     'allow bypass',
     const AllowBypassItem(),
     (c) => c.read(vpnSettingProvider).allowBypass,
-    initial: true,
   ),
   _ToggleCase(
     'vpn system proxy',

@@ -1020,6 +1020,12 @@ class MessageLookup extends MessageLookupByLibrary {
     "hideFromList": MessageLookupByLibrary.simpleMessage("Скрыть из списка"),
     "hideIp": MessageLookupByLibrary.simpleMessage("Скрыть IP"),
     "hidePassword": MessageLookupByLibrary.simpleMessage("Скрыть пароль"),
+    "hidePort": MessageLookupByLibrary.simpleMessage(
+      "Скрыть локальный порт прокси",
+    ),
+    "hidePortDesc": MessageLookupByLibrary.simpleMessage(
+      "Другие приложения не найдут прокси на порту 7890",
+    ),
     "hideTimeoutProxies": MessageLookupByLibrary.simpleMessage(
       "Скрывать прокси с таймаутом",
     ),
