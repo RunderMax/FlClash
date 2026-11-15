@@ -11,6 +11,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'fold.dart';
 import 'layout.dart';
 import 'style.dart';
 import 'widget_registry.dart';
@@ -213,9 +214,12 @@ class _DashboardEditorState extends ConsumerState<DashboardEditor>
                   _LiftedCard(
                     animation: animation,
                     child: AbsorbPointer(
-                      child: RepaintBoundary(
-                        key: widget.cardKeyOf(cards[index]),
-                        child: cards[index].card,
+                      child: DashboardFold(
+                        folded: true,
+                        child: RepaintBoundary(
+                          key: widget.cardKeyOf(cards[index]),
+                          child: cards[index].card,
+                        ),
                       ),
                     ),
                   ),
@@ -421,7 +425,11 @@ class _EditableCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = context.colorScheme;
     final card = AbsorbPointer(
-      child: RepaintBoundary(key: cardKey, child: item.card),
+      child: DashboardFold(
+        folded: true,
+        animateIn: true,
+        child: RepaintBoundary(key: cardKey, child: item.card),
+      ),
     );
     final onRemove = this.onRemove;
     final content = Stack(

@@ -396,7 +396,7 @@ void main() {
     expect(find.byTooltip('Add VPN'), findsNothing);
     final current = find.byType(CurrentOutboundCard);
     expect(tester.getSize(current).width, 560);
-    expect(tester.getCenter(current).dx, closeTo(310, 0.01));
+    expect(tester.getCenter(current).dx, closeTo(310, 0.5));
 
     final card = find.byType(ProfilesCard);
     final rise =

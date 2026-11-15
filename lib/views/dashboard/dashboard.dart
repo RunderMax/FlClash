@@ -11,6 +11,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/widgets.dart';
 
 import 'edit.dart';
+import 'fold.dart';
 import 'layout.dart';
 import 'style.dart';
 import 'widget_registry.dart';
@@ -35,10 +36,21 @@ class DashboardView extends ConsumerStatefulWidget {
 
 class _DashboardViewState extends ConsumerState<DashboardView> {
   var _editing = false;
+  var _unfolding = false;
   final _cardKeys = <DashboardWidget, GlobalKey>{};
 
+  /// Leaving edit mode opens the folded cards once; a later mount of the list
+  /// shows them open at once.
   void _setEditing(bool editing) {
-    setState(() => _editing = editing);
+    setState(() {
+      _unfolding = _editing && !editing;
+      _editing = editing;
+    });
+    if (_unfolding) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) setState(() => _unfolding = false);
+      });
+    }
   }
 
   GlobalKey _cardKeyOf(DashboardWidget widget) =>
@@ -100,6 +112,7 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
                     platform: platform,
                     gap: gap,
                     editing: editing,
+                    unfolding: _unfolding,
                     cardKeyOf: _cardKeyOf,
                     onDone: () => _setEditing(false),
                   ),
@@ -296,6 +309,7 @@ class _MobileDashboard extends ConsumerWidget {
     required this.platform,
     required this.gap,
     required this.editing,
+    required this.unfolding,
     required this.cardKeyOf,
     required this.onDone,
   });
@@ -303,6 +317,7 @@ class _MobileDashboard extends ConsumerWidget {
   final SupportPlatform platform;
   final double gap;
   final bool editing;
+  final bool unfolding;
   final GlobalKey Function(DashboardWidget widget) cardKeyOf;
   final VoidCallback onDone;
 
@@ -349,9 +364,13 @@ class _MobileDashboard extends ConsumerWidget {
                       spacing: gap,
                       children: [
                         for (final widget in widgets)
-                          RepaintBoundary(
-                            key: cardKeyOf(widget),
-                            child: widget.card,
+                          DashboardFold(
+                            folded: false,
+                            animateIn: unfolding,
+                            child: RepaintBoundary(
+                              key: cardKeyOf(widget),
+                              child: widget.card,
+                            ),
                           ),
                       ],
                     ),
