@@ -5,6 +5,7 @@ import 'package:fl_clash/features/ip_quality/labels.dart';
 import 'package:fl_clash/models/models.dart';
 import 'package:fl_clash/providers/ip_quality.dart';
 import 'package:fl_clash/providers/outbound_ip.dart';
+import 'package:fl_clash/providers/pick_routes.dart';
 import 'package:fl_clash/providers/providers.dart';
 import 'package:fl_clash/ui/icons/icons.dart';
 import 'package:fl_clash/views/dashboard/layout.dart';
@@ -42,6 +43,34 @@ Group? _hostGroup(List<Group> groups) => groups.firstWhereOrNull(
       group.type == GroupType.Selector &&
       group.all.any((proxy) => proxy.name == slothPicksGroup),
 );
+
+/// The nodes traffic goes through now: what each group recent traffic entered
+/// has chosen at present, so a switch shows at once, and nodes rules name
+/// themselves. With no traffic seen yet, the group the picks are offered in
+/// stands for it.
+Set<String> _inUse(
+  List<Group> groups,
+  Map<String, String> selectedMap,
+  PickRoutes routes,
+  String? host,
+) {
+  final starts = {
+    for (final name in routes.groups)
+      if (groups.getGroup(name) != null) name,
+  };
+  if (starts.isEmpty && routes.nodes.isEmpty && host != null) {
+    starts.add(host);
+  }
+  return {
+    ...routes.nodes,
+    for (final group in starts)
+      computeRealSelectedProxyState(
+        group,
+        groups: groups,
+        selectedMap: selectedMap,
+      ).proxyName,
+  };
+}
 
 typedef _Pick = ({String name, int? delay, IpInfo? ip, IpQuality? quality});
 
@@ -190,14 +219,13 @@ class _FastestNodesCardState extends ConsumerState<FastestNodesCard> {
     final sort = ref.watch(
       appSettingProvider.select((state) => state.pickSort),
     );
-    final host = ref.watch(
-      groupsProvider.select((groups) => _hostGroup(groups)?.name),
+    final groups = ref.watch(groupsProvider);
+    final inUse = _inUse(
+      groups,
+      ref.watch(selectedMapProvider),
+      ref.watch(pickRoutesStateProvider),
+      _hostGroup(groups)?.name,
     );
-    // Followed through every group, so a pick chosen in the proxies page
-    // counts as well as one chosen here.
-    final current = host == null
-        ? null
-        : ref.watch(realSelectedProxyStateProvider(host)).proxyName;
     _watchPicks(names);
     final picks = _sorted([for (final name in names) _pickOf(name)], sort);
     return DashboardCard(
@@ -269,8 +297,7 @@ class _FastestNodesCardState extends ConsumerState<FastestNodesCard> {
             for (final pick in picks) ...[
               _PickTile(
                 pick: pick,
-                number: names.indexOf(pick.name) + 1,
-                selected: pick.name == current,
+                selected: inUse.contains(pick.name),
                 onTap: () => _select(pick.name),
               ),
               const SizedBox(height: 6),
@@ -310,15 +337,11 @@ class _FastestNodesCardState extends ConsumerState<FastestNodesCard> {
 class _PickTile extends StatelessWidget {
   const _PickTile({
     required this.pick,
-    required this.number,
     required this.selected,
     required this.onTap,
   });
 
   final _Pick pick;
-
-  /// The pick's place in the custom order, worn on its mark.
-  final int number;
   final bool selected;
   final VoidCallback onTap;
 
@@ -357,39 +380,29 @@ class _PickTile extends StatelessWidget {
       ),
       child: DashboardBlock(
         radius: AppCorner.md,
-        padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
+        padding: const EdgeInsets.fromLTRB(14, 10, 12, 10),
         onTap: onTap,
         semanticLabel: selected
             ? '${pick.name} ${appLocalizations.pickInUse}'
             : pick.name,
         child: Row(
-          spacing: 10,
           children: [
-            AnimatedSwitcher(
+            AnimatedSize(
               duration: duration,
-              transitionBuilder: (child, animation) =>
-                  ScaleTransition(scale: animation, child: child),
-              child: selected
-                  ? const SelectionBadge(key: ValueKey(true), size: _mark)
-                  : SizedBox.square(
-                      key: const ValueKey(false),
-                      dimension: _mark,
-                      child: DecoratedBox(
-                        decoration: ShapeDecoration(
-                          shape: AppShape.circle,
-                          color: DashboardColors.of(context).card,
-                        ),
-                        child: Center(
-                          child: Text(
-                            '$number',
-                            style: AppTextStyle.caption1
-                                .of(context, emphasized: true)
-                                .toTabular
-                                .copyWith(color: colorScheme.onSurfaceVariant),
-                          ),
-                        ),
-                      ),
-                    ),
+              curve: Curves.easeOutCubic,
+              alignment: AlignmentDirectional.centerStart,
+              child: AnimatedSwitcher(
+                duration: duration,
+                transitionBuilder: (child, animation) =>
+                    ScaleTransition(scale: animation, child: child),
+                child: selected
+                    ? const Padding(
+                        key: ValueKey(true),
+                        padding: EdgeInsetsDirectional.only(end: 10),
+                        child: SelectionBadge(size: _mark),
+                      )
+                    : const SizedBox.shrink(key: ValueKey(false)),
+              ),
             ),
             Expanded(
               child: Column(
@@ -435,6 +448,7 @@ class _PickTile extends StatelessWidget {
                 ],
               ),
             ),
+            const SizedBox(width: 10),
             Text(
               switch (delay) {
                 null => '-',
