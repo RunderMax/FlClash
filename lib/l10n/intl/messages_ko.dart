@@ -359,11 +359,19 @@ class MessageLookup extends MessageLookupByLibrary {
     "binaryData": MessageLookupByLibrary.simpleMessage("바이너리 데이터"),
     "bind": MessageLookupByLibrary.simpleMessage("연결"),
     "blacklistMode": MessageLookupByLibrary.simpleMessage("블랙리스트 모드"),
+    "blockAds": MessageLookupByLibrary.simpleMessage("광고와 추적기 차단"),
+    "blockAdsDesc": MessageLookupByLibrary.simpleMessage(
+      "알려진 광고·추적 사이트를 거부합니다",
+    ),
     "blockBypass": MessageLookupByLibrary.simpleMessage("앱의 VPN 우회 차단"),
     "blockBypassDesc": MessageLookupByLibrary.simpleMessage(
       "앱이 스스로 프록시를 벗어날 수 없습니다",
     ),
     "blockQuic": MessageLookupByLibrary.simpleMessage("QUIC 차단"),
+    "blockQuicStun": MessageLookupByLibrary.simpleMessage("QUIC와 STUN 차단"),
+    "blockQuicStunDesc": MessageLookupByLibrary.simpleMessage(
+      "프록시가 알아볼 수 있는 연결로 바뀝니다. 일부 영상 통화가 안 될 수 있습니다",
+    ),
     "bodyRewrite": MessageLookupByLibrary.simpleMessage("본문 재작성"),
     "brightness": MessageLookupByLibrary.simpleMessage("밝기"),
     "bypassDomain": MessageLookupByLibrary.simpleMessage("우회 도메인"),

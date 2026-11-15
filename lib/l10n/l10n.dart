@@ -9384,6 +9384,46 @@ class AppLocalizations {
       args: [],
     );
   }
+
+  /// `Block QUIC and STUN`
+  String get blockQuicStun {
+    return Intl.message(
+      'Block QUIC and STUN',
+      name: 'blockQuicStun',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Pages fall back to connections the proxy can see; a few video calls may fail`
+  String get blockQuicStunDesc {
+    return Intl.message(
+      'Pages fall back to connections the proxy can see; a few video calls may fail',
+      name: 'blockQuicStunDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Block ads and trackers`
+  String get blockAds {
+    return Intl.message(
+      'Block ads and trackers',
+      name: 'blockAds',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Refuses known ad and tracking sites`
+  String get blockAdsDesc {
+    return Intl.message(
+      'Refuses known ad and tracking sites',
+      name: 'blockAdsDesc',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<AppLocalizations> {

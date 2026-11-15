@@ -423,6 +423,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "binaryData": MessageLookupByLibrary.simpleMessage("Binary data"),
     "bind": MessageLookupByLibrary.simpleMessage("Bind"),
     "blacklistMode": MessageLookupByLibrary.simpleMessage("Blacklist mode"),
+    "blockAds": MessageLookupByLibrary.simpleMessage("Block ads and trackers"),
+    "blockAdsDesc": MessageLookupByLibrary.simpleMessage(
+      "Refuses known ad and tracking sites",
+    ),
     "blockBypass": MessageLookupByLibrary.simpleMessage(
       "Stop apps bypassing the VPN",
     ),
@@ -430,6 +434,12 @@ class MessageLookup extends MessageLookupByLibrary {
       "Apps cannot opt out of the proxy on their own",
     ),
     "blockQuic": MessageLookupByLibrary.simpleMessage("Block QUIC"),
+    "blockQuicStun": MessageLookupByLibrary.simpleMessage(
+      "Block QUIC and STUN",
+    ),
+    "blockQuicStunDesc": MessageLookupByLibrary.simpleMessage(
+      "Pages fall back to connections the proxy can see; a few video calls may fail",
+    ),
     "bodyRewrite": MessageLookupByLibrary.simpleMessage("Body rewrite"),
     "brightness": MessageLookupByLibrary.simpleMessage("Brightness"),
     "bypassDomain": MessageLookupByLibrary.simpleMessage("Bypass domains"),

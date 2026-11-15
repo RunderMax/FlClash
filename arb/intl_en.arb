@@ -1116,5 +1116,9 @@
   "blockBypass": "Stop apps bypassing the VPN",
   "blockBypassDesc": "Apps cannot opt out of the proxy on their own",
   "killSwitch": "Kill switch",
-  "killSwitchDesc": "In system settings, turn on Always-on VPN and Block connections without VPN"
+  "killSwitchDesc": "In system settings, turn on Always-on VPN and Block connections without VPN",
+  "blockQuicStun": "Block QUIC and STUN",
+  "blockQuicStunDesc": "Pages fall back to connections the proxy can see; a few video calls may fail",
+  "blockAds": "Block ads and trackers",
+  "blockAdsDesc": "Refuses known ad and tracking sites"
 }

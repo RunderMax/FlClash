@@ -363,11 +363,17 @@ class MessageLookup extends MessageLookupByLibrary {
     "binaryData": MessageLookupByLibrary.simpleMessage("バイナリデータ"),
     "bind": MessageLookupByLibrary.simpleMessage("連携"),
     "blacklistMode": MessageLookupByLibrary.simpleMessage("ブラックリストモード"),
+    "blockAds": MessageLookupByLibrary.simpleMessage("広告とトラッカーをブロック"),
+    "blockAdsDesc": MessageLookupByLibrary.simpleMessage("既知の広告・追跡サイトを拒否します"),
     "blockBypass": MessageLookupByLibrary.simpleMessage("アプリの VPN 回避を禁止"),
     "blockBypassDesc": MessageLookupByLibrary.simpleMessage(
       "アプリが自分でプロキシを外れることはできません",
     ),
     "blockQuic": MessageLookupByLibrary.simpleMessage("QUIC をブロック"),
+    "blockQuicStun": MessageLookupByLibrary.simpleMessage("QUIC と STUN をブロック"),
+    "blockQuicStunDesc": MessageLookupByLibrary.simpleMessage(
+      "プロキシが判別できる接続に切り替えます。一部のビデオ通話がつながらない場合があります",
+    ),
     "bodyRewrite": MessageLookupByLibrary.simpleMessage("ボディ書き換え"),
     "brightness": MessageLookupByLibrary.simpleMessage("明度"),
     "bypassDomain": MessageLookupByLibrary.simpleMessage("除外ドメイン"),

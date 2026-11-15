@@ -349,11 +349,17 @@ class MessageLookup extends MessageLookupByLibrary {
     "binaryData": MessageLookupByLibrary.simpleMessage("二进制数据"),
     "bind": MessageLookupByLibrary.simpleMessage("绑定"),
     "blacklistMode": MessageLookupByLibrary.simpleMessage("黑名单模式"),
+    "blockAds": MessageLookupByLibrary.simpleMessage("拦截广告和追踪器"),
+    "blockAdsDesc": MessageLookupByLibrary.simpleMessage("直接拒绝已知的广告和追踪网站"),
     "blockBypass": MessageLookupByLibrary.simpleMessage("禁止 app 绕过 VPN"),
     "blockBypassDesc": MessageLookupByLibrary.simpleMessage(
       "手机上的 app 不能自己选择不走代理",
     ),
     "blockQuic": MessageLookupByLibrary.simpleMessage("阻止 QUIC"),
+    "blockQuicStun": MessageLookupByLibrary.simpleMessage("挡掉 QUIC 和 STUN"),
+    "blockQuicStunDesc": MessageLookupByLibrary.simpleMessage(
+      "网页改走代理认得出的方式；极少数视频通话可能连不上",
+    ),
     "bodyRewrite": MessageLookupByLibrary.simpleMessage("Body 重写"),
     "brightness": MessageLookupByLibrary.simpleMessage("亮度"),
     "bypassDomain": MessageLookupByLibrary.simpleMessage("排除域名"),

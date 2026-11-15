@@ -1116,5 +1116,9 @@
   "blockBypass": "Impedir que las apps eviten la VPN",
   "blockBypassDesc": "Las apps no pueden salirse del proxy por su cuenta",
   "killSwitch": "Interruptor de seguridad",
-  "killSwitchDesc": "En los ajustes, activa «VPN siempre activada» y «Bloquear conexiones sin VPN»"
+  "killSwitchDesc": "En los ajustes, activa «VPN siempre activada» y «Bloquear conexiones sin VPN»",
+  "blockQuicStun": "Bloquear QUIC y STUN",
+  "blockQuicStunDesc": "Las páginas usan conexiones que el proxy reconoce; algunas videollamadas pueden fallar",
+  "blockAds": "Bloquear anuncios y rastreadores",
+  "blockAdsDesc": "Rechaza sitios conocidos de anuncios y rastreo"
 }

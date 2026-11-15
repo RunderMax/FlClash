@@ -1116,5 +1116,9 @@
   "blockBypass": "Empêcher le contournement du VPN",
   "blockBypassDesc": "Les apps ne peuvent pas quitter le proxy d’elles-mêmes",
   "killSwitch": "Coupe-circuit",
-  "killSwitchDesc": "Dans les réglages, activez « VPN permanent » et « Bloquer les connexions sans VPN »"
+  "killSwitchDesc": "Dans les réglages, activez « VPN permanent » et « Bloquer les connexions sans VPN »",
+  "blockQuicStun": "Bloquer QUIC et STUN",
+  "blockQuicStunDesc": "Les pages passent par des connexions que le proxy reconnaît ; quelques appels vidéo peuvent échouer",
+  "blockAds": "Bloquer pubs et traqueurs",
+  "blockAdsDesc": "Refuse les sites connus de pub et de pistage"
 }

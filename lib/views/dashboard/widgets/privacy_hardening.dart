@@ -25,6 +25,18 @@ class PrivacyHardeningCard extends ConsumerWidget {
     void setBlockBypass(bool block) => ref
         .read(vpnSettingProvider.notifier)
         .update((state) => state.copyWith(allowBypass: !block));
+    final (:blockQuic, :blockAds) = ref.watch(
+      patchClashConfigProvider.select(
+        (state) =>
+            (blockQuic: state.slothBlockQuic, blockAds: state.slothBlockAds),
+      ),
+    );
+    void setBlockQuic(bool value) => ref
+        .read(patchClashConfigProvider.notifier)
+        .update((state) => state.copyWith(slothBlockQuic: value));
+    void setBlockAds(bool value) => ref
+        .read(patchClashConfigProvider.notifier)
+        .update((state) => state.copyWith(slothBlockAds: value));
     final plugin = app;
     return DashboardCard(
       semanticLabel: appLocalizations.privacyHardening,
@@ -48,6 +60,28 @@ class PrivacyHardeningCard extends ConsumerWidget {
             radius: AppCorner.md,
             onTap: () => setBlockBypass(allowBypass),
             onChanged: setBlockBypass,
+          ),
+          DashboardSwitchRow(
+            glyph: AppGlyphs.block,
+            title: appLocalizations.blockQuicStun,
+            subtitle: appLocalizations.blockQuicStunDesc,
+            value: blockQuic,
+            iconSize: _rowIcon,
+            padding: _rowPadding,
+            radius: AppCorner.md,
+            onTap: () => setBlockQuic(!blockQuic),
+            onChanged: setBlockQuic,
+          ),
+          DashboardSwitchRow(
+            glyph: AppGlyphs.eyeOff,
+            title: appLocalizations.blockAds,
+            subtitle: appLocalizations.blockAdsDesc,
+            value: blockAds,
+            iconSize: _rowIcon,
+            padding: _rowPadding,
+            radius: AppCorner.md,
+            onTap: () => setBlockAds(!blockAds),
+            onChanged: setBlockAds,
           ),
           if (plugin != null)
             _LinkRow(

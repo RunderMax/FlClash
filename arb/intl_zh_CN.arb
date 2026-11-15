@@ -1116,5 +1116,9 @@
   "blockBypass": "禁止 app 绕过 VPN",
   "blockBypassDesc": "手机上的 app 不能自己选择不走代理",
   "killSwitch": "断网保护",
-  "killSwitchDesc": "到系统设置里打开「始终开启的 VPN」和「屏蔽未使用 VPN 的连接」"
+  "killSwitchDesc": "到系统设置里打开「始终开启的 VPN」和「屏蔽未使用 VPN 的连接」",
+  "blockQuicStun": "挡掉 QUIC 和 STUN",
+  "blockQuicStunDesc": "网页改走代理认得出的方式；极少数视频通话可能连不上",
+  "blockAds": "拦截广告和追踪器",
+  "blockAdsDesc": "直接拒绝已知的广告和追踪网站"
 }

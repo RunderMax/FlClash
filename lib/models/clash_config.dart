@@ -2196,6 +2196,8 @@ abstract class PatchClashConfig with _$PatchClashConfig {
     @Default(defaultMitm) Mitm mitm,
     @Default([]) @JsonKey(name: 'sloth-picks') List<String> slothPicks,
     @Default(true) @JsonKey(name: 'sloth-pick-record') bool slothPickRecord,
+    @Default(false) @JsonKey(name: 'sloth-block-quic') bool slothBlockQuic,
+    @Default(false) @JsonKey(name: 'sloth-block-ads') bool slothBlockAds,
   }) = _PatchClashConfig;
 
   factory PatchClashConfig.fromJson(Map<String, Object?> json) =>

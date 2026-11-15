@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:fl_clash/common/common.dart';
+import 'package:fl_clash/common/hardening.dart';
 import 'package:fl_clash/common/mitm_module.dart';
 import 'package:fl_clash/common/pick_history.dart';
 import 'package:fl_clash/enum/enum.dart';
@@ -390,7 +391,11 @@ Future<RealProfile> _makeRealProfileTask(MakeRealProfileState data) async {
         .map((item) => item.definition)
         .toList();
   }
-  rawConfig['rules'] = [...mitm.rules, ...rules];
+  rawConfig['rules'] = [
+    ...mitm.rules,
+    ...hardeningRules(realPatchConfig),
+    ...rules,
+  ];
   final yaml = await _encodeYaml(Map<String, dynamic>.from(rawConfig));
   return (yaml: yaml, md5: yaml.toMd5(), counts: configCountsOf(rawConfig));
 }

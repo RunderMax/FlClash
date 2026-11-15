@@ -1116,5 +1116,9 @@
   "blockBypass": "アプリの VPN 回避を禁止",
   "blockBypassDesc": "アプリが自分でプロキシを外れることはできません",
   "killSwitch": "キルスイッチ",
-  "killSwitchDesc": "システム設定で「常時接続 VPN」と「VPN 以外の接続をブロック」をオン"
+  "killSwitchDesc": "システム設定で「常時接続 VPN」と「VPN 以外の接続をブロック」をオン",
+  "blockQuicStun": "QUIC と STUN をブロック",
+  "blockQuicStunDesc": "プロキシが判別できる接続に切り替えます。一部のビデオ通話がつながらない場合があります",
+  "blockAds": "広告とトラッカーをブロック",
+  "blockAdsDesc": "既知の広告・追跡サイトを拒否します"
 }

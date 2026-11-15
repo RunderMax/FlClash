@@ -441,11 +441,23 @@ class MessageLookup extends MessageLookupByLibrary {
     "blacklistMode": MessageLookupByLibrary.simpleMessage(
       "Режим чёрного списка",
     ),
+    "blockAds": MessageLookupByLibrary.simpleMessage(
+      "Блокировать рекламу и трекеры",
+    ),
+    "blockAdsDesc": MessageLookupByLibrary.simpleMessage(
+      "Отклоняет известные рекламные и следящие сайты",
+    ),
     "blockBypass": MessageLookupByLibrary.simpleMessage("Запретить обход VPN"),
     "blockBypassDesc": MessageLookupByLibrary.simpleMessage(
       "Приложения не могут сами выйти из-под прокси",
     ),
     "blockQuic": MessageLookupByLibrary.simpleMessage("Блокировать QUIC"),
+    "blockQuicStun": MessageLookupByLibrary.simpleMessage(
+      "Блокировать QUIC и STUN",
+    ),
+    "blockQuicStunDesc": MessageLookupByLibrary.simpleMessage(
+      "Страницы переходят на соединения, понятные прокси; некоторые видеозвонки могут не работать",
+    ),
     "bodyRewrite": MessageLookupByLibrary.simpleMessage("Перезапись тела"),
     "brightness": MessageLookupByLibrary.simpleMessage("Яркость"),
     "bypassDomain": MessageLookupByLibrary.simpleMessage("Исключённые домены"),

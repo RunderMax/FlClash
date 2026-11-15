@@ -454,6 +454,12 @@ class MessageLookup extends MessageLookupByLibrary {
     "binaryData": MessageLookupByLibrary.simpleMessage("Datos binarios"),
     "bind": MessageLookupByLibrary.simpleMessage("Vincular"),
     "blacklistMode": MessageLookupByLibrary.simpleMessage("Modo lista negra"),
+    "blockAds": MessageLookupByLibrary.simpleMessage(
+      "Bloquear anuncios y rastreadores",
+    ),
+    "blockAdsDesc": MessageLookupByLibrary.simpleMessage(
+      "Rechaza sitios conocidos de anuncios y rastreo",
+    ),
     "blockBypass": MessageLookupByLibrary.simpleMessage(
       "Impedir que las apps eviten la VPN",
     ),
@@ -461,6 +467,12 @@ class MessageLookup extends MessageLookupByLibrary {
       "Las apps no pueden salirse del proxy por su cuenta",
     ),
     "blockQuic": MessageLookupByLibrary.simpleMessage("Bloquear QUIC"),
+    "blockQuicStun": MessageLookupByLibrary.simpleMessage(
+      "Bloquear QUIC y STUN",
+    ),
+    "blockQuicStunDesc": MessageLookupByLibrary.simpleMessage(
+      "Las páginas usan conexiones que el proxy reconoce; algunas videollamadas pueden fallar",
+    ),
     "bodyRewrite": MessageLookupByLibrary.simpleMessage(
       "Reescritura del cuerpo",
     ),
