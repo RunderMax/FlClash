@@ -137,6 +137,16 @@ final List<DashboardWidget> platformDefaultDashboardWidgets = system.isAndroid
       ]
     : defaultDashboardWidgets;
 
+/// The phone layout before the privacy check card, saved on first launch, so
+/// an untouched one would never show the cards added since.
+const _previousAndroidDefaultDashboardWidgets = {
+  'currentOutbound',
+  'networkSpeed',
+  'outboundMode',
+  'profiles',
+  'proxyGroups',
+};
+
 const _legacyDefaultDashboardWidgets = {
   'networkSpeed',
   'systemProxyButton',
@@ -174,6 +184,13 @@ List<DashboardWidget> dashboardWidgetsFromJson(
     return platformDefaultDashboardWidgets;
   }
   final byName = DashboardWidget.values.asNameMap();
+  if (dashboardWidgets.length ==
+          _previousAndroidDefaultDashboardWidgets.length &&
+      dashboardWidgets.toSet().containsAll(
+        _previousAndroidDefaultDashboardWidgets,
+      )) {
+    return platformDefaultDashboardWidgets;
+  }
   if (dashboardWidgets.contains(DashboardWidget.currentOutbound.name)) {
     return dashboardWidgets
         .map((e) => _legacyDashboardWidgets[e] ?? byName[e])
