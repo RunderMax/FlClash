@@ -7663,8 +7663,7 @@ class AppLocalizations {
   String customImportDroppedSubRules(num count, Object label) {
     return Intl.plural(
       count,
-      one:
-          '1 SUB-RULE rule was dropped, since custom profiles do not support sub-rules',
+      one: '1 SUB-RULE rule was dropped, since custom profiles do not support sub-rules',
       other:
           '$label SUB-RULE rules were dropped, since custom profiles do not support sub-rules',
       name: 'customImportDroppedSubRules',
@@ -9468,6 +9467,91 @@ class AppLocalizations {
   /// `In use`
   String get pickInUse {
     return Intl.message('In use', name: 'pickInUse', desc: '', args: []);
+  }
+
+  /// `App routes`
+  String get appRoutes {
+    return Intl.message('App routes', name: 'appRoutes', desc: '', args: []);
+  }
+
+  /// `Send an app through a node of its own, like YouTube through Japan`
+  String get appRoutesIdle {
+    return Intl.message(
+      'Send an app through a node of its own, like YouTube through Japan',
+      name: 'appRoutesIdle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Choose apps`
+  String get appRoutesChoose {
+    return Intl.message(
+      'Choose apps',
+      name: 'appRoutesChoose',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Follow the rules`
+  String get appRouteFollow {
+    return Intl.message(
+      'Follow the rules',
+      name: 'appRouteFollow',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Goes where the profile's rules send it`
+  String get appRouteFollowDesc {
+    return Intl.message(
+      'Goes where the profile\'s rules send it',
+      name: 'appRouteFollowDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Skips the proxy and uses the phone's own network`
+  String get appRouteDirectDesc {
+    return Intl.message(
+      'Skips the proxy and uses the phone\'s own network',
+      name: 'appRouteDirectDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `No network`
+  String get appRouteBlock {
+    return Intl.message(
+      'No network',
+      name: 'appRouteBlock',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `The app cannot go online while the VPN is on`
+  String get appRouteBlockDesc {
+    return Intl.message(
+      'The app cannot go online while the VPN is on',
+      name: 'appRouteBlockDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `No longer in the profile`
+  String get appRouteMissing {
+    return Intl.message(
+      'No longer in the profile',
+      name: 'appRouteMissing',
+      desc: '',
+      args: [],
+    );
   }
 }
 

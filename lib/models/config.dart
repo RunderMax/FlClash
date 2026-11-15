@@ -135,6 +135,7 @@ final List<DashboardWidget> platformDefaultDashboardWidgets = system.isAndroid
         DashboardWidget.privacyCheck,
         DashboardWidget.privacyHardening,
         DashboardWidget.fastestNodes,
+        DashboardWidget.appRoutes,
         DashboardWidget.profiles,
         DashboardWidget.proxyGroups,
       ]

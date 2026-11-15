@@ -377,6 +377,27 @@ class MessageLookup extends MessageLookupByLibrary {
     "appProxiesEmpty": MessageLookupByLibrary.simpleMessage(
       "Нет локальных прокси",
     ),
+    "appRouteBlock": MessageLookupByLibrary.simpleMessage("Без сети"),
+    "appRouteBlockDesc": MessageLookupByLibrary.simpleMessage(
+      "Пока VPN включён, приложение не выйдет в сеть",
+    ),
+    "appRouteDirectDesc": MessageLookupByLibrary.simpleMessage(
+      "В обход прокси, через сеть телефона",
+    ),
+    "appRouteFollow": MessageLookupByLibrary.simpleMessage("По правилам"),
+    "appRouteFollowDesc": MessageLookupByLibrary.simpleMessage(
+      "Как велят правила профиля",
+    ),
+    "appRouteMissing": MessageLookupByLibrary.simpleMessage(
+      "Больше нет в профиле",
+    ),
+    "appRoutes": MessageLookupByLibrary.simpleMessage("Маршруты приложений"),
+    "appRoutesChoose": MessageLookupByLibrary.simpleMessage(
+      "Выбрать приложения",
+    ),
+    "appRoutesIdle": MessageLookupByLibrary.simpleMessage(
+      "Пустите приложение через свой узел, например YouTube через Японию",
+    ),
     "appendSystemDns": MessageLookupByLibrary.simpleMessage(
       "Добавлять системный DNS",
     ),
@@ -1140,9 +1161,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "installCertificateSuccess": MessageLookupByLibrary.simpleMessage(
       "Сертификат установлен",
     ),
-    "installedAppsPermissionDeniedMessage": MessageLookupByLibrary.simpleMessage(
-      "Разрешение на список приложений отклонено, поэтому установленные приложения недоступны. Предоставьте его вручную в системных настройках.",
-    ),
+    "installedAppsPermissionDeniedMessage":
+        MessageLookupByLibrary.simpleMessage(
+          "Разрешение на список приложений отклонено, поэтому установленные приложения недоступны. Предоставьте его вручную в системных настройках.",
+        ),
     "installedAppsPermissionDesc": MessageLookupByLibrary.simpleMessage(
       "Эта система не выдаёт список установленных приложений без разрешения. Предоставьте его, чтобы настроить прокси для отдельных приложений.",
     ),

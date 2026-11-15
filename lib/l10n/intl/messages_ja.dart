@@ -319,6 +319,23 @@ class MessageLookup extends MessageLookupByLibrary {
     "appAccessControl": MessageLookupByLibrary.simpleMessage("アプリアクセス制御"),
     "appIconDesign": MessageLookupByLibrary.simpleMessage("アプリアイコンのデザイン"),
     "appProxiesEmpty": MessageLookupByLibrary.simpleMessage("ローカルプロキシがありません"),
+    "appRouteBlock": MessageLookupByLibrary.simpleMessage("通信を禁止"),
+    "appRouteBlockDesc": MessageLookupByLibrary.simpleMessage(
+      "VPN がオンの間、このアプリは通信できません",
+    ),
+    "appRouteDirectDesc": MessageLookupByLibrary.simpleMessage(
+      "プロキシを通さず端末の回線で接続します",
+    ),
+    "appRouteFollow": MessageLookupByLibrary.simpleMessage("ルールに従う"),
+    "appRouteFollowDesc": MessageLookupByLibrary.simpleMessage(
+      "プロファイルのルール通りに通信します",
+    ),
+    "appRouteMissing": MessageLookupByLibrary.simpleMessage("プロファイルにもうありません"),
+    "appRoutes": MessageLookupByLibrary.simpleMessage("アプリ別ルート"),
+    "appRoutesChoose": MessageLookupByLibrary.simpleMessage("アプリを選ぶ"),
+    "appRoutesIdle": MessageLookupByLibrary.simpleMessage(
+      "アプリごとに通るノードを決められます。例：YouTube は日本経由",
+    ),
     "appendSystemDns": MessageLookupByLibrary.simpleMessage("システムDNSを追加"),
     "applied": MessageLookupByLibrary.simpleMessage("適用しました"),
     "applyNow": MessageLookupByLibrary.simpleMessage("今すぐ適用"),

@@ -184,6 +184,7 @@ const _$DashboardWidgetEnumMap = {
   DashboardWidget.privacyCheck: 'privacyCheck',
   DashboardWidget.privacyHardening: 'privacyHardening',
   DashboardWidget.fastestNodes: 'fastestNodes',
+  DashboardWidget.appRoutes: 'appRoutes',
   DashboardWidget.profiles: 'profiles',
   DashboardWidget.proxyGroups: 'proxyGroups',
   DashboardWidget.connectionStats: 'connectionStats',

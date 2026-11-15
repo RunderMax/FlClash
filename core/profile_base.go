@@ -156,6 +156,7 @@ func mergeProfileBase(base *SetupBase) (*yaml.Node, error) {
 	if err := applyFastestGroup(root); err != nil {
 		return nil, err
 	}
+	applyAppRoutes(root)
 	if retag {
 		retagShortIDs(root)
 	}

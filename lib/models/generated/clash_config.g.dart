@@ -948,6 +948,11 @@ _PatchClashConfig _$PatchClashConfigFromJson(Map<String, dynamic> json) =>
       slothPickRecord: json['sloth-pick-record'] as bool? ?? true,
       slothBlockQuic: json['sloth-block-quic'] as bool? ?? false,
       slothBlockAds: json['sloth-block-ads'] as bool? ?? false,
+      slothAppRoutes:
+          (json['sloth-app-routes'] as Map<String, dynamic>?)?.map(
+            (k, e) => MapEntry(k, e as String),
+          ) ??
+          const {},
     );
 
 Map<String, dynamic> _$PatchClashConfigToJson(_PatchClashConfig instance) =>
@@ -998,6 +1003,7 @@ Map<String, dynamic> _$PatchClashConfigToJson(_PatchClashConfig instance) =>
       'sloth-pick-record': instance.slothPickRecord,
       'sloth-block-quic': instance.slothBlockQuic,
       'sloth-block-ads': instance.slothBlockAds,
+      'sloth-app-routes': instance.slothAppRoutes,
     };
 
 const _$ModeEnumMap = {
@@ -1017,6 +1023,7 @@ const _$LogLevelEnumMap = {
 const _$FindProcessModeEnumMap = {
   FindProcessMode.always: 'always',
   FindProcessMode.off: 'off',
+  FindProcessMode.strict: 'strict',
 };
 
 const _$InterfaceNameModeEnumMap = {

@@ -319,6 +319,21 @@ class MessageLookup extends MessageLookupByLibrary {
     "appAccessControl": MessageLookupByLibrary.simpleMessage("앱 접근 제어"),
     "appIconDesign": MessageLookupByLibrary.simpleMessage("앱 아이콘 디자인"),
     "appProxiesEmpty": MessageLookupByLibrary.simpleMessage("로컬 프록시 없음"),
+    "appRouteBlock": MessageLookupByLibrary.simpleMessage("네트워크 차단"),
+    "appRouteBlockDesc": MessageLookupByLibrary.simpleMessage(
+      "VPN이 켜져 있는 동안 이 앱은 인터넷을 쓸 수 없어요",
+    ),
+    "appRouteDirectDesc": MessageLookupByLibrary.simpleMessage(
+      "프록시 없이 휴대폰 자체 네트워크로 연결해요",
+    ),
+    "appRouteFollow": MessageLookupByLibrary.simpleMessage("규칙 따르기"),
+    "appRouteFollowDesc": MessageLookupByLibrary.simpleMessage("프로필 규칙대로 연결해요"),
+    "appRouteMissing": MessageLookupByLibrary.simpleMessage("프로필에 더 이상 없어요"),
+    "appRoutes": MessageLookupByLibrary.simpleMessage("앱별 경로"),
+    "appRoutesChoose": MessageLookupByLibrary.simpleMessage("앱 선택"),
+    "appRoutesIdle": MessageLookupByLibrary.simpleMessage(
+      "앱마다 지나갈 노드를 정할 수 있어요. 예: YouTube는 일본으로",
+    ),
     "appendSystemDns": MessageLookupByLibrary.simpleMessage("시스템 DNS 추가"),
     "applied": MessageLookupByLibrary.simpleMessage("적용했습니다"),
     "applyNow": MessageLookupByLibrary.simpleMessage("지금 적용"),

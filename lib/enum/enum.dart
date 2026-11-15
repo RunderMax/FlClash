@@ -199,7 +199,7 @@ enum CoreEventType {
   dialerLoop,
 }
 
-enum FindProcessMode { always, off }
+enum FindProcessMode { always, off, strict }
 
 enum InterfaceNameMode { clear, follow, custom }
 
@@ -457,6 +457,7 @@ enum DashboardWidget {
   privacyCheck,
   privacyHardening,
   fastestNodes,
+  appRoutes(platforms: [SupportPlatform.Android]),
   profiles,
   proxyGroups,
   connectionStats,

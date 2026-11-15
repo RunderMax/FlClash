@@ -21,6 +21,7 @@ const packageName = 'com.follow.clash';
 /// The Core reads this overlay key and builds the picks group from it.
 const slothPicksKey = 'x-sloth-fastest';
 const slothPicksGroup = 'Sloth Pick';
+const slothAppRoutesKey = 'x-sloth-app-routes';
 final unixSocketPath = '/tmp/FlClashSocket_${Random().nextInt(10000)}.sock';
 final windowsPipeName = '\\\\.\\pipe\\FlClashCore_${_randomPipeId()}';
 const helperPort = 47890;

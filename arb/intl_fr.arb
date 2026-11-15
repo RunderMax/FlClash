@@ -1125,5 +1125,14 @@
   "secureWindowDesc": "L’app apparaît vide dans les récentes et les captures sont bloquées",
   "hidePort": "Masquer le port du proxy local",
   "hidePortDesc": "Les autres apps ne trouvent plus le proxy sur le port 7890",
-  "pickInUse": "Utilisé"
+  "pickInUse": "Utilisé",
+  "appRoutes": "Routes par app",
+  "appRoutesIdle": "Faites passer une app par son propre nœud, comme YouTube par le Japon",
+  "appRoutesChoose": "Choisir des apps",
+  "appRouteFollow": "Suivre les règles",
+  "appRouteFollowDesc": "Suit les règles du profil",
+  "appRouteDirectDesc": "Contourne le proxy et utilise le réseau du téléphone",
+  "appRouteBlock": "Pas de réseau",
+  "appRouteBlockDesc": "L'app ne peut pas se connecter tant que le VPN est actif",
+  "appRouteMissing": "N'est plus dans le profil"
 }

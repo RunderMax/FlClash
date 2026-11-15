@@ -1,6 +1,7 @@
 package com.follow.clash.packages
 
 import android.Manifest
+import android.content.Intent
 import android.content.pm.ApplicationInfo
 import android.content.pm.ComponentInfo
 import android.content.pm.PackageManager
@@ -50,6 +51,7 @@ internal class PackageResolver(
             @Suppress("DEPRECATION")
             packageManager.getInstalledPackages(flags)
         }
+        val launchable = launcherPackageNames()
         return packages.asSequence()
             .filter { info ->
                 info.packageName != appPackageName && info.packageName != ANDROID_PACKAGE_NAME
@@ -65,8 +67,22 @@ internal class PackageResolver(
                     internet = info.requestedPermissions
                         ?.contains(Manifest.permission.INTERNET) == true,
                     lastUpdateTime = info.lastUpdateTime,
+                    launchable = info.packageName in launchable,
                 )
             }.toList()
+    }
+
+    // Preinstalled apps such as YouTube carry FLAG_SYSTEM too; a launcher
+    // entry is what tells an app the user opens from a background service.
+    private fun launcherPackageNames(): Set<String> {
+        val intent = Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LAUNCHER)
+        val activities = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            packageManager.queryIntentActivities(intent, PackageManager.ResolveInfoFlags.of(0L))
+        } else {
+            @Suppress("DEPRECATION")
+            packageManager.queryIntentActivities(intent, 0)
+        }
+        return activities.mapNotNullTo(HashSet()) { it.activityInfo?.packageName }
     }
 
     private fun isChinaPackage(packageName: String): Boolean {

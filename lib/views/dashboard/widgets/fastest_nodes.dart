@@ -26,7 +26,8 @@ const _builtInTypes = {
   'Dns',
 };
 
-List<String> _candidates(List<Group> groups) {
+/// The nodes of the profile, leaving out its groups and the built-in outbounds.
+List<String> nodeNamesOf(List<Group> groups) {
   final groupNames = {for (final group in groups) group.name};
   return {
     for (final group in groups)
@@ -187,7 +188,7 @@ class _FastestNodesCardState extends ConsumerState<FastestNodesCard> {
     showSheet<void>(
       context: context,
       builder: (_) => _PicksSheet(
-        candidates: _candidates(ref.read(groupsProvider)),
+        candidates: nodeNamesOf(ref.read(groupsProvider)),
         picks: ref.read(patchClashConfigProvider).slothPicks,
         onConfirm: (picks) => ref
             .read(patchClashConfigProvider.notifier)

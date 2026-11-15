@@ -1125,5 +1125,14 @@
   "secureWindowDesc": "The app shows blank in recents, and screenshots are blocked",
   "hidePort": "Hide the local proxy port",
   "hidePortDesc": "Other apps can no longer find the proxy on port 7890",
-  "pickInUse": "In use"
+  "pickInUse": "In use",
+  "appRoutes": "App routes",
+  "appRoutesIdle": "Send an app through a node of its own, like YouTube through Japan",
+  "appRoutesChoose": "Choose apps",
+  "appRouteFollow": "Follow the rules",
+  "appRouteFollowDesc": "Goes where the profile's rules send it",
+  "appRouteDirectDesc": "Skips the proxy and uses the phone's own network",
+  "appRouteBlock": "No network",
+  "appRouteBlockDesc": "The app cannot go online while the VPN is on",
+  "appRouteMissing": "No longer in the profile"
 }

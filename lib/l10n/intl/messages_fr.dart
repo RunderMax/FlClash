@@ -388,6 +388,25 @@ class MessageLookup extends MessageLookupByLibrary {
     "appProxiesEmpty": MessageLookupByLibrary.simpleMessage(
       "Aucun proxy local",
     ),
+    "appRouteBlock": MessageLookupByLibrary.simpleMessage("Pas de réseau"),
+    "appRouteBlockDesc": MessageLookupByLibrary.simpleMessage(
+      "L\'app ne peut pas se connecter tant que le VPN est actif",
+    ),
+    "appRouteDirectDesc": MessageLookupByLibrary.simpleMessage(
+      "Contourne le proxy et utilise le réseau du téléphone",
+    ),
+    "appRouteFollow": MessageLookupByLibrary.simpleMessage("Suivre les règles"),
+    "appRouteFollowDesc": MessageLookupByLibrary.simpleMessage(
+      "Suit les règles du profil",
+    ),
+    "appRouteMissing": MessageLookupByLibrary.simpleMessage(
+      "N\'est plus dans le profil",
+    ),
+    "appRoutes": MessageLookupByLibrary.simpleMessage("Routes par app"),
+    "appRoutesChoose": MessageLookupByLibrary.simpleMessage("Choisir des apps"),
+    "appRoutesIdle": MessageLookupByLibrary.simpleMessage(
+      "Faites passer une app par son propre nœud, comme YouTube par le Japon",
+    ),
     "appendSystemDns": MessageLookupByLibrary.simpleMessage(
       "Ajouter le DNS du système",
     ),
@@ -1175,9 +1194,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "installCertificateSuccess": MessageLookupByLibrary.simpleMessage(
       "Certificat installé",
     ),
-    "installedAppsPermissionDeniedMessage": MessageLookupByLibrary.simpleMessage(
-      "L’autorisation de la liste des apps a été refusée ; les apps installées ne peuvent donc pas être listées. Veuillez l’accorder manuellement dans les réglages du système.",
-    ),
+    "installedAppsPermissionDeniedMessage":
+        MessageLookupByLibrary.simpleMessage(
+          "L’autorisation de la liste des apps a été refusée ; les apps installées ne peuvent donc pas être listées. Veuillez l’accorder manuellement dans les réglages du système.",
+        ),
     "installedAppsPermissionDesc": MessageLookupByLibrary.simpleMessage(
       "Ce système masque la liste des apps installées tant que l’autorisation n’est pas accordée. Accordez-la pour configurer le proxy par app.",
     ),

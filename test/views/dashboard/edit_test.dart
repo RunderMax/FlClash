@@ -223,6 +223,7 @@ void main() {
       DashboardWidget.serviceStatus,
       DashboardWidget.fastestNodes,
       DashboardWidget.privacyHardening,
+      DashboardWidget.appRoutes,
     ]);
     await pumpEditor(tester, size: const Size(412, 700));
     final position = positionOf(tester);

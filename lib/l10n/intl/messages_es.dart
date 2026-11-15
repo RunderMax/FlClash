@@ -386,6 +386,25 @@ class MessageLookup extends MessageLookupByLibrary {
     "appProxiesEmpty": MessageLookupByLibrary.simpleMessage(
       "No hay proxies locales",
     ),
+    "appRouteBlock": MessageLookupByLibrary.simpleMessage("Sin red"),
+    "appRouteBlockDesc": MessageLookupByLibrary.simpleMessage(
+      "La app no puede conectarse mientras la VPN esté activa",
+    ),
+    "appRouteDirectDesc": MessageLookupByLibrary.simpleMessage(
+      "Evita el proxy y usa la red del teléfono",
+    ),
+    "appRouteFollow": MessageLookupByLibrary.simpleMessage("Seguir las reglas"),
+    "appRouteFollowDesc": MessageLookupByLibrary.simpleMessage(
+      "Sigue las reglas del perfil",
+    ),
+    "appRouteMissing": MessageLookupByLibrary.simpleMessage(
+      "Ya no está en el perfil",
+    ),
+    "appRoutes": MessageLookupByLibrary.simpleMessage("Rutas por app"),
+    "appRoutesChoose": MessageLookupByLibrary.simpleMessage("Elegir apps"),
+    "appRoutesIdle": MessageLookupByLibrary.simpleMessage(
+      "Haz que una app use su propio nodo, como YouTube por Japón",
+    ),
     "appendSystemDns": MessageLookupByLibrary.simpleMessage(
       "Añadir DNS del sistema",
     ),
@@ -1171,9 +1190,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "installCertificateSuccess": MessageLookupByLibrary.simpleMessage(
       "Certificado instalado",
     ),
-    "installedAppsPermissionDeniedMessage": MessageLookupByLibrary.simpleMessage(
-      "Se denegó el permiso de lista de apps, por lo que no se pueden mostrar las apps instaladas. Concédelo manualmente en los ajustes del sistema.",
-    ),
+    "installedAppsPermissionDeniedMessage":
+        MessageLookupByLibrary.simpleMessage(
+          "Se denegó el permiso de lista de apps, por lo que no se pueden mostrar las apps instaladas. Concédelo manualmente en los ajustes del sistema.",
+        ),
     "installedAppsPermissionDesc": MessageLookupByLibrary.simpleMessage(
       "Este sistema oculta la lista de apps instaladas hasta que se concede el permiso. Autorízalo para configurar el proxy por app.",
     ),

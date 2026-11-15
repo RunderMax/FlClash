@@ -391,11 +391,14 @@ Future<RealProfile> _makeRealProfileTask(MakeRealProfileState data) async {
         .map((item) => item.definition)
         .toList();
   }
-  rawConfig['rules'] = [
-    ...mitm.rules,
-    ...hardeningRules(realPatchConfig),
-    ...rules,
-  ];
+  final leadingRules = [...mitm.rules, ...hardeningRules(realPatchConfig)];
+  if (realPatchConfig.slothAppRoutes.isNotEmpty) {
+    rawConfig[slothAppRoutesKey] = {
+      'at': leadingRules.length,
+      'routes': realPatchConfig.slothAppRoutes,
+    };
+  }
+  rawConfig['rules'] = [...leadingRules, ...rules];
   final yaml = await _encodeYaml(Map<String, dynamic>.from(rawConfig));
   return (yaml: yaml, md5: yaml.toMd5(), counts: configCountsOf(rawConfig));
 }

@@ -639,22 +639,26 @@ class SetupAction extends _$SetupAction {
 
   PatchClashConfig _effectivePatchConfig(PatchClashConfig patchConfig) {
     if (ref.read(safeModeProvider)) {
-      return patchConfig.copyWith(
-        tun: patchConfig.tun.copyWith(enable: false),
-        externalController: ExternalControllerStatus.close,
-      );
+      return patchConfig
+          .appRoutesFor(android: system.isAndroid)
+          .copyWith(
+            tun: patchConfig.tun.copyWith(enable: false),
+            externalController: ExternalControllerStatus.close,
+          );
     }
     final authorized =
         ref.read(authorizedTunEnableProvider) ==
         TunAuthorizationState.authorized;
-    return patchConfig.copyWith(
-      tun: patchConfig.tun.copyWith(
-        enable: patchConfig.tun.enable && authorized,
-      ),
-      externalController: patchConfig.secret.isEmpty
-          ? ExternalControllerStatus.close
-          : patchConfig.externalController,
-    );
+    return patchConfig
+        .appRoutesFor(android: system.isAndroid)
+        .copyWith(
+          tun: patchConfig.tun.copyWith(
+            enable: patchConfig.tun.enable && authorized,
+          ),
+          externalController: patchConfig.secret.isEmpty
+              ? ExternalControllerStatus.close
+              : patchConfig.externalController,
+        );
   }
 
   @protected

@@ -111,8 +111,8 @@ func loadConfig(path string) (*config.Config, error) {
 	if err != nil {
 		return nil, err
 	}
-	if bytes.Contains(buf, []byte(fastestGroupKey)) {
-		return loadConfigWithFastestGroup(buf, path)
+	if bytes.Contains(buf, []byte(fastestGroupKey)) || bytes.Contains(buf, []byte(appRoutesKey)) {
+		return loadConfigWithRequests(buf, path)
 	}
 	cfg, err := executor.ParseWithBytes(buf)
 	if err != nil {
@@ -121,9 +121,9 @@ func loadConfig(path string) (*config.Config, error) {
 	return withPlatformLimits(cfg), nil
 }
 
-// The file is rewritten with the group in place, as the Android service reads
-// it again on its own without this step.
-func loadConfigWithFastestGroup(buf []byte, path string) (*config.Config, error) {
+// The file is rewritten with the requests carried out, as the Android service
+// reads it again on its own without this step.
+func loadConfigWithRequests(buf []byte, path string) (*config.Config, error) {
 	var document yaml.Node
 	if err := yaml.Unmarshal(buf, &document); err != nil {
 		return nil, err
@@ -135,6 +135,7 @@ func loadConfigWithFastestGroup(buf []byte, path string) (*config.Config, error)
 	if err := applyFastestGroup(root); err != nil {
 		return nil, err
 	}
+	applyAppRoutes(root)
 	retagShortIDs(root)
 	merged := &yaml.Node{Kind: yaml.DocumentNode, Content: []*yaml.Node{root}}
 	raw := config.DefaultRawConfig()

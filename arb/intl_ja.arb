@@ -1125,5 +1125,14 @@
   "secureWindowDesc": "最近使ったアプリでは空白になり、スクリーンショットもできません",
   "hidePort": "ローカルのプロキシポートを隠す",
   "hidePortDesc": "他のアプリがポート 7890 でプロキシを見つけられなくなります",
-  "pickInUse": "使用中"
+  "pickInUse": "使用中",
+  "appRoutes": "アプリ別ルート",
+  "appRoutesIdle": "アプリごとに通るノードを決められます。例：YouTube は日本経由",
+  "appRoutesChoose": "アプリを選ぶ",
+  "appRouteFollow": "ルールに従う",
+  "appRouteFollowDesc": "プロファイルのルール通りに通信します",
+  "appRouteDirectDesc": "プロキシを通さず端末の回線で接続します",
+  "appRouteBlock": "通信を禁止",
+  "appRouteBlockDesc": "VPN がオンの間、このアプリは通信できません",
+  "appRouteMissing": "プロファイルにもうありません"
 }

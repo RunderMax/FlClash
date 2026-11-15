@@ -365,6 +365,25 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "appIconDesign": MessageLookupByLibrary.simpleMessage("App icon design"),
     "appProxiesEmpty": MessageLookupByLibrary.simpleMessage("No local proxies"),
+    "appRouteBlock": MessageLookupByLibrary.simpleMessage("No network"),
+    "appRouteBlockDesc": MessageLookupByLibrary.simpleMessage(
+      "The app cannot go online while the VPN is on",
+    ),
+    "appRouteDirectDesc": MessageLookupByLibrary.simpleMessage(
+      "Skips the proxy and uses the phone\'s own network",
+    ),
+    "appRouteFollow": MessageLookupByLibrary.simpleMessage("Follow the rules"),
+    "appRouteFollowDesc": MessageLookupByLibrary.simpleMessage(
+      "Goes where the profile\'s rules send it",
+    ),
+    "appRouteMissing": MessageLookupByLibrary.simpleMessage(
+      "No longer in the profile",
+    ),
+    "appRoutes": MessageLookupByLibrary.simpleMessage("App routes"),
+    "appRoutesChoose": MessageLookupByLibrary.simpleMessage("Choose apps"),
+    "appRoutesIdle": MessageLookupByLibrary.simpleMessage(
+      "Send an app through a node of its own, like YouTube through Japan",
+    ),
     "appendSystemDns": MessageLookupByLibrary.simpleMessage(
       "Append system DNS",
     ),
@@ -1092,9 +1111,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "installCertificateSuccess": MessageLookupByLibrary.simpleMessage(
       "Certificate installed",
     ),
-    "installedAppsPermissionDeniedMessage": MessageLookupByLibrary.simpleMessage(
-      "The app list permission was denied, so installed apps cannot be listed. Please grant it manually in system settings.",
-    ),
+    "installedAppsPermissionDeniedMessage":
+        MessageLookupByLibrary.simpleMessage(
+          "The app list permission was denied, so installed apps cannot be listed. Please grant it manually in system settings.",
+        ),
     "installedAppsPermissionDesc": MessageLookupByLibrary.simpleMessage(
       "This system hides the installed app list until the permission is granted. Authorize it to configure the per-app proxy.",
     ),
