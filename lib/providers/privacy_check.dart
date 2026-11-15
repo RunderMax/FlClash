@@ -1,7 +1,10 @@
 import 'package:fl_clash/common/print.dart';
 import 'package:fl_clash/common/privacy_check.dart';
+import 'package:fl_clash/common/service_probe.dart';
 import 'package:fl_clash/enum/enum.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+import 'core.dart';
 
 part 'generated/privacy_check.g.dart';
 
@@ -29,7 +32,7 @@ class PrivacyCheck extends _$PrivacyCheck {
       report: state.report,
     );
     try {
-      final report = await runPrivacyCheck();
+      final report = await runPrivacyCheck(realIp: await _realIp());
       if (run != _run) return;
       state = PrivacyCheckState(phase: PrivacyCheckPhase.done, report: report);
     } on Object catch (error) {
@@ -42,6 +45,22 @@ class PrivacyCheck extends _$PrivacyCheck {
         phase: PrivacyCheckPhase.failed,
         report: state.report,
       );
+    }
+  }
+
+  Future<String?> _realIp() async {
+    try {
+      final result = await lookupOutboundIp(
+        ref.read(coreHandlerProvider),
+        directOutbound,
+      );
+      return parseOutboundIp(result)?.ip;
+    } on Object catch (error) {
+      commonPrint.log(
+        'Direct IP lookup failed: $error',
+        logLevel: LogLevel.warning,
+      );
+      return null;
     }
   }
 

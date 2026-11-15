@@ -41,11 +41,13 @@ class WebRtcCheck {
 class PrivacyReport {
   const PrivacyReport({
     required this.exit,
+    required this.real,
     required this.dns,
     required this.webRtc,
   });
 
   final IpPlace exit;
+  final IpPlace? real;
   final DnsCheck dns;
   final WebRtcCheck webRtc;
 }
@@ -61,18 +63,24 @@ const _timeout = Duration(seconds: 6);
 
 /// Every request here leaves through a plain socket, so it takes the same path
 /// through the VPN and its rules as any other app, not the core's own proxy port.
-Future<PrivacyReport> runPrivacyCheck() async {
+/// [realIp] is the address the network itself gives out, found without the
+/// proxy; a leak is anything that shows it or its provider.
+Future<PrivacyReport> runPrivacyCheck({String? realIp}) async {
   final client = HttpClient()
     ..findProxy = ((_) => 'DIRECT')
     ..connectionTimeout = _timeout;
   try {
     final exit = await _lookupPlace(client, null);
+    final real = realIp == null || realIp == exit.ip
+        ? null
+        : await _lookupPlaceOrBare(client, realIp);
     final results = await Future.wait([
-      _checkDns(client, exit),
-      _checkWebRtc(client, exit),
+      _checkDns(client, exit, real),
+      _checkWebRtc(client, exit, real),
     ]);
     return PrivacyReport(
       exit: exit,
+      real: real,
       dns: results[0] as DnsCheck,
       webRtc: results[1] as WebRtcCheck,
     );
@@ -119,7 +127,11 @@ String _randomHex(int length) {
   ).join();
 }
 
-Future<DnsCheck> _checkDns(HttpClient client, IpPlace exit) async {
+Future<DnsCheck> _checkDns(
+  HttpClient client,
+  IpPlace exit,
+  IpPlace? real,
+) async {
   final fakeIp = await _resolvesToFakeIp();
   final session = _randomHex(40);
   var seen = <String, int>{};
@@ -148,7 +160,7 @@ Future<DnsCheck> _checkDns(HttpClient client, IpPlace exit) async {
   return DnsCheck(
     fakeIp: fakeIp,
     resolvers: resolvers,
-    verdict: dnsVerdict(exit, resolvers),
+    verdict: dnsVerdict(exit, resolvers, real: real),
   );
 }
 
@@ -163,12 +175,19 @@ Future<bool> _resolvesToFakeIp() async {
   }
 }
 
-Future<WebRtcCheck> _checkWebRtc(HttpClient client, IpPlace exit) async {
+Future<WebRtcCheck> _checkWebRtc(
+  HttpClient client,
+  IpPlace exit,
+  IpPlace? real,
+) async {
   for (final (host, port) in _stunServers) {
     final ip = await stunMappedAddress(host, port);
     if (ip == null) continue;
     final mapped = ip == exit.ip ? exit : await _lookupPlaceOrBare(client, ip);
-    return WebRtcCheck(mapped: mapped, verdict: webRtcVerdict(exit, mapped));
+    return WebRtcCheck(
+      mapped: mapped,
+      verdict: webRtcVerdict(exit, mapped, real: real),
+    );
   }
   return const WebRtcCheck(mapped: null, verdict: LeakVerdict.unreachable);
 }
@@ -181,30 +200,35 @@ bool isFakeIp(String address) {
   return first == 198 && (second == 18 || second == 19);
 }
 
-/// A resolver in the exit's country is the node's own; one elsewhere is most
-/// likely the local network answering for apps that should not reach it.
-LeakVerdict dnsVerdict(IpPlace exit, List<IpPlace> resolvers) {
-  if (resolvers.isEmpty) return LeakVerdict.unreachable;
-  final country = exit.countryCode;
-  if (country == null) return LeakVerdict.safe;
-  return resolvers.every(
-        (resolver) =>
-            resolver.countryCode == null || resolver.countryCode == country,
-      )
-      ? LeakVerdict.safe
-      : LeakVerdict.possibleLeak;
+bool _sameProvider(IpPlace a, IpPlace b) {
+  final isp = a.isp?.trim().toLowerCase();
+  return isp != null && isp.isNotEmpty && isp == b.isp?.trim().toLowerCase();
 }
 
-/// Some nodes send UDP out of a sibling address, so only a different country
-/// counts as a leak.
-LeakVerdict webRtcVerdict(IpPlace exit, IpPlace mapped) {
-  if (mapped.ip == exit.ip) return LeakVerdict.safe;
-  if (mapped.countryCode == null || exit.countryCode == null) {
-    return LeakVerdict.possibleLeak;
-  }
-  return mapped.countryCode == exit.countryCode
-      ? LeakVerdict.safe
-      : LeakVerdict.possibleLeak;
+/// Big public resolvers answer from anycast addresses that geolocate to their
+/// head office, so only the real network's own provider, or a resolver in the
+/// real country when the exit is elsewhere, shows where the lookup came from.
+LeakVerdict dnsVerdict(IpPlace exit, List<IpPlace> resolvers, {IpPlace? real}) {
+  if (resolvers.isEmpty) return LeakVerdict.unreachable;
+  if (real == null) return LeakVerdict.safe;
+  final realCountry = real.countryCode;
+  final leaks = resolvers.any(
+    (resolver) =>
+        _sameProvider(resolver, real) ||
+        (realCountry != null &&
+            realCountry != exit.countryCode &&
+            resolver.countryCode == realCountry),
+  );
+  return leaks ? LeakVerdict.possibleLeak : LeakVerdict.safe;
+}
+
+/// Some nodes send UDP out of a sibling address, so only the real address or
+/// its provider counts as a leak.
+LeakVerdict webRtcVerdict(IpPlace exit, IpPlace mapped, {IpPlace? real}) {
+  if (mapped.ip == exit.ip || real == null) return LeakVerdict.safe;
+  return mapped.ip == real.ip || _sameProvider(mapped, real)
+      ? LeakVerdict.possibleLeak
+      : LeakVerdict.safe;
 }
 
 Uint8List stunBindingRequest(List<int> transactionId) {

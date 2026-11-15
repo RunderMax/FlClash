@@ -41,30 +41,38 @@ void main() {
     expect(request.sublist(8), id);
   });
 
-  test('a resolver outside the exit country counts as a leak', () {
-    const exit = IpPlace(ip: '1.1.1.1', countryCode: 'US');
+  const real = IpPlace(ip: '60.50.1.1', countryCode: 'MY', isp: 'TM Net');
+  const exit = IpPlace(ip: '1.1.1.1', countryCode: 'JP', isp: 'Node Co');
+
+  test('a resolver of the real provider or country counts as a leak', () {
+    const google = IpPlace(ip: '8.8.8.8', countryCode: 'US', isp: 'Google LLC');
+    expect(dnsVerdict(exit, const [google], real: real), LeakVerdict.safe);
     expect(
-      dnsVerdict(exit, const [IpPlace(ip: '8.8.8.8', countryCode: 'US')]),
-      LeakVerdict.safe,
-    );
-    expect(
-      dnsVerdict(exit, const [IpPlace(ip: '9.9.9.9', countryCode: 'MY')]),
+      dnsVerdict(exit, const [
+        IpPlace(ip: '60.50.9.9', countryCode: 'MY', isp: 'TM Net'),
+      ], real: real),
       LeakVerdict.possibleLeak,
     );
-    expect(dnsVerdict(exit, const []), LeakVerdict.unreachable);
+    expect(
+      dnsVerdict(exit, const [
+        IpPlace(ip: '9.9.9.9', countryCode: 'MY', isp: 'Other'),
+      ], real: real),
+      LeakVerdict.possibleLeak,
+    );
+    expect(dnsVerdict(exit, const [], real: real), LeakVerdict.unreachable);
   });
 
-  test('a stun address in another country counts as a leak', () {
-    const exit = IpPlace(ip: '1.1.1.1', countryCode: 'JP');
-    expect(webRtcVerdict(exit, exit), LeakVerdict.safe);
+  test('a stun address on the real network counts as a leak', () {
+    expect(webRtcVerdict(exit, exit, real: real), LeakVerdict.safe);
     expect(
-      webRtcVerdict(exit, const IpPlace(ip: '1.1.1.2', countryCode: 'JP')),
+      webRtcVerdict(
+        exit,
+        const IpPlace(ip: '2.2.2.2', countryCode: 'JP', isp: 'Node Co'),
+        real: real,
+      ),
       LeakVerdict.safe,
     );
-    expect(
-      webRtcVerdict(exit, const IpPlace(ip: '2.2.2.2', countryCode: 'MY')),
-      LeakVerdict.possibleLeak,
-    );
+    expect(webRtcVerdict(exit, real, real: real), LeakVerdict.possibleLeak);
   });
 
   test('recognises the fake ip range', () {
