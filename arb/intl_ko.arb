@@ -1111,5 +1111,10 @@
   "pickHistoryStats": "평균 {average} ms · 시간 초과 {timeouts}회 · 변동 ±{jitter} ms",
   "pickHistoryEmpty": "아직 기록이 없습니다. Wi-Fi로 연결된 동안 3시간마다 테스트합니다.",
   "pickRecord": "안정성 기록",
-  "pickRecordDesc": "3시간마다, Wi-Fi에서만"
+  "pickRecordDesc": "3시간마다, Wi-Fi에서만",
+  "privacyHardening": "개인정보 강화",
+  "blockBypass": "앱의 VPN 우회 차단",
+  "blockBypassDesc": "앱이 스스로 프록시를 벗어날 수 없습니다",
+  "killSwitch": "킬 스위치",
+  "killSwitchDesc": "시스템 설정에서 「VPN 항상 사용」과 「VPN 없는 연결 차단」을 켜세요"
 }

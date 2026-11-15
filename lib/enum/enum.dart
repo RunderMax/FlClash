@@ -455,6 +455,7 @@ enum DashboardWidget {
   networkTakeover(platforms: desktopPlatforms),
   serviceStatus,
   privacyCheck,
+  privacyHardening,
   fastestNodes,
   profiles,
   proxyGroups,

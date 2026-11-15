@@ -277,6 +277,15 @@ class AppPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAware 
                 )
             }
 
+            "openVpnSettings" -> {
+                onMainThread {
+                    result.success(
+                        startSettings(Intent(Settings.ACTION_VPN_SETTINGS)) ||
+                            startSettings(Intent(Settings.ACTION_SETTINGS)),
+                    )
+                }
+            }
+
             "openCertificateSettings" -> {
                 val userCredentials = call.argument<Boolean>("userCredentials") == true
                 onMainThread { result.success(openCertificateSettings(userCredentials)) }

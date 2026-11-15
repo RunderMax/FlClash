@@ -1111,5 +1111,10 @@
   "pickHistoryStats": "Avg {average} ms · {timeouts} timeouts · ±{jitter} ms swing",
   "pickHistoryEmpty": "No records yet. While connected on Wi-Fi, picks are tested every 3 hours.",
   "pickRecord": "Record stability",
-  "pickRecordDesc": "Every 3 hours, on Wi-Fi only"
+  "pickRecordDesc": "Every 3 hours, on Wi-Fi only",
+  "privacyHardening": "Privacy hardening",
+  "blockBypass": "Stop apps bypassing the VPN",
+  "blockBypassDesc": "Apps cannot opt out of the proxy on their own",
+  "killSwitch": "Kill switch",
+  "killSwitchDesc": "In system settings, turn on Always-on VPN and Block connections without VPN"
 }

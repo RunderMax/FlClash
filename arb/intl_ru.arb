@@ -1111,5 +1111,10 @@
   "pickHistoryStats": "Среднее {average} мс · таймаутов {timeouts} · разброс ±{jitter} мс",
   "pickHistoryEmpty": "Записей пока нет. При подключении по Wi-Fi избранное проверяется каждые 3 часа.",
   "pickRecord": "Записывать стабильность",
-  "pickRecordDesc": "Каждые 3 часа, только по Wi-Fi"
+  "pickRecordDesc": "Каждые 3 часа, только по Wi-Fi",
+  "privacyHardening": "Усиление приватности",
+  "blockBypass": "Запретить обход VPN",
+  "blockBypassDesc": "Приложения не могут сами выйти из-под прокси",
+  "killSwitch": "Аварийное отключение",
+  "killSwitchDesc": "В настройках включите «Постоянная VPN» и «Блокировать соединения без VPN»"
 }

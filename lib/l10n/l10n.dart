@@ -9339,6 +9339,51 @@ class AppLocalizations {
       args: [],
     );
   }
+
+  /// `Privacy hardening`
+  String get privacyHardening {
+    return Intl.message(
+      'Privacy hardening',
+      name: 'privacyHardening',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Stop apps bypassing the VPN`
+  String get blockBypass {
+    return Intl.message(
+      'Stop apps bypassing the VPN',
+      name: 'blockBypass',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Apps cannot opt out of the proxy on their own`
+  String get blockBypassDesc {
+    return Intl.message(
+      'Apps cannot opt out of the proxy on their own',
+      name: 'blockBypassDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Kill switch`
+  String get killSwitch {
+    return Intl.message('Kill switch', name: 'killSwitch', desc: '', args: []);
+  }
+
+  /// `In system settings, turn on Always-on VPN and Block connections without VPN`
+  String get killSwitchDesc {
+    return Intl.message(
+      'In system settings, turn on Always-on VPN and Block connections without VPN',
+      name: 'killSwitchDesc',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<AppLocalizations> {

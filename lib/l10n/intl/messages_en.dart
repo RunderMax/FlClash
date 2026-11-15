@@ -423,6 +423,12 @@ class MessageLookup extends MessageLookupByLibrary {
     "binaryData": MessageLookupByLibrary.simpleMessage("Binary data"),
     "bind": MessageLookupByLibrary.simpleMessage("Bind"),
     "blacklistMode": MessageLookupByLibrary.simpleMessage("Blacklist mode"),
+    "blockBypass": MessageLookupByLibrary.simpleMessage(
+      "Stop apps bypassing the VPN",
+    ),
+    "blockBypassDesc": MessageLookupByLibrary.simpleMessage(
+      "Apps cannot opt out of the proxy on their own",
+    ),
     "blockQuic": MessageLookupByLibrary.simpleMessage("Block QUIC"),
     "bodyRewrite": MessageLookupByLibrary.simpleMessage("Body rewrite"),
     "brightness": MessageLookupByLibrary.simpleMessage("Brightness"),
@@ -1179,6 +1185,10 @@ class MessageLookup extends MessageLookupByLibrary {
       "TCP keep-alive interval",
     ),
     "key": MessageLookupByLibrary.simpleMessage("Key"),
+    "killSwitch": MessageLookupByLibrary.simpleMessage("Kill switch"),
+    "killSwitchDesc": MessageLookupByLibrary.simpleMessage(
+      "In system settings, turn on Always-on VPN and Block connections without VPN",
+    ),
     "ko": MessageLookupByLibrary.simpleMessage("Korean"),
     "label": MessageLookupByLibrary.simpleMessage("Label"),
     "language": MessageLookupByLibrary.simpleMessage("Language"),
@@ -1592,6 +1602,9 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "privacyCheckNeedsVpn": MessageLookupByLibrary.simpleMessage(
       "Connect first to run the check",
+    ),
+    "privacyHardening": MessageLookupByLibrary.simpleMessage(
+      "Privacy hardening",
     ),
     "privateKey": MessageLookupByLibrary.simpleMessage("Private key"),
     "privateKeyPassphrase": MessageLookupByLibrary.simpleMessage(

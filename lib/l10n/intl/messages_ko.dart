@@ -359,6 +359,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "binaryData": MessageLookupByLibrary.simpleMessage("바이너리 데이터"),
     "bind": MessageLookupByLibrary.simpleMessage("연결"),
     "blacklistMode": MessageLookupByLibrary.simpleMessage("블랙리스트 모드"),
+    "blockBypass": MessageLookupByLibrary.simpleMessage("앱의 VPN 우회 차단"),
+    "blockBypassDesc": MessageLookupByLibrary.simpleMessage(
+      "앱이 스스로 프록시를 벗어날 수 없습니다",
+    ),
     "blockQuic": MessageLookupByLibrary.simpleMessage("QUIC 차단"),
     "bodyRewrite": MessageLookupByLibrary.simpleMessage("본문 재작성"),
     "brightness": MessageLookupByLibrary.simpleMessage("밝기"),
@@ -994,6 +998,10 @@ class MessageLookup extends MessageLookupByLibrary {
       "TCP 킵얼라이브 간격",
     ),
     "key": MessageLookupByLibrary.simpleMessage("키"),
+    "killSwitch": MessageLookupByLibrary.simpleMessage("킬 스위치"),
+    "killSwitchDesc": MessageLookupByLibrary.simpleMessage(
+      "시스템 설정에서 「VPN 항상 사용」과 「VPN 없는 연결 차단」을 켜세요",
+    ),
     "ko": MessageLookupByLibrary.simpleMessage("한국어"),
     "label": MessageLookupByLibrary.simpleMessage("레이블"),
     "language": MessageLookupByLibrary.simpleMessage("언어"),
@@ -1338,6 +1346,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "privacyCheckNeedsVpn": MessageLookupByLibrary.simpleMessage(
       "연결한 후 검사할 수 있습니다",
     ),
+    "privacyHardening": MessageLookupByLibrary.simpleMessage("개인정보 강화"),
     "privateKey": MessageLookupByLibrary.simpleMessage("개인 키"),
     "privateKeyPassphrase": MessageLookupByLibrary.simpleMessage("개인 키 암호"),
     "process": MessageLookupByLibrary.simpleMessage("프로세스"),

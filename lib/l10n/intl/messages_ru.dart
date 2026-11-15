@@ -441,6 +441,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "blacklistMode": MessageLookupByLibrary.simpleMessage(
       "Режим чёрного списка",
     ),
+    "blockBypass": MessageLookupByLibrary.simpleMessage("Запретить обход VPN"),
+    "blockBypassDesc": MessageLookupByLibrary.simpleMessage(
+      "Приложения не могут сами выйти из-под прокси",
+    ),
     "blockQuic": MessageLookupByLibrary.simpleMessage("Блокировать QUIC"),
     "bodyRewrite": MessageLookupByLibrary.simpleMessage("Перезапись тела"),
     "brightness": MessageLookupByLibrary.simpleMessage("Яркость"),
@@ -1229,6 +1233,10 @@ class MessageLookup extends MessageLookupByLibrary {
       "Интервал TCP keep-alive",
     ),
     "key": MessageLookupByLibrary.simpleMessage("Ключ"),
+    "killSwitch": MessageLookupByLibrary.simpleMessage("Аварийное отключение"),
+    "killSwitchDesc": MessageLookupByLibrary.simpleMessage(
+      "В настройках включите «Постоянная VPN» и «Блокировать соединения без VPN»",
+    ),
     "ko": MessageLookupByLibrary.simpleMessage("Корейский"),
     "label": MessageLookupByLibrary.simpleMessage("Метка"),
     "language": MessageLookupByLibrary.simpleMessage("Язык"),
@@ -1680,6 +1688,9 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "privacyCheckNeedsVpn": MessageLookupByLibrary.simpleMessage(
       "Подключитесь, чтобы проверить",
+    ),
+    "privacyHardening": MessageLookupByLibrary.simpleMessage(
+      "Усиление приватности",
     ),
     "privateKey": MessageLookupByLibrary.simpleMessage("Закрытый ключ"),
     "privateKeyPassphrase": MessageLookupByLibrary.simpleMessage(

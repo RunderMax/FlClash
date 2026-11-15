@@ -289,6 +289,10 @@ class App {
     };
   }
 
+  Future<bool?> openVpnSettings() {
+    return methodChannel.invokeMethod<bool>('openVpnSettings');
+  }
+
   Future<bool?> openCertificateSettings({bool userCredentials = false}) {
     return methodChannel.invokeMethod<bool>('openCertificateSettings', {
       'userCredentials': userCredentials,

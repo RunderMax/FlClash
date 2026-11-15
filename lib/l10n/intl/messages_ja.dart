@@ -363,6 +363,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "binaryData": MessageLookupByLibrary.simpleMessage("バイナリデータ"),
     "bind": MessageLookupByLibrary.simpleMessage("連携"),
     "blacklistMode": MessageLookupByLibrary.simpleMessage("ブラックリストモード"),
+    "blockBypass": MessageLookupByLibrary.simpleMessage("アプリの VPN 回避を禁止"),
+    "blockBypassDesc": MessageLookupByLibrary.simpleMessage(
+      "アプリが自分でプロキシを外れることはできません",
+    ),
     "blockQuic": MessageLookupByLibrary.simpleMessage("QUIC をブロック"),
     "bodyRewrite": MessageLookupByLibrary.simpleMessage("ボディ書き換え"),
     "brightness": MessageLookupByLibrary.simpleMessage("明度"),
@@ -1010,6 +1014,10 @@ class MessageLookup extends MessageLookupByLibrary {
       "TCPキープアライブ間隔",
     ),
     "key": MessageLookupByLibrary.simpleMessage("キー"),
+    "killSwitch": MessageLookupByLibrary.simpleMessage("キルスイッチ"),
+    "killSwitchDesc": MessageLookupByLibrary.simpleMessage(
+      "システム設定で「常時接続 VPN」と「VPN 以外の接続をブロック」をオン",
+    ),
     "ko": MessageLookupByLibrary.simpleMessage("韓国語"),
     "label": MessageLookupByLibrary.simpleMessage("ラベル"),
     "language": MessageLookupByLibrary.simpleMessage("言語"),
@@ -1360,6 +1368,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "privacyCheckNeedsVpn": MessageLookupByLibrary.simpleMessage(
       "接続してからチェックできます",
     ),
+    "privacyHardening": MessageLookupByLibrary.simpleMessage("プライバシー強化"),
     "privateKey": MessageLookupByLibrary.simpleMessage("秘密鍵"),
     "privateKeyPassphrase": MessageLookupByLibrary.simpleMessage("秘密鍵のパスフレーズ"),
     "process": MessageLookupByLibrary.simpleMessage("プロセス"),

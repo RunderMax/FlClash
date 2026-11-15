@@ -1111,5 +1111,10 @@
   "pickHistoryStats": "Media {average} ms · {timeouts} tiempos agotados · ±{jitter} ms de variación",
   "pickHistoryEmpty": "Aún no hay registros. Conectado por Wi-Fi, los favoritos se prueban cada 3 horas.",
   "pickRecord": "Registrar estabilidad",
-  "pickRecordDesc": "Cada 3 horas, solo con Wi-Fi"
+  "pickRecordDesc": "Cada 3 horas, solo con Wi-Fi",
+  "privacyHardening": "Refuerzo de privacidad",
+  "blockBypass": "Impedir que las apps eviten la VPN",
+  "blockBypassDesc": "Las apps no pueden salirse del proxy por su cuenta",
+  "killSwitch": "Interruptor de seguridad",
+  "killSwitchDesc": "En los ajustes, activa «VPN siempre activada» y «Bloquear conexiones sin VPN»"
 }

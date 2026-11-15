@@ -1111,5 +1111,10 @@
   "pickHistoryStats": "平均 {average} ms · 超时 {timeouts} 次 · 波动 ±{jitter} ms",
   "pickHistoryEmpty": "还没有记录。连着代理并且在 Wi‑Fi 下时，每 3 小时测一次。",
   "pickRecord": "记录稳定性",
-  "pickRecordDesc": "每 3 小时测一次，只在 Wi‑Fi 下"
+  "pickRecordDesc": "每 3 小时测一次，只在 Wi‑Fi 下",
+  "privacyHardening": "隐私加固",
+  "blockBypass": "禁止 app 绕过 VPN",
+  "blockBypassDesc": "手机上的 app 不能自己选择不走代理",
+  "killSwitch": "断网保护",
+  "killSwitchDesc": "到系统设置里打开「始终开启的 VPN」和「屏蔽未使用 VPN 的连接」"
 }

@@ -452,6 +452,12 @@ class MessageLookup extends MessageLookupByLibrary {
     "binaryData": MessageLookupByLibrary.simpleMessage("Données binaires"),
     "bind": MessageLookupByLibrary.simpleMessage("Lier"),
     "blacklistMode": MessageLookupByLibrary.simpleMessage("Mode liste noire"),
+    "blockBypass": MessageLookupByLibrary.simpleMessage(
+      "Empêcher le contournement du VPN",
+    ),
+    "blockBypassDesc": MessageLookupByLibrary.simpleMessage(
+      "Les apps ne peuvent pas quitter le proxy d’elles-mêmes",
+    ),
     "blockQuic": MessageLookupByLibrary.simpleMessage("Bloquer QUIC"),
     "bodyRewrite": MessageLookupByLibrary.simpleMessage("Réécriture du corps"),
     "brightness": MessageLookupByLibrary.simpleMessage("Luminosité"),
@@ -1270,6 +1276,10 @@ class MessageLookup extends MessageLookupByLibrary {
       "Intervalle keep-alive TCP",
     ),
     "key": MessageLookupByLibrary.simpleMessage("Clé"),
+    "killSwitch": MessageLookupByLibrary.simpleMessage("Coupe-circuit"),
+    "killSwitchDesc": MessageLookupByLibrary.simpleMessage(
+      "Dans les réglages, activez « VPN permanent » et « Bloquer les connexions sans VPN »",
+    ),
     "ko": MessageLookupByLibrary.simpleMessage("Coréen"),
     "label": MessageLookupByLibrary.simpleMessage("Libellé"),
     "language": MessageLookupByLibrary.simpleMessage("Langue"),
@@ -1724,6 +1734,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "privacyCheckNeedsVpn": MessageLookupByLibrary.simpleMessage(
       "Connectez-vous pour lancer le contrôle",
     ),
+    "privacyHardening": MessageLookupByLibrary.simpleMessage("Renforcement"),
     "privateKey": MessageLookupByLibrary.simpleMessage("Clé privée"),
     "privateKeyPassphrase": MessageLookupByLibrary.simpleMessage(
       "Phrase secrète de la clé privée",
