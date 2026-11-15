@@ -41,7 +41,7 @@ final class PrivacyCheckProvider
   }
 }
 
-String _$privacyCheckHash() => r'daf1da099c35924c5282e36b648ff28ef64538c9';
+String _$privacyCheckHash() => r'cc131d893bdc5d574670f0063f5e677a7c0861d9';
 
 abstract class _$PrivacyCheck extends $Notifier<PrivacyCheckState> {
   PrivacyCheckState build();

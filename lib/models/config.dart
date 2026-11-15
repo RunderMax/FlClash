@@ -132,20 +132,32 @@ final List<DashboardWidget> platformDefaultDashboardWidgets = system.isAndroid
         DashboardWidget.outboundMode,
         DashboardWidget.serviceStatus,
         DashboardWidget.privacyCheck,
+        DashboardWidget.fastestNodes,
         DashboardWidget.profiles,
         DashboardWidget.proxyGroups,
       ]
     : defaultDashboardWidgets;
 
-/// The phone layout before the privacy check card, saved on first launch, so
-/// an untouched one would never show the cards added since.
-const _previousAndroidDefaultDashboardWidgets = {
-  'currentOutbound',
-  'networkSpeed',
-  'outboundMode',
-  'profiles',
-  'proxyGroups',
-};
+/// Phone layouts this fork shipped as defaults, saved on first launch, so an
+/// untouched one would never show the cards added since.
+const _previousAndroidDefaultDashboardWidgets = [
+  {
+    'currentOutbound',
+    'networkSpeed',
+    'outboundMode',
+    'profiles',
+    'proxyGroups',
+  },
+  {
+    'currentOutbound',
+    'networkSpeed',
+    'outboundMode',
+    'serviceStatus',
+    'privacyCheck',
+    'profiles',
+    'proxyGroups',
+  },
+];
 
 const _legacyDefaultDashboardWidgets = {
   'networkSpeed',
@@ -184,11 +196,12 @@ List<DashboardWidget> dashboardWidgetsFromJson(
     return platformDefaultDashboardWidgets;
   }
   final byName = DashboardWidget.values.asNameMap();
-  if (dashboardWidgets.length ==
-          _previousAndroidDefaultDashboardWidgets.length &&
-      dashboardWidgets.toSet().containsAll(
-        _previousAndroidDefaultDashboardWidgets,
-      )) {
+  final saved = dashboardWidgets.toSet();
+  if (_previousAndroidDefaultDashboardWidgets.any(
+    (previous) =>
+        previous.length == dashboardWidgets.length &&
+        saved.containsAll(previous),
+  )) {
     return platformDefaultDashboardWidgets;
   }
   if (dashboardWidgets.contains(DashboardWidget.currentOutbound.name)) {

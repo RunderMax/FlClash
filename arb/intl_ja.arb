@@ -1092,5 +1092,13 @@
   "dnsRealIp": "実 IP",
   "dnsGuard": "DNS リーク防止",
   "dnsGuardOnDesc": "名前解決もプロキシ経由",
-  "dnsGuardOffDesc": "プロファイルの DNS を使用"
+  "dnsGuardOffDesc": "プロファイルの DNS を使用",
+  "fastestNodes": "最速ノード",
+  "fastestNodesSwitch": "最速を自動で使う",
+  "fastestNodesCount": "{count} 件選択済み",
+  "fastestNodesChoose": "ノードを選ぶ",
+  "fastestNodesIdle": "いくつか選ぶと最速のものを使います",
+  "fastestNodesCurrent": "{name} を使用中",
+  "fastestNodesMissing": "選んだノードがこのプロファイルにありません",
+  "fastestNodesEmpty": "このプロファイルにはまだノードがありません"
 }

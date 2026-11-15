@@ -221,6 +221,7 @@ void main() {
       DashboardWidget.profiles,
       DashboardWidget.proxyGroups,
       DashboardWidget.serviceStatus,
+      DashboardWidget.fastestNodes,
     ]);
     await pumpEditor(tester, size: const Size(412, 700));
     final position = positionOf(tester);

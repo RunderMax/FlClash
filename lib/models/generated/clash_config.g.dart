@@ -940,6 +940,12 @@ _PatchClashConfig _$PatchClashConfigFromJson(Map<String, dynamic> json) =>
       mitm: json['mitm'] == null
           ? defaultMitm
           : Mitm.fromJson(json['mitm'] as Map<String, dynamic>),
+      slothFastest: json['sloth-fastest'] as bool? ?? false,
+      slothFastestProxies:
+          (json['sloth-fastest-proxies'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList() ??
+          const [],
     );
 
 Map<String, dynamic> _$PatchClashConfigToJson(_PatchClashConfig instance) =>
@@ -986,6 +992,8 @@ Map<String, dynamic> _$PatchClashConfigToJson(_PatchClashConfig instance) =>
           .map((e) => _$GeneralOverrideKeyEnumMap[e]!)
           .toList(),
       'mitm': instance.mitm,
+      'sloth-fastest': instance.slothFastest,
+      'sloth-fastest-proxies': instance.slothFastestProxies,
     };
 
 const _$ModeEnumMap = {

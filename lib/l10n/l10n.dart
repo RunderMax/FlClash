@@ -9204,6 +9204,88 @@ class AppLocalizations {
       args: [],
     );
   }
+
+  /// `Fastest pick`
+  String get fastestNodes {
+    return Intl.message(
+      'Fastest pick',
+      name: 'fastestNodes',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Use the fastest`
+  String get fastestNodesSwitch {
+    return Intl.message(
+      'Use the fastest',
+      name: 'fastestNodesSwitch',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `{count, plural, =1{1 node chosen} other{{count} nodes chosen}}`
+  String fastestNodesCount(num count) {
+    return Intl.plural(
+      count,
+      one: '1 node chosen',
+      other: '$count nodes chosen',
+      name: 'fastestNodesCount',
+      desc: '',
+      args: [count],
+    );
+  }
+
+  /// `Choose nodes`
+  String get fastestNodesChoose {
+    return Intl.message(
+      'Choose nodes',
+      name: 'fastestNodesChoose',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Pick a few nodes and the fastest of them is used`
+  String get fastestNodesIdle {
+    return Intl.message(
+      'Pick a few nodes and the fastest of them is used',
+      name: 'fastestNodesIdle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Now using {name}`
+  String fastestNodesCurrent(Object name) {
+    return Intl.message(
+      'Now using $name',
+      name: 'fastestNodesCurrent',
+      desc: '',
+      args: [name],
+    );
+  }
+
+  /// `None of the chosen nodes are in this profile`
+  String get fastestNodesMissing {
+    return Intl.message(
+      'None of the chosen nodes are in this profile',
+      name: 'fastestNodesMissing',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `This profile has no nodes yet`
+  String get fastestNodesEmpty {
+    return Intl.message(
+      'This profile has no nodes yet',
+      name: 'fastestNodesEmpty',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<AppLocalizations> {

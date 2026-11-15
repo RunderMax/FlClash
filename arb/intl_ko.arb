@@ -1092,5 +1092,13 @@
   "dnsRealIp": "실제 IP",
   "dnsGuard": "DNS 유출 방지",
   "dnsGuardOnDesc": "DNS 조회도 프록시로",
-  "dnsGuardOffDesc": "프로필 자체 DNS 사용"
+  "dnsGuardOffDesc": "프로필 자체 DNS 사용",
+  "fastestNodes": "가장 빠른 노드",
+  "fastestNodesSwitch": "가장 빠른 노드 자동 사용",
+  "fastestNodesCount": "노드 {count}개 선택됨",
+  "fastestNodesChoose": "노드 선택",
+  "fastestNodesIdle": "몇 개를 고르면 가장 빠른 노드를 씁니다",
+  "fastestNodesCurrent": "{name} 사용 중",
+  "fastestNodesMissing": "선택한 노드가 이 프로필에 없습니다",
+  "fastestNodesEmpty": "이 프로필에는 아직 노드가 없습니다"
 }

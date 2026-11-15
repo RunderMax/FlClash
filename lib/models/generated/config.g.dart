@@ -164,6 +164,7 @@ const _$DashboardWidgetEnumMap = {
   DashboardWidget.networkTakeover: 'networkTakeover',
   DashboardWidget.serviceStatus: 'serviceStatus',
   DashboardWidget.privacyCheck: 'privacyCheck',
+  DashboardWidget.fastestNodes: 'fastestNodes',
   DashboardWidget.profiles: 'profiles',
   DashboardWidget.proxyGroups: 'proxyGroups',
   DashboardWidget.connectionStats: 'connectionStats',
