@@ -7,6 +7,7 @@ import 'package:fl_clash/enum/enum.dart';
 import 'package:fl_clash/models/models.dart';
 import 'package:fl_clash/plugins/app.dart';
 import 'package:fl_clash/providers/app_exits.dart';
+import 'package:fl_clash/providers/app_route_activity.dart';
 import 'package:fl_clash/providers/providers.dart';
 import 'package:fl_clash/ui/icons/icons.dart';
 import 'package:fl_clash/views/dashboard/layout.dart';
@@ -16,6 +17,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'card.dart';
 import 'fastest_nodes.dart';
+import 'in_use.dart';
 
 const _cardRows = 4;
 const _cardIcon = 32.0;
@@ -38,6 +40,10 @@ Set<String> _reachable(List<Group> groups) => {
     for (final proxy in group.all) proxy.name,
   ],
 };
+
+/// Direct and blocked traffic leave through no node to time.
+bool _measured(String target) =>
+    target != appRouteDirect && target != appRouteBlock;
 
 bool _missing(String target, Set<String> reachable) =>
     target != appRouteDirect &&
@@ -80,6 +86,8 @@ class AppRoutesCard extends ConsumerStatefulWidget {
 }
 
 class _AppRoutesCardState extends ConsumerState<AppRoutesCard> {
+  final Set<String> _tested = {};
+
   @override
   void initState() {
     super.initState();
@@ -91,6 +99,42 @@ class _AppRoutesCardState extends ConsumerState<AppRoutesCard> {
             .getPackages()
             .catchError((Object _) => const <Package>[]),
       );
+    }
+    void testLater() => runAfterFrame(_testUnmeasured);
+    ref.listenManual(groupsProvider, (_, _) => testLater());
+    ref.listenManual(
+      patchClashConfigProvider.select((state) => state.slothAppRoutes),
+      (_, _) => testLater(),
+    );
+    testLater();
+  }
+
+  /// Each target is timed once by itself, so a speed shows without a tap.
+  void _testUnmeasured() {
+    if (!mounted || ref.read(groupsProvider).isEmpty) {
+      return;
+    }
+    final routes = ref.read(patchClashConfigProvider).slothAppRoutes;
+    _test([
+      for (final target in routes.values.toSet())
+        if (_measured(target) &&
+            _tested.add(target) &&
+            ref.read(delayProvider(proxyName: target)) == null)
+          target,
+    ]);
+  }
+
+  void _test(Iterable<String> targets) {
+    final byName = {
+      for (final group in ref.read(groupsProvider))
+        for (final proxy in group.all) proxy.name: proxy,
+    };
+    final proxies = [
+      for (final target in targets)
+        if (_measured(target)) byName[target] ?? Proxy(name: target, type: ''),
+    ];
+    if (proxies.isNotEmpty) {
+      unawaited(ref.read(proxiesActionProvider.notifier).delayTest(proxies));
     }
   }
 
@@ -108,6 +152,7 @@ class _AppRoutesCardState extends ConsumerState<AppRoutesCard> {
     };
     final reachable = _reachable(ref.watch(groupsProvider));
     final exits = ref.watch(appExitsProvider).value ?? const {};
+    final active = ref.watch(activeRoutedAppsProvider);
     final shown = routes.entries.take(_cardRows).toList();
     final hidden = routes.length - shown.length;
     return DashboardCard(
@@ -119,6 +164,18 @@ class _AppRoutesCardState extends ConsumerState<AppRoutesCard> {
           DashboardCardHeader(
             glyph: AppGlyphs.appsList,
             title: appLocalizations.appRoutes,
+            trailing: [
+              Transform.translate(
+                offset: const Offset(8, 0),
+                child: DashboardIconButton(
+                  glyph: AppGlyphs.speed,
+                  tooltip: appLocalizations.appRoutesTest,
+                  onPressed: routes.values.any(_measured)
+                      ? () => _test(routes.values.toSet())
+                      : null,
+                ),
+              ),
+            ],
           ),
           const SizedBox(height: 12),
           if (shown.isEmpty)
@@ -136,6 +193,7 @@ class _AppRoutesCardState extends ConsumerState<AppRoutesCard> {
                 target: target,
                 missing: _missing(target, reachable),
                 latest: exits[packageName]?.firstOrNull,
+                active: active.contains(packageName),
               ),
               const SizedBox(height: 6),
             ],
@@ -181,13 +239,14 @@ class _AppRoutesCardState extends ConsumerState<AppRoutesCard> {
   }
 }
 
-class _RouteRow extends StatelessWidget {
+class _RouteRow extends ConsumerWidget {
   const _RouteRow({
     required this.packageName,
     required this.label,
     required this.target,
     required this.missing,
     required this.latest,
+    required this.active,
   });
 
   final String packageName;
@@ -195,63 +254,97 @@ class _RouteRow extends StatelessWidget {
   final String target;
   final bool missing;
   final AppExit? latest;
+  final bool active;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final appLocalizations = context.appLocalizations;
+    final colorScheme = context.colorScheme;
     final color = _targetColor(context, target, missing);
     final targetLabel = _targetLabel(context, target);
-    return DashboardBlock(
+    final delay = _measured(target)
+        ? ref.watch(delayProvider(proxyName: target))
+        : null;
+    return InUseFrame(
+      inUse: active,
       radius: AppCorner.md,
-      padding: const EdgeInsets.fromLTRB(10, 8, 12, 8),
-      onTap: () => _showTargets(context, packageName, label),
-      semanticLabel: [
-        label,
-        targetLabel,
-        if (missing) appLocalizations.appRouteMissing,
-      ].join(' '),
-      child: Row(
-        children: [
-          PackageIcon(packageName: packageName, size: _cardIcon),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              spacing: 2,
-              children: [
-                Text(
-                  label,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: AppTextStyle.subheadline.of(context, emphasized: true),
-                ),
-                if (latest case final latest?)
-                  _ExitLine(
-                    exit: latest,
-                    style: AppTextStyle.caption1
-                        .of(context)
-                        .copyWith(color: context.colorScheme.onSurfaceVariant),
+      child: DashboardBlock(
+        radius: AppCorner.md,
+        padding: const EdgeInsets.fromLTRB(10, 8, 12, 8),
+        onTap: () => _showTargets(context, packageName, label),
+        semanticLabel: [
+          label,
+          targetLabel,
+          if (active) appLocalizations.pickInUse,
+          if (missing) appLocalizations.appRouteMissing,
+        ].join(' '),
+        child: Row(
+          children: [
+            InUseBadge(inUse: active),
+            PackageIcon(packageName: packageName, size: _cardIcon),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                spacing: 2,
+                children: [
+                  AnimatedDefaultTextStyle(
+                    duration: context.motionDuration(commonDuration),
+                    style: AppTextStyle.subheadline
+                        .of(context, emphasized: true)
+                        .copyWith(
+                          color: active
+                              ? colorScheme.primary
+                              : colorScheme.onSurface,
+                        ),
+                    child: Text(
+                      label,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
-              ],
+                  if (latest case final latest?)
+                    _ExitLine(
+                      exit: latest,
+                      style: AppTextStyle.caption1
+                          .of(context)
+                          .copyWith(color: colorScheme.onSurfaceVariant),
+                    ),
+                ],
+              ),
             ),
-          ),
-          const SizedBox(width: 8),
-          if (missing)
-            Padding(
-              padding: const EdgeInsetsDirectional.only(end: 4),
-              child: GlyphIcon(AppGlyphs.warning, size: 16, color: color),
+            const SizedBox(width: 8),
+            if (missing)
+              Padding(
+                padding: const EdgeInsetsDirectional.only(end: 4),
+                child: GlyphIcon(AppGlyphs.warning, size: 16, color: color),
+              ),
+            Flexible(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                spacing: 2,
+                children: [
+                  Text(
+                    targetLabel,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: AppTextStyle.footnote
+                        .of(context, emphasized: true)
+                        .copyWith(color: color),
+                  ),
+                  if (delay != null)
+                    Text(
+                      delay < 0 ? appLocalizations.timeout : '$delay ms',
+                      style: AppTextStyle.caption1
+                          .of(context, emphasized: true)
+                          .toTabular
+                          .copyWith(color: colorScheme.delayColor(delay)),
+                    ),
+                ],
+              ),
             ),
-          Flexible(
-            child: Text(
-              targetLabel,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: AppTextStyle.footnote
-                  .of(context, emphasized: true)
-                  .copyWith(color: color),
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

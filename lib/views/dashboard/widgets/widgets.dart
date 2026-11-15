@@ -3,6 +3,7 @@ export 'connection_stats.dart';
 export 'connections_table.dart';
 export 'current_outbound.dart';
 export 'fastest_nodes.dart';
+export 'in_use.dart';
 export 'intranet_ip.dart';
 export 'memory_info.dart';
 export 'network_takeover.dart';

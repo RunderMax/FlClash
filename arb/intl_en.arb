@@ -1136,5 +1136,6 @@
   "appRouteBlockDesc": "The app cannot go online while the VPN is on",
   "appRouteMissing": "No longer in the profile",
   "appExits": "IPs used",
-  "appRouteTo": "Send through"
+  "appRouteTo": "Send through",
+  "appRoutesTest": "Test speed"
 }

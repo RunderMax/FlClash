@@ -1136,5 +1136,6 @@
   "appRouteBlockDesc": "VPN がオンの間、このアプリは通信できません",
   "appRouteMissing": "プロファイルにもうありません",
   "appExits": "使った IP",
-  "appRouteTo": "経由先"
+  "appRouteTo": "経由先",
+  "appRoutesTest": "速度を測る"
 }

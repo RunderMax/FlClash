@@ -400,6 +400,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "appRoutesIdle": MessageLookupByLibrary.simpleMessage(
       "Пустите приложение через свой узел, например YouTube через Японию",
     ),
+    "appRoutesTest": MessageLookupByLibrary.simpleMessage("Проверить скорость"),
     "appendSystemDns": MessageLookupByLibrary.simpleMessage(
       "Добавлять системный DNS",
     ),

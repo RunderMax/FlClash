@@ -409,6 +409,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "appRoutesIdle": MessageLookupByLibrary.simpleMessage(
       "Faites passer une app par son propre nœud, comme YouTube par le Japon",
     ),
+    "appRoutesTest": MessageLookupByLibrary.simpleMessage("Tester la vitesse"),
     "appendSystemDns": MessageLookupByLibrary.simpleMessage(
       "Ajouter le DNS du système",
     ),

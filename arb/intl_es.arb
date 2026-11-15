@@ -1136,5 +1136,6 @@
   "appRouteBlockDesc": "La app no puede conectarse mientras la VPN esté activa",
   "appRouteMissing": "Ya no está en el perfil",
   "appExits": "IP usadas",
-  "appRouteTo": "Enviar por"
+  "appRouteTo": "Enviar por",
+  "appRoutesTest": "Medir velocidad"
 }

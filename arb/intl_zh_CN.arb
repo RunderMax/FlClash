@@ -1136,5 +1136,6 @@
   "appRouteBlockDesc": "开着 VPN 时这个软件上不了网",
   "appRouteMissing": "订阅里已经没有这个了",
   "appExits": "用过的 IP",
-  "appRouteTo": "分配到"
+  "appRouteTo": "分配到",
+  "appRoutesTest": "测速"
 }

@@ -1136,5 +1136,6 @@
   "appRouteBlockDesc": "VPN이 켜져 있는 동안 이 앱은 인터넷을 쓸 수 없어요",
   "appRouteMissing": "프로필에 더 이상 없어요",
   "appExits": "사용한 IP",
-  "appRouteTo": "보낼 곳"
+  "appRouteTo": "보낼 곳",
+  "appRoutesTest": "속도 측정"
 }

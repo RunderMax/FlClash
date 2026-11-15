@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:fl_clash/common/app_exits.dart';
+import 'package:fl_clash/common/app_routes.dart';
 import 'package:fl_clash/common/common.dart';
 import 'package:path/path.dart' show join;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -11,8 +12,6 @@ part 'generated/app_exits.g.dart';
 
 /// The Core saves its record half a minute after a routed app goes online.
 const _reloadAfter = Duration(seconds: 40);
-
-const _processNameRule = 'ProcessName';
 
 @riverpod
 class AppExits extends _$AppExits {
@@ -25,7 +24,7 @@ class AppExits extends _$AppExits {
       if (_reload != null || requests.length == 0) {
         return;
       }
-      if (requests[requests.length - 1].rule == _processNameRule) {
+      if (requests[requests.length - 1].rule == processNameRule) {
         _reload = Timer(_reloadAfter, () {
           _reload = null;
           ref.invalidateSelf();

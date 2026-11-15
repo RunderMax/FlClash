@@ -1,5 +1,7 @@
 import 'package:fl_clash/common/app_exits.dart';
 import 'package:fl_clash/common/app_routes.dart';
+import 'package:fl_clash/core/controller.dart';
+import 'package:fl_clash/core/interface.dart';
 import 'package:fl_clash/enum/enum.dart';
 import 'package:fl_clash/models/models.dart';
 import 'package:fl_clash/providers/app_exits.dart';
@@ -10,6 +12,8 @@ import 'package:fl_clash/views/dashboard/widgets/app_routes.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mocktail/mocktail.dart';
+import 'package:prism_ui/prism_ui.dart';
 
 import '../../helpers/host_scaffold.dart';
 import '../../helpers/test_app.dart';
@@ -44,6 +48,8 @@ const _groups = [
   ),
 ];
 
+class _MockCore extends Mock implements CoreHandlerInterface {}
+
 class _Exits extends AppExits {
   _Exits(this.exits);
 
@@ -60,17 +66,33 @@ AppExit _exit(String node, String ip, int minutesAgo) {
 
 void main() {
   late ProviderContainer container;
+  late _MockCore core;
   var exits = <String, List<AppExit>>{};
+
+  setUpAll(
+    () => registerFallbackValue(
+      const TestDelayParams(proxyName: '', testUrl: '', timeout: 0),
+    ),
+  );
 
   setUp(() {
     exits = {};
+    core = _MockCore();
+    when(() => core.testDelay(any())).thenAnswer((invocation) async {
+      final params = invocation.positionalArguments.single as TestDelayParams;
+      return Delay(name: params.proxyName, url: params.testUrl, value: 88);
+    });
     container = ProviderContainer(
-      overrides: [appExitsProvider.overrideWith(() => _Exits(exits))],
+      overrides: [
+        appExitsProvider.overrideWith(() => _Exits(exits)),
+        coreHandlerProvider.overrideWithValue(CoreController.scoped(core)),
+      ],
     );
     globalState.container = container;
     container.listen(groupsProvider, (_, _) {});
     container.listen(packagesProvider, (_, _) {});
     container.listen(patchClashConfigProvider, (_, _) {});
+    container.listen(requestsProvider, (_, _) {});
   });
 
   tearDown(() => container.dispose());
@@ -243,5 +265,38 @@ void main() {
     expect(find.text('2.2.2.2'), findsOneWidget);
     expect(find.textContaining('US-01 · '), findsOneWidget);
     expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('an app whose route got through is marked like a pick, with '
+      'the speed of its node', (tester) async {
+    container.read(packagesProvider.notifier).value = _packages;
+    container.read(groupsProvider.notifier).value = _groups;
+    route({'com.example.video': 'JP-01', 'com.example.chat': appRouteDirect});
+    container
+        .read(requestsProvider.notifier)
+        .addRequest(
+          TrackerInfo(
+            id: '1',
+            start: DateTime.now(),
+            metadata: const Metadata(),
+            chains: const ['JP-01'],
+            rule: processNameRule,
+            rulePayload: 'com.example.video',
+          ),
+        );
+    await pumpCard(tester);
+    await tester.pumpAndSettle();
+
+    expect(find.text('88 ms'), findsOneWidget);
+    expect(find.byType(SelectionBadge), findsOneWidget);
+    expect(find.bySemanticsLabel(RegExp('Video JP-01 In use')), findsOneWidget);
+    expect(find.bySemanticsLabel(RegExp('Chat Direct In use')), findsNothing);
+    verify(() => core.testDelay(any())).called(1);
+    expect(tester.takeException(), isNull);
+
+    // The mark waits five minutes to lapse, longer than the test runs.
+    await tester.pumpWidget(const SizedBox.shrink());
+    container.dispose();
+    await tester.pump(const Duration(seconds: 1));
   });
 }

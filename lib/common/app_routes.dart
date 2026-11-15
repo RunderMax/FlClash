@@ -4,6 +4,9 @@ import 'package:fl_clash/models/models.dart';
 const appRouteDirect = 'DIRECT';
 const appRouteBlock = 'REJECT';
 
+/// How the Core names the rule type an app route makes.
+const processNameRule = 'ProcessName';
+
 extension AppRoutesExt on PatchClashConfig {
   /// Off never looks up which app a connection is from, as the rules need.
   PatchClashConfig appRoutesFor({required bool android}) {

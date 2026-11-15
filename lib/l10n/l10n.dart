@@ -9563,6 +9563,16 @@ class AppLocalizations {
   String get appRouteTo {
     return Intl.message('Send through', name: 'appRouteTo', desc: '', args: []);
   }
+
+  /// `Test speed`
+  String get appRoutesTest {
+    return Intl.message(
+      'Test speed',
+      name: 'appRoutesTest',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<AppLocalizations> {

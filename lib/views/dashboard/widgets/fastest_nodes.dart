@@ -15,6 +15,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'card.dart';
+import 'in_use.dart';
 import 'pick_history.dart';
 
 const _builtInTypes = {
@@ -346,9 +347,6 @@ class _PickTile extends StatelessWidget {
   final bool selected;
   final VoidCallback onTap;
 
-  static const _mark = 26.0;
-  static const _border = 1.5;
-
   @override
   Widget build(BuildContext context) {
     final colorScheme = context.colorScheme;
@@ -360,25 +358,9 @@ class _PickTile extends StatelessWidget {
     final ip = pick.ip;
     final quality = pick.quality;
     final duration = context.motionDuration(commonDuration);
-    final shape = AppShape.all(AppCorner.md);
-    // The mark and the frame both say which pick carries traffic, so a
-    // glance finds it without reading.
-    return TweenAnimationBuilder<double>(
-      tween: Tween(end: selected ? 1 : 0),
-      duration: duration,
-      curve: Curves.easeOutCubic,
-      builder: (context, emphasis, child) => DecoratedBox(
-        position: DecorationPosition.foreground,
-        decoration: ShapeDecoration(
-          shape: shape.copyWith(
-            side: BorderSide(
-              color: colorScheme.primary.withValues(alpha: emphasis),
-              width: _border,
-            ),
-          ),
-        ),
-        child: child,
-      ),
+    return InUseFrame(
+      inUse: selected,
+      radius: AppCorner.md,
       child: DashboardBlock(
         radius: AppCorner.md,
         padding: const EdgeInsets.fromLTRB(14, 10, 12, 10),
@@ -388,23 +370,7 @@ class _PickTile extends StatelessWidget {
             : pick.name,
         child: Row(
           children: [
-            AnimatedSize(
-              duration: duration,
-              curve: Curves.easeOutCubic,
-              alignment: AlignmentDirectional.centerStart,
-              child: AnimatedSwitcher(
-                duration: duration,
-                transitionBuilder: (child, animation) =>
-                    ScaleTransition(scale: animation, child: child),
-                child: selected
-                    ? const Padding(
-                        key: ValueKey(true),
-                        padding: EdgeInsetsDirectional.only(end: 10),
-                        child: SelectionBadge(size: _mark),
-                      )
-                    : const SizedBox.shrink(key: ValueKey(false)),
-              ),
-            ),
+            InUseBadge(inUse: selected),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,

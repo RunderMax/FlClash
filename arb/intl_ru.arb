@@ -1136,5 +1136,6 @@
   "appRouteBlockDesc": "Пока VPN включён, приложение не выйдет в сеть",
   "appRouteMissing": "Больше нет в профиле",
   "appExits": "Использованные IP",
-  "appRouteTo": "Направить через"
+  "appRouteTo": "Направить через",
+  "appRoutesTest": "Проверить скорость"
 }

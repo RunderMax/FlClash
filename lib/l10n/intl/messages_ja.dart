@@ -338,6 +338,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "appRoutesIdle": MessageLookupByLibrary.simpleMessage(
       "アプリごとに通るノードを決められます。例：YouTube は日本経由",
     ),
+    "appRoutesTest": MessageLookupByLibrary.simpleMessage("速度を測る"),
     "appendSystemDns": MessageLookupByLibrary.simpleMessage("システムDNSを追加"),
     "applied": MessageLookupByLibrary.simpleMessage("適用しました"),
     "applyNow": MessageLookupByLibrary.simpleMessage("今すぐ適用"),

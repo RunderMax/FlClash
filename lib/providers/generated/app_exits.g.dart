@@ -33,7 +33,7 @@ final class AppExitsProvider
   AppExits create() => AppExits();
 }
 
-String _$appExitsHash() => r'40f371a68081df0500b579c46862b403e04f4996';
+String _$appExitsHash() => r'7fe1cb5e04fc88115291c810f10a8e3b6bacd426';
 
 abstract class _$AppExits extends $AsyncNotifier<Map<String, List<AppExit>>> {
   FutureOr<Map<String, List<AppExit>>> build();

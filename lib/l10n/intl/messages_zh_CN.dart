@@ -326,6 +326,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "appRoutesIdle": MessageLookupByLibrary.simpleMessage(
       "让一个软件走你指定的节点，比如 YouTube 走日本",
     ),
+    "appRoutesTest": MessageLookupByLibrary.simpleMessage("测速"),
     "appendSystemDns": MessageLookupByLibrary.simpleMessage("追加系统DNS"),
     "applied": MessageLookupByLibrary.simpleMessage("已应用"),
     "applyNow": MessageLookupByLibrary.simpleMessage("立即应用"),
