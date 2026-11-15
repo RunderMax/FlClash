@@ -1134,5 +1134,7 @@
   "appRouteDirectDesc": "プロキシを通さず端末の回線で接続します",
   "appRouteBlock": "通信を禁止",
   "appRouteBlockDesc": "VPN がオンの間、このアプリは通信できません",
-  "appRouteMissing": "プロファイルにもうありません"
+  "appRouteMissing": "プロファイルにもうありません",
+  "appExits": "使った IP",
+  "appRouteTo": "経由先"
 }

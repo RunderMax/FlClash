@@ -1,10 +1,12 @@
 import 'dart:async';
 
+import 'package:fl_clash/common/app_exits.dart';
 import 'package:fl_clash/common/app_routes.dart';
 import 'package:fl_clash/common/common.dart';
 import 'package:fl_clash/enum/enum.dart';
 import 'package:fl_clash/models/models.dart';
 import 'package:fl_clash/plugins/app.dart';
+import 'package:fl_clash/providers/app_exits.dart';
 import 'package:fl_clash/providers/providers.dart';
 import 'package:fl_clash/ui/icons/icons.dart';
 import 'package:fl_clash/views/dashboard/layout.dart';
@@ -105,6 +107,7 @@ class _AppRoutesCardState extends ConsumerState<AppRoutesCard> {
         package.packageName: package.label,
     };
     final reachable = _reachable(ref.watch(groupsProvider));
+    final exits = ref.watch(appExitsProvider).value ?? const {};
     final shown = routes.entries.take(_cardRows).toList();
     final hidden = routes.length - shown.length;
     return DashboardCard(
@@ -132,6 +135,7 @@ class _AppRoutesCardState extends ConsumerState<AppRoutesCard> {
                 label: labels[packageName] ?? packageName,
                 target: target,
                 missing: _missing(target, reachable),
+                latest: exits[packageName]?.firstOrNull,
               ),
               const SizedBox(height: 6),
             ],
@@ -183,12 +187,14 @@ class _RouteRow extends StatelessWidget {
     required this.label,
     required this.target,
     required this.missing,
+    required this.latest,
   });
 
   final String packageName;
   final String label;
   final String target;
   final bool missing;
+  final AppExit? latest;
 
   @override
   Widget build(BuildContext context) {
@@ -209,11 +215,24 @@ class _RouteRow extends StatelessWidget {
           PackageIcon(packageName: packageName, size: _cardIcon),
           const SizedBox(width: 10),
           Expanded(
-            child: Text(
-              label,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: AppTextStyle.subheadline.of(context, emphasized: true),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              spacing: 2,
+              children: [
+                Text(
+                  label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: AppTextStyle.subheadline.of(context, emphasized: true),
+                ),
+                if (latest case final latest?)
+                  _ExitLine(
+                    exit: latest,
+                    style: AppTextStyle.caption1
+                        .of(context)
+                        .copyWith(color: context.colorScheme.onSurfaceVariant),
+                  ),
+              ],
             ),
           ),
           const SizedBox(width: 8),
@@ -511,6 +530,9 @@ class _TargetsPageState extends ConsumerState<_TargetsPage> {
       ),
     );
     final groups = ref.watch(groupsProvider);
+    final exits = ref.watch(
+      appExitsProvider.select((state) => state.value?[widget.packageName]),
+    );
     final query = SearchQuery(_query);
     final shownGroups = [
       for (final group in groups)
@@ -548,14 +570,37 @@ class _TargetsPageState extends ConsumerState<_TargetsPage> {
         builder: (context) => CustomScrollView(
           slivers: [
             SliverToBoxAdapter(
-              child: SizedBox(height: context.contentTopPadding),
+              child: SizedBox(height: context.sectionsTopPadding),
             ),
             SliverPadding(
               padding: EdgeInsets.fromLTRB(16, 0, 16, 16 + context.bottomInset),
               sliver: SliverMainAxisGroup(
                 slivers: [
+                  if (query.isEmpty && exits != null && exits.isNotEmpty) ...[
+                    SliverToBoxAdapter(
+                      child: ListHeader(title: appLocalizations.appExits),
+                    ),
+                    SliverToBoxAdapter(
+                      child: ItemPositionProvider(
+                        position: ItemPosition.startAndEnd,
+                        child: _ExitItem(
+                          exit: exits.first,
+                          latest: true,
+                          onPressed: () => showInSheet<void>(
+                            context,
+                            builder: (_) =>
+                                _ExitsPage(packageName: widget.packageName),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                   if (query.isEmpty)
-                    ..._section(choices: fixed, current: current),
+                    ..._section(
+                      title: appLocalizations.appRouteTo,
+                      choices: fixed,
+                      current: current,
+                    ),
                   if (query.isEmpty && groups.isEmpty)
                     SliverToBoxAdapter(
                       child: Padding(
@@ -626,6 +671,131 @@ class _Delay extends ConsumerWidget {
           .of(context, emphasized: true)
           .toTabular
           .copyWith(color: context.colorScheme.delayColor(delay)),
+    );
+  }
+}
+
+String _clock(DateTime time) =>
+    '${getDateStringLast2(time.hour)}:${getDateStringLast2(time.minute)}';
+
+String _day(DateTime time) =>
+    '${getDateStringLast2(time.month)}-${getDateStringLast2(time.day)}';
+
+String _spanOf(AppExit exit) {
+  final AppExit(:first, :last) = exit;
+  final start = '${_day(first)} ${_clock(first)}';
+  if (last.difference(first) < const Duration(minutes: 1)) {
+    return start;
+  }
+  final sameDay =
+      first.year == last.year &&
+      first.month == last.month &&
+      first.day == last.day;
+  return '$start – ${sameDay ? _clock(last) : '${_day(last)} ${_clock(last)}'}';
+}
+
+class _ExitLine extends StatelessWidget {
+  const _ExitLine({required this.exit, required this.style});
+
+  final AppExit exit;
+  final TextStyle style;
+
+  @override
+  Widget build(BuildContext context) {
+    return Text.rich(
+      TextSpan(
+        children: [
+          if (exit.country.isNotEmpty)
+            TextSpan(
+              text: '${exit.country.countryFlagEmoji} ',
+              style: style.copyWith(fontFamily: FontFamily.twEmoji.value),
+            ),
+          TextSpan(text: exit.ip),
+        ],
+      ),
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+      style: style.toTabular,
+    );
+  }
+}
+
+class _ExitItem extends StatelessWidget {
+  const _ExitItem({required this.exit, this.latest = false, this.onPressed});
+
+  final AppExit exit;
+  final bool latest;
+  final VoidCallback? onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    final style = AppTextStyle.title3.of(context);
+    final when = latest
+        ? exit.last.getLastUpdateTimeDesc(context)
+        : _spanOf(exit);
+    return DecorationListItem(
+      leading: SizedBox.square(
+        dimension: 28,
+        child: Center(
+          child: exit.country.isEmpty
+              ? const GlyphIcon(AppGlyphs.locate)
+              : Text(
+                  exit.country.countryFlagEmoji,
+                  style: style.copyWith(fontFamily: FontFamily.twEmoji.value),
+                ),
+        ),
+      ),
+      title: Text(exit.ip, maxLines: 1, overflow: TextOverflow.ellipsis),
+      subtitle: Text(
+        '${_targetLabel(context, exit.node)} · $when',
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+      ),
+      trailing: onPressed == null
+          ? null
+          : GlyphIcon(
+              AppGlyphs.chevronForward,
+              size: 18,
+              color: context.colorScheme.onSurfaceVariant,
+            ),
+      onPressed: onPressed,
+    );
+  }
+}
+
+class _ExitsPage extends ConsumerWidget {
+  const _ExitsPage({required this.packageName});
+
+  final String packageName;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final exits =
+        ref.watch(
+          appExitsProvider.select((state) => state.value?[packageName]),
+        ) ??
+        const [];
+    return Scaffold(
+      title: context.appLocalizations.appExits,
+      body: Builder(
+        builder: (context) => CustomScrollView(
+          slivers: [
+            SliverToBoxAdapter(
+              child: SizedBox(height: context.contentTopPadding),
+            ),
+            SliverPadding(
+              padding: EdgeInsets.fromLTRB(16, 0, 16, 16 + context.bottomInset),
+              sliver: SliverPrismList(
+                itemCount: exits.length,
+                itemBuilder: (_, index) => ItemPositionProvider(
+                  position: ItemPosition.get(index, exits.length),
+                  child: _ExitItem(exit: exits[index]),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

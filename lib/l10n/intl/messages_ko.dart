@@ -317,6 +317,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "answers": MessageLookupByLibrary.simpleMessage("응답"),
     "app": MessageLookupByLibrary.simpleMessage("앱"),
     "appAccessControl": MessageLookupByLibrary.simpleMessage("앱 접근 제어"),
+    "appExits": MessageLookupByLibrary.simpleMessage("사용한 IP"),
     "appIconDesign": MessageLookupByLibrary.simpleMessage("앱 아이콘 디자인"),
     "appProxiesEmpty": MessageLookupByLibrary.simpleMessage("로컬 프록시 없음"),
     "appRouteBlock": MessageLookupByLibrary.simpleMessage("네트워크 차단"),
@@ -329,6 +330,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "appRouteFollow": MessageLookupByLibrary.simpleMessage("규칙 따르기"),
     "appRouteFollowDesc": MessageLookupByLibrary.simpleMessage("프로필 규칙대로 연결해요"),
     "appRouteMissing": MessageLookupByLibrary.simpleMessage("프로필에 더 이상 없어요"),
+    "appRouteTo": MessageLookupByLibrary.simpleMessage("보낼 곳"),
     "appRoutes": MessageLookupByLibrary.simpleMessage("앱별 경로"),
     "appRoutesChoose": MessageLookupByLibrary.simpleMessage("앱 선택"),
     "appRoutesIdle": MessageLookupByLibrary.simpleMessage(

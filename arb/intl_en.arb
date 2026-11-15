@@ -1134,5 +1134,7 @@
   "appRouteDirectDesc": "Skips the proxy and uses the phone's own network",
   "appRouteBlock": "No network",
   "appRouteBlockDesc": "The app cannot go online while the VPN is on",
-  "appRouteMissing": "No longer in the profile"
+  "appRouteMissing": "No longer in the profile",
+  "appExits": "IPs used",
+  "appRouteTo": "Send through"
 }

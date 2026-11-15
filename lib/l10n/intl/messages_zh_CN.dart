@@ -309,6 +309,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "answers": MessageLookupByLibrary.simpleMessage("应答"),
     "app": MessageLookupByLibrary.simpleMessage("应用"),
     "appAccessControl": MessageLookupByLibrary.simpleMessage("应用访问控制"),
+    "appExits": MessageLookupByLibrary.simpleMessage("用过的 IP"),
     "appIconDesign": MessageLookupByLibrary.simpleMessage("应用图标设计"),
     "appProxiesEmpty": MessageLookupByLibrary.simpleMessage("暂无本地代理"),
     "appRouteBlock": MessageLookupByLibrary.simpleMessage("禁止联网"),
@@ -319,6 +320,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "appRouteFollow": MessageLookupByLibrary.simpleMessage("跟随规则"),
     "appRouteFollowDesc": MessageLookupByLibrary.simpleMessage("按订阅里的规则走"),
     "appRouteMissing": MessageLookupByLibrary.simpleMessage("订阅里已经没有这个了"),
+    "appRouteTo": MessageLookupByLibrary.simpleMessage("分配到"),
     "appRoutes": MessageLookupByLibrary.simpleMessage("按软件分配"),
     "appRoutesChoose": MessageLookupByLibrary.simpleMessage("选择软件"),
     "appRoutesIdle": MessageLookupByLibrary.simpleMessage(

@@ -317,6 +317,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "answers": MessageLookupByLibrary.simpleMessage("応答"),
     "app": MessageLookupByLibrary.simpleMessage("アプリ"),
     "appAccessControl": MessageLookupByLibrary.simpleMessage("アプリアクセス制御"),
+    "appExits": MessageLookupByLibrary.simpleMessage("使った IP"),
     "appIconDesign": MessageLookupByLibrary.simpleMessage("アプリアイコンのデザイン"),
     "appProxiesEmpty": MessageLookupByLibrary.simpleMessage("ローカルプロキシがありません"),
     "appRouteBlock": MessageLookupByLibrary.simpleMessage("通信を禁止"),
@@ -331,6 +332,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "プロファイルのルール通りに通信します",
     ),
     "appRouteMissing": MessageLookupByLibrary.simpleMessage("プロファイルにもうありません"),
+    "appRouteTo": MessageLookupByLibrary.simpleMessage("経由先"),
     "appRoutes": MessageLookupByLibrary.simpleMessage("アプリ別ルート"),
     "appRoutesChoose": MessageLookupByLibrary.simpleMessage("アプリを選ぶ"),
     "appRoutesIdle": MessageLookupByLibrary.simpleMessage(

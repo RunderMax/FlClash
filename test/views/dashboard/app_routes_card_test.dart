@@ -1,6 +1,8 @@
+import 'package:fl_clash/common/app_exits.dart';
 import 'package:fl_clash/common/app_routes.dart';
 import 'package:fl_clash/enum/enum.dart';
 import 'package:fl_clash/models/models.dart';
+import 'package:fl_clash/providers/app_exits.dart';
 import 'package:fl_clash/providers/providers.dart';
 import 'package:fl_clash/state.dart';
 import 'package:fl_clash/views/dashboard/layout.dart';
@@ -42,11 +44,29 @@ const _groups = [
   ),
 ];
 
+class _Exits extends AppExits {
+  _Exits(this.exits);
+
+  final Map<String, List<AppExit>> exits;
+
+  @override
+  Future<Map<String, List<AppExit>>> build() async => exits;
+}
+
+AppExit _exit(String node, String ip, int minutesAgo) {
+  final at = DateTime.now().subtract(Duration(minutes: minutesAgo));
+  return AppExit(node: node, ip: ip, country: 'JP', first: at, last: at);
+}
+
 void main() {
   late ProviderContainer container;
+  var exits = <String, List<AppExit>>{};
 
   setUp(() {
-    container = ProviderContainer();
+    exits = {};
+    container = ProviderContainer(
+      overrides: [appExitsProvider.overrideWith(() => _Exits(exits))],
+    );
     globalState.container = container;
     container.listen(groupsProvider, (_, _) {});
     container.listen(packagesProvider, (_, _) {});
@@ -63,7 +83,7 @@ void main() {
       .update((state) => state.copyWith(slothAppRoutes: routes));
 
   Future<void> pumpCard(WidgetTester tester) async {
-    const size = Size(400, 900);
+    const size = Size(400, 1400);
     container.read(viewSizeProvider.notifier).value = size;
     tester.view.physicalSize = size;
     tester.view.devicePixelRatio = 1;
@@ -192,6 +212,36 @@ void main() {
     expect(find.text('Chat'), findsWidgets);
     expect(find.text('No network'), findsWidgets);
     expect(find.text('Follow the rules'), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('an app shows the address it last went out from, and the '
+      'others it used', (tester) async {
+    container.read(packagesProvider.notifier).value = _packages;
+    container.read(groupsProvider.notifier).value = _groups;
+    route({'com.example.video': 'Media'});
+    exits = {
+      'com.example.video': [
+        _exit('JP-01', '1.1.1.1', 3),
+        _exit('US-01', '2.2.2.2', 90),
+      ],
+    };
+    await pumpCard(tester);
+    await tester.pump();
+
+    expect(find.textContaining('1.1.1.1', findRichText: true), findsOneWidget);
+    expect(find.textContaining('2.2.2.2', findRichText: true), findsNothing);
+
+    await tester.tap(find.text('Video'));
+    await tester.pumpAndSettle();
+    expect(find.text('IPs used'), findsOneWidget);
+    expect(find.text('Send through'), findsOneWidget);
+    expect(find.text('JP-01 · 3 minutes ago'), findsOneWidget);
+
+    await tester.tap(find.text('JP-01 · 3 minutes ago'));
+    await tester.pumpAndSettle();
+    expect(find.text('2.2.2.2'), findsOneWidget);
+    expect(find.textContaining('US-01 · '), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 }

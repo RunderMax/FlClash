@@ -1134,5 +1134,7 @@
   "appRouteDirectDesc": "不走代理，用手机自己的网络",
   "appRouteBlock": "禁止联网",
   "appRouteBlockDesc": "开着 VPN 时这个软件上不了网",
-  "appRouteMissing": "订阅里已经没有这个了"
+  "appRouteMissing": "订阅里已经没有这个了",
+  "appExits": "用过的 IP",
+  "appRouteTo": "分配到"
 }

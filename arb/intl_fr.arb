@@ -1134,5 +1134,7 @@
   "appRouteDirectDesc": "Contourne le proxy et utilise le réseau du téléphone",
   "appRouteBlock": "Pas de réseau",
   "appRouteBlockDesc": "L'app ne peut pas se connecter tant que le VPN est actif",
-  "appRouteMissing": "N'est plus dans le profil"
+  "appRouteMissing": "N'est plus dans le profil",
+  "appExits": "IP utilisées",
+  "appRouteTo": "Faire passer par"
 }

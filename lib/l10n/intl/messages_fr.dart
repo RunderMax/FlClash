@@ -382,6 +382,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "appAccessControl": MessageLookupByLibrary.simpleMessage(
       "Contrôle d’accès des apps",
     ),
+    "appExits": MessageLookupByLibrary.simpleMessage("IP utilisées"),
     "appIconDesign": MessageLookupByLibrary.simpleMessage(
       "Conception de l’icône de l’app",
     ),
@@ -402,6 +403,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "appRouteMissing": MessageLookupByLibrary.simpleMessage(
       "N\'est plus dans le profil",
     ),
+    "appRouteTo": MessageLookupByLibrary.simpleMessage("Faire passer par"),
     "appRoutes": MessageLookupByLibrary.simpleMessage("Routes par app"),
     "appRoutesChoose": MessageLookupByLibrary.simpleMessage("Choisir des apps"),
     "appRoutesIdle": MessageLookupByLibrary.simpleMessage(

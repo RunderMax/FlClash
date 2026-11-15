@@ -9553,6 +9553,16 @@ class AppLocalizations {
       args: [],
     );
   }
+
+  /// `IPs used`
+  String get appExits {
+    return Intl.message('IPs used', name: 'appExits', desc: '', args: []);
+  }
+
+  /// `Send through`
+  String get appRouteTo {
+    return Intl.message('Send through', name: 'appRouteTo', desc: '', args: []);
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<AppLocalizations> {

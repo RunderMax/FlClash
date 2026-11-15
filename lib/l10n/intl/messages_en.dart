@@ -363,6 +363,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "appAccessControl": MessageLookupByLibrary.simpleMessage(
       "App access control",
     ),
+    "appExits": MessageLookupByLibrary.simpleMessage("IPs used"),
     "appIconDesign": MessageLookupByLibrary.simpleMessage("App icon design"),
     "appProxiesEmpty": MessageLookupByLibrary.simpleMessage("No local proxies"),
     "appRouteBlock": MessageLookupByLibrary.simpleMessage("No network"),
@@ -379,6 +380,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "appRouteMissing": MessageLookupByLibrary.simpleMessage(
       "No longer in the profile",
     ),
+    "appRouteTo": MessageLookupByLibrary.simpleMessage("Send through"),
     "appRoutes": MessageLookupByLibrary.simpleMessage("App routes"),
     "appRoutesChoose": MessageLookupByLibrary.simpleMessage("Choose apps"),
     "appRoutesIdle": MessageLookupByLibrary.simpleMessage(

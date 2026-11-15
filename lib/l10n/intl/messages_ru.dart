@@ -371,6 +371,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "appAccessControl": MessageLookupByLibrary.simpleMessage(
       "Контроль доступа приложений",
     ),
+    "appExits": MessageLookupByLibrary.simpleMessage("Использованные IP"),
     "appIconDesign": MessageLookupByLibrary.simpleMessage(
       "Дизайн значка приложения",
     ),
@@ -391,6 +392,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "appRouteMissing": MessageLookupByLibrary.simpleMessage(
       "Больше нет в профиле",
     ),
+    "appRouteTo": MessageLookupByLibrary.simpleMessage("Направить через"),
     "appRoutes": MessageLookupByLibrary.simpleMessage("Маршруты приложений"),
     "appRoutesChoose": MessageLookupByLibrary.simpleMessage(
       "Выбрать приложения",

@@ -1134,5 +1134,7 @@
   "appRouteDirectDesc": "В обход прокси, через сеть телефона",
   "appRouteBlock": "Без сети",
   "appRouteBlockDesc": "Пока VPN включён, приложение не выйдет в сеть",
-  "appRouteMissing": "Больше нет в профиле"
+  "appRouteMissing": "Больше нет в профиле",
+  "appExits": "Использованные IP",
+  "appRouteTo": "Направить через"
 }
