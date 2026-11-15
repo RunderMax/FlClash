@@ -62,7 +62,7 @@ Future<SetupState> setupState(Ref ref, int? profileId) async {
             (state) => ProfileOverrides(
               dns: state.dns,
               dnsOverrideKeys: state.dnsOverrideKeys.intersection(
-                DnsOverrideKey.normalProfileKeys,
+                profileDnsOverrideKeys(state.dnsOverrideKeys),
               ),
               tun: state.tunOverride,
               tunOverrideKeys: state.tunOverrideKeys,

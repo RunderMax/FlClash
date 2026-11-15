@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:fl_clash/common/common.dart';
+import 'package:fl_clash/common/dns_guard.dart';
 import 'package:fl_clash/common/privacy_check.dart';
 import 'package:fl_clash/providers/privacy_check.dart';
 import 'package:fl_clash/providers/providers.dart';
@@ -18,6 +21,8 @@ class PrivacyCheckCard extends ConsumerStatefulWidget {
 }
 
 class _PrivacyCheckCardState extends ConsumerState<PrivacyCheckCard> {
+  Timer? _recheck;
+
   bool get _connected =>
       ref.read(isStartProvider) && !ref.read(suspendProvider);
 
@@ -33,6 +38,25 @@ class _PrivacyCheckCardState extends ConsumerState<PrivacyCheckCard> {
   }
 
   @override
+  void dispose() {
+    _recheck?.cancel();
+    super.dispose();
+  }
+
+  /// The core takes a moment to load the new DNS before a check can see it.
+  void _setDnsGuard(bool enabled) {
+    ref
+        .read(patchClashConfigProvider.notifier)
+        .update((state) => state.withDnsGuard(enabled));
+    _recheck?.cancel();
+    _recheck = Timer(const Duration(seconds: 3), () {
+      if (mounted && _connected) {
+        ref.read(privacyCheckProvider.notifier).run();
+      }
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     ref.listen(isStartProvider, (_, started) {
       if (!started) ref.read(privacyCheckProvider.notifier).reset();
@@ -41,6 +65,9 @@ class _PrivacyCheckCardState extends ConsumerState<PrivacyCheckCard> {
     final mobile = !DashboardDensityScope.of(context).isDesktop;
     final check = ref.watch(privacyCheckProvider);
     final connected = ref.watch(isStartProvider) && !ref.watch(suspendProvider);
+    final dnsGuard = ref.watch(
+      patchClashConfigProvider.select((state) => state.dnsGuard),
+    );
     final running = check.phase == PrivacyCheckPhase.running;
     final report = check.report;
     final hint = !connected
@@ -92,6 +119,20 @@ class _PrivacyCheckCardState extends ConsumerState<PrivacyCheckCard> {
               detail: _webRtcDetail(context, report.webRtc),
             ),
           ],
+          const SizedBox(height: 8),
+          DashboardSwitchRow(
+            glyph: AppGlyphs.dns,
+            title: appLocalizations.dnsGuard,
+            subtitle: dnsGuard
+                ? appLocalizations.dnsGuardOnDesc
+                : appLocalizations.dnsGuardOffDesc,
+            value: dnsGuard,
+            iconSize: 38,
+            padding: const EdgeInsets.fromLTRB(10, 10, 12, 10),
+            radius: AppCorner.md,
+            onTap: () => _setDnsGuard(!dnsGuard),
+            onChanged: _setDnsGuard,
+          ),
         ],
       ),
     );

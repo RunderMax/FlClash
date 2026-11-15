@@ -1089,5 +1089,8 @@
   "privacyCheckFailed": "チェックに失敗しました",
   "runCheck": "チェック",
   "dnsResolverCount": "{count} 件のリゾルバー",
-  "dnsRealIp": "実 IP"
+  "dnsRealIp": "実 IP",
+  "dnsGuard": "DNS リーク防止",
+  "dnsGuardOnDesc": "名前解決もプロキシ経由",
+  "dnsGuardOffDesc": "プロファイルの DNS を使用"
 }

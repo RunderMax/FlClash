@@ -811,6 +811,13 @@ class MessageLookup extends MessageLookupByLibrary {
       "Nouvelle version disponible",
     ),
     "dnsCacheCleared": MessageLookupByLibrary.simpleMessage("Cache DNS vidé"),
+    "dnsGuard": MessageLookupByLibrary.simpleMessage("Bloquer les fuites DNS"),
+    "dnsGuardOffDesc": MessageLookupByLibrary.simpleMessage(
+      "DNS du profil utilisé",
+    ),
+    "dnsGuardOnDesc": MessageLookupByLibrary.simpleMessage(
+      "Les requêtes DNS passent par le proxy",
+    ),
     "dnsHijackDesc": MessageLookupByLibrary.simpleMessage(
       "Sans cette entrée, TUN détourne toutes les requêtes DNS vers le port 53 (any:53).",
     ),

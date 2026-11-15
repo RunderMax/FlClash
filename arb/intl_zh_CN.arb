@@ -1089,5 +1089,8 @@
   "privacyCheckFailed": "检测失败",
   "runCheck": "检测",
   "dnsResolverCount": "{count} 个解析服务器",
-  "dnsRealIp": "真实 IP"
+  "dnsRealIp": "真实 IP",
+  "dnsGuard": "防 DNS 泄漏",
+  "dnsGuardOnDesc": "问路也走代理",
+  "dnsGuardOffDesc": "使用订阅自带的 DNS"
 }

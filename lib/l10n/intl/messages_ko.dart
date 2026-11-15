@@ -638,6 +638,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "disconnected": MessageLookupByLibrary.simpleMessage("연결 끊김"),
     "discoverNewVersion": MessageLookupByLibrary.simpleMessage("새 버전 발견"),
     "dnsCacheCleared": MessageLookupByLibrary.simpleMessage("DNS 캐시를 지웠습니다"),
+    "dnsGuard": MessageLookupByLibrary.simpleMessage("DNS 유출 방지"),
+    "dnsGuardOffDesc": MessageLookupByLibrary.simpleMessage("프로필 자체 DNS 사용"),
+    "dnsGuardOnDesc": MessageLookupByLibrary.simpleMessage("DNS 조회도 프록시로"),
     "dnsHijackDesc": MessageLookupByLibrary.simpleMessage(
       "추가하지 않으면 53번 포트로 가는 모든 DNS 쿼리를 하이재킹합니다(any:53).",
     ),

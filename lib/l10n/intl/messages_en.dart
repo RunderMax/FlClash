@@ -762,6 +762,13 @@ class MessageLookup extends MessageLookupByLibrary {
     "dnsCacheCleared": MessageLookupByLibrary.simpleMessage(
       "DNS cache cleared",
     ),
+    "dnsGuard": MessageLookupByLibrary.simpleMessage("Prevent DNS leaks"),
+    "dnsGuardOffDesc": MessageLookupByLibrary.simpleMessage(
+      "Using the profile\'s own DNS",
+    ),
+    "dnsGuardOnDesc": MessageLookupByLibrary.simpleMessage(
+      "Lookups go through the proxy",
+    ),
     "dnsHijackDesc": MessageLookupByLibrary.simpleMessage(
       "Without this entry, TUN hijacks every DNS query to port 53 (any:53).",
     ),

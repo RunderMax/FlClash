@@ -1089,5 +1089,8 @@
   "privacyCheckFailed": "Check failed",
   "runCheck": "Run check",
   "dnsResolverCount": "{count, plural, =1{1 resolver} other{{count} resolvers}}",
-  "dnsRealIp": "Real IP"
+  "dnsRealIp": "Real IP",
+  "dnsGuard": "Prevent DNS leaks",
+  "dnsGuardOnDesc": "Lookups go through the proxy",
+  "dnsGuardOffDesc": "Using the profile's own DNS"
 }

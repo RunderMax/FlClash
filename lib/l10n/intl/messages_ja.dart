@@ -648,6 +648,9 @@ class MessageLookup extends MessageLookupByLibrary {
       "新しいバージョンが見つかりました",
     ),
     "dnsCacheCleared": MessageLookupByLibrary.simpleMessage("DNSキャッシュをクリアしました"),
+    "dnsGuard": MessageLookupByLibrary.simpleMessage("DNS リーク防止"),
+    "dnsGuardOffDesc": MessageLookupByLibrary.simpleMessage("プロファイルの DNS を使用"),
+    "dnsGuardOnDesc": MessageLookupByLibrary.simpleMessage("名前解決もプロキシ経由"),
     "dnsHijackDesc": MessageLookupByLibrary.simpleMessage(
       "追加しない場合、ポート 53 宛てのすべての DNS 問い合わせをハイジャックします（any:53）。",
     ),

@@ -1089,5 +1089,8 @@
   "privacyCheckFailed": "Error en la comprobación",
   "runCheck": "Comprobar",
   "dnsResolverCount": "{count, plural, =1{1 resolutor} other{{count} resolutores}}",
-  "dnsRealIp": "IP real"
+  "dnsRealIp": "IP real",
+  "dnsGuard": "Evitar fugas de DNS",
+  "dnsGuardOnDesc": "Las consultas DNS van por el proxy",
+  "dnsGuardOffDesc": "Usando el DNS del perfil"
 }

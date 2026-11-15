@@ -1089,5 +1089,8 @@
   "privacyCheckFailed": "검사 실패",
   "runCheck": "검사",
   "dnsResolverCount": "리졸버 {count}개",
-  "dnsRealIp": "실제 IP"
+  "dnsRealIp": "실제 IP",
+  "dnsGuard": "DNS 유출 방지",
+  "dnsGuardOnDesc": "DNS 조회도 프록시로",
+  "dnsGuardOffDesc": "프로필 자체 DNS 사용"
 }

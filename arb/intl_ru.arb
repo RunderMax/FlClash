@@ -1089,5 +1089,8 @@
   "privacyCheckFailed": "Проверка не удалась",
   "runCheck": "Проверить",
   "dnsResolverCount": "{count, plural, one{{count} резолвер} few{{count} резолвера} other{{count} резолверов}}",
-  "dnsRealIp": "Реальный IP"
+  "dnsRealIp": "Реальный IP",
+  "dnsGuard": "Защита от утечки DNS",
+  "dnsGuardOnDesc": "DNS-запросы идут через прокси",
+  "dnsGuardOffDesc": "Используется DNS профиля"
 }

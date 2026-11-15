@@ -594,6 +594,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "disconnected": MessageLookupByLibrary.simpleMessage("已断开"),
     "discoverNewVersion": MessageLookupByLibrary.simpleMessage("发现新版本"),
     "dnsCacheCleared": MessageLookupByLibrary.simpleMessage("DNS缓存已清除"),
+    "dnsGuard": MessageLookupByLibrary.simpleMessage("防 DNS 泄漏"),
+    "dnsGuardOffDesc": MessageLookupByLibrary.simpleMessage("使用订阅自带的 DNS"),
+    "dnsGuardOnDesc": MessageLookupByLibrary.simpleMessage("问路也走代理"),
     "dnsHijackDesc": MessageLookupByLibrary.simpleMessage(
       "未添加时劫持所有发往 53 端口的 DNS 请求（any:53）。",
     ),

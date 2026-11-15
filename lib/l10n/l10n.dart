@@ -9174,6 +9174,36 @@ class AppLocalizations {
   String get dnsRealIp {
     return Intl.message('Real IP', name: 'dnsRealIp', desc: '', args: []);
   }
+
+  /// `Prevent DNS leaks`
+  String get dnsGuard {
+    return Intl.message(
+      'Prevent DNS leaks',
+      name: 'dnsGuard',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Lookups go through the proxy`
+  String get dnsGuardOnDesc {
+    return Intl.message(
+      'Lookups go through the proxy',
+      name: 'dnsGuardOnDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Using the profile's own DNS`
+  String get dnsGuardOffDesc {
+    return Intl.message(
+      'Using the profile\'s own DNS',
+      name: 'dnsGuardOffDesc',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<AppLocalizations> {

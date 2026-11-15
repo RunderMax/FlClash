@@ -794,6 +794,13 @@ class MessageLookup extends MessageLookupByLibrary {
       "Доступна новая версия",
     ),
     "dnsCacheCleared": MessageLookupByLibrary.simpleMessage("Кэш DNS очищен"),
+    "dnsGuard": MessageLookupByLibrary.simpleMessage("Защита от утечки DNS"),
+    "dnsGuardOffDesc": MessageLookupByLibrary.simpleMessage(
+      "Используется DNS профиля",
+    ),
+    "dnsGuardOnDesc": MessageLookupByLibrary.simpleMessage(
+      "DNS-запросы идут через прокси",
+    ),
     "dnsHijackDesc": MessageLookupByLibrary.simpleMessage(
       "Без этого параметра TUN перехватывает все DNS-запросы на порт 53 (any:53).",
     ),
