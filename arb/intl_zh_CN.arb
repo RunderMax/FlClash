@@ -1124,5 +1124,6 @@
   "secureWindow": "最近任务里隐藏画面",
   "secureWindowDesc": "最近任务里只显示空白，同时禁止截屏",
   "hidePort": "隐藏本地代理端口",
-  "hidePortDesc": "别的 app 扫不到 7890 端口，看不出你在用代理"
+  "hidePortDesc": "别的 app 扫不到 7890 端口，看不出你在用代理",
+  "pickInUse": "正在使用"
 }

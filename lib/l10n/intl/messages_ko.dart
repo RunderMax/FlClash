@@ -1315,6 +1315,7 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "pickHistoryStats": m76,
     "pickHistoryWeek": MessageLookupByLibrary.simpleMessage("7일"),
+    "pickInUse": MessageLookupByLibrary.simpleMessage("사용 중"),
     "pickNotEnough": MessageLookupByLibrary.simpleMessage("데이터 부족"),
     "pickRecord": MessageLookupByLibrary.simpleMessage("안정성 기록"),
     "pickRecordDesc": MessageLookupByLibrary.simpleMessage("3시간마다, Wi-Fi에서만"),

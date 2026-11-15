@@ -1209,6 +1209,7 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "pickHistoryStats": m76,
     "pickHistoryWeek": MessageLookupByLibrary.simpleMessage("7 天"),
+    "pickInUse": MessageLookupByLibrary.simpleMessage("正在使用"),
     "pickNotEnough": MessageLookupByLibrary.simpleMessage("数据不够"),
     "pickRecord": MessageLookupByLibrary.simpleMessage("记录稳定性"),
     "pickRecordDesc": MessageLookupByLibrary.simpleMessage(

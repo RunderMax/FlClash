@@ -1681,6 +1681,7 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "pickHistoryStats": m76,
     "pickHistoryWeek": MessageLookupByLibrary.simpleMessage("7 días"),
+    "pickInUse": MessageLookupByLibrary.simpleMessage("En uso"),
     "pickNotEnough": MessageLookupByLibrary.simpleMessage(
       "Datos insuficientes",
     ),

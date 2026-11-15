@@ -190,10 +190,14 @@ class _FastestNodesCardState extends ConsumerState<FastestNodesCard> {
     final sort = ref.watch(
       appSettingProvider.select((state) => state.pickSort),
     );
-    final groups = ref.watch(groupsProvider);
-    final current = _hostGroup(groups)?.now == slothPicksGroup
-        ? groups.firstWhereOrNull((group) => group.name == slothPicksGroup)?.now
-        : null;
+    final host = ref.watch(
+      groupsProvider.select((groups) => _hostGroup(groups)?.name),
+    );
+    // Followed through every group, so a pick chosen in the proxies page
+    // counts as well as one chosen here.
+    final current = host == null
+        ? null
+        : ref.watch(realSelectedProxyStateProvider(host)).proxyName;
     _watchPicks(names);
     final picks = _sorted([for (final name in names) _pickOf(name)], sort);
     return DashboardCard(
@@ -323,11 +327,13 @@ class _PickTile extends StatelessWidget {
     final delay = pick.delay;
     final ip = pick.ip;
     final quality = pick.quality;
-    return DashboardBlock(
+    final tile = DashboardBlock(
       radius: AppCorner.md,
-      padding: const EdgeInsets.fromLTRB(14, 10, 12, 10),
+      padding: EdgeInsets.fromLTRB(14, selected ? 36 : 10, 12, 10),
       onTap: onTap,
-      semanticLabel: pick.name,
+      semanticLabel: selected
+          ? '${pick.name} ${appLocalizations.pickInUse}'
+          : pick.name,
       child: Row(
         spacing: 10,
         children: [
@@ -380,6 +386,21 @@ class _PickTile extends StatelessWidget {
           if (selected) const SelectionCheck(),
         ],
       ),
+    );
+    if (!selected) return tile;
+    return Stack(
+      children: [
+        tile,
+        PositionedDirectional(
+          top: 8,
+          end: 10,
+          child: DashboardChip(
+            label: appLocalizations.pickInUse,
+            tone: DashboardChipTone.ok,
+            dot: true,
+          ),
+        ),
+      ],
     );
   }
 }

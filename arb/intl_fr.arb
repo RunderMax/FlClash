@@ -1124,5 +1124,6 @@
   "secureWindow": "Masquer dans les apps récentes",
   "secureWindowDesc": "L’app apparaît vide dans les récentes et les captures sont bloquées",
   "hidePort": "Masquer le port du proxy local",
-  "hidePortDesc": "Les autres apps ne trouvent plus le proxy sur le port 7890"
+  "hidePortDesc": "Les autres apps ne trouvent plus le proxy sur le port 7890",
+  "pickInUse": "Utilisé"
 }

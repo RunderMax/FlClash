@@ -1333,6 +1333,7 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "pickHistoryStats": m76,
     "pickHistoryWeek": MessageLookupByLibrary.simpleMessage("7 日"),
+    "pickInUse": MessageLookupByLibrary.simpleMessage("使用中"),
     "pickNotEnough": MessageLookupByLibrary.simpleMessage("データ不足"),
     "pickRecord": MessageLookupByLibrary.simpleMessage("安定性を記録"),
     "pickRecordDesc": MessageLookupByLibrary.simpleMessage(

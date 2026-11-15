@@ -1638,6 +1638,7 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "pickHistoryStats": m76,
     "pickHistoryWeek": MessageLookupByLibrary.simpleMessage("7 дней"),
+    "pickInUse": MessageLookupByLibrary.simpleMessage("Используется"),
     "pickNotEnough": MessageLookupByLibrary.simpleMessage("Мало данных"),
     "pickRecord": MessageLookupByLibrary.simpleMessage(
       "Записывать стабильность",

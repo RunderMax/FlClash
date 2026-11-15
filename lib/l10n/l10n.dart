@@ -9464,6 +9464,11 @@ class AppLocalizations {
       args: [],
     );
   }
+
+  /// `In use`
+  String get pickInUse {
+    return Intl.message('In use', name: 'pickInUse', desc: '', args: []);
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<AppLocalizations> {
