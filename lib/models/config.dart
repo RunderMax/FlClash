@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:fl_clash/common/common.dart';
 import 'package:fl_clash/enum/enum.dart';
 import 'package:flutter/services.dart';
@@ -139,37 +140,6 @@ final List<DashboardWidget> platformDefaultDashboardWidgets = system.isAndroid
       ]
     : defaultDashboardWidgets;
 
-/// Phone layouts this fork shipped as defaults, saved on first launch, so an
-/// untouched one would never show the cards added since.
-const _previousAndroidDefaultDashboardWidgets = [
-  {
-    'currentOutbound',
-    'networkSpeed',
-    'outboundMode',
-    'profiles',
-    'proxyGroups',
-  },
-  {
-    'currentOutbound',
-    'networkSpeed',
-    'outboundMode',
-    'serviceStatus',
-    'privacyCheck',
-    'profiles',
-    'proxyGroups',
-  },
-  {
-    'currentOutbound',
-    'networkSpeed',
-    'outboundMode',
-    'serviceStatus',
-    'privacyCheck',
-    'fastestNodes',
-    'profiles',
-    'proxyGroups',
-  },
-];
-
 const _legacyDefaultDashboardWidgets = {
   'networkSpeed',
   'systemProxyButton',
@@ -207,14 +177,6 @@ List<DashboardWidget> dashboardWidgetsFromJson(
     return platformDefaultDashboardWidgets;
   }
   final byName = DashboardWidget.values.asNameMap();
-  final saved = dashboardWidgets.toSet();
-  if (_previousAndroidDefaultDashboardWidgets.any(
-    (previous) =>
-        previous.length == dashboardWidgets.length &&
-        saved.containsAll(previous),
-  )) {
-    return platformDefaultDashboardWidgets;
-  }
   if (dashboardWidgets.contains(DashboardWidget.currentOutbound.name)) {
     return dashboardWidgets
         .map((e) => _legacyDashboardWidgets[e] ?? byName[e])
@@ -288,6 +250,10 @@ abstract class AppSettingProps with _$AppSettingProps {
     @Default(false) bool onlyStatisticsProxy,
     @Default(PickSort.custom) PickSort pickSort,
     @Default(false) bool secureWindow,
+
+    /// Every card this build has offered, so a card a later build adds shows
+    /// up once among the user's own, and a card the user removed stays gone.
+    @Default([]) List<String> seenDashboardWidgets,
     @Default(true) bool showNotificationStopAction,
     @Default(false) bool autoLaunch,
     @Default(false) bool silentLaunch,
@@ -571,9 +537,11 @@ abstract class Config with _$Config {
       decodeSalvaging('config', json, Config.strictFromJson);
 
   factory Config.strictFromJson(Map<String, Object?> json) =>
-      _withLegacyOverrideDns(
-        _$ConfigFromJson(_withLegacyTestUrl(_withLegacyRouteMode(json))),
-        json,
+      _withNewDashboardWidgets(
+        _withLegacyOverrideDns(
+          _$ConfigFromJson(_withLegacyTestUrl(_withLegacyRouteMode(json))),
+          json,
+        ),
       );
 
   factory Config.realFromJson(Map<String, Object?>? json) {
@@ -588,6 +556,52 @@ abstract class Config with _$Config {
     }
     return Config.fromJson(json);
   }
+}
+
+/// A config from before the record counts every card it could see as seen,
+/// so nothing it left out comes back.
+Config _withNewDashboardWidgets(Config config) {
+  final settings = config.appSettingProps;
+  final all = [for (final card in DashboardWidget.values) card.name];
+  final seen = settings.seenDashboardWidgets.toSet();
+  if (seen.isEmpty) {
+    return config.copyWith.appSettingProps(seenDashboardWidgets: all);
+  }
+  if (seen.containsAll(all)) {
+    return config;
+  }
+  return config.copyWith.appSettingProps(
+    dashboardWidgets: _insertNewCards(
+      settings.dashboardWidgets,
+      platformDefaultDashboardWidgets.where(
+        (card) => !seen.contains(card.name),
+      ),
+    ),
+    seenDashboardWidgets: all,
+  );
+}
+
+/// Each new card goes after the nearest card that comes before it in the
+/// defaults, so the user's own order stands.
+List<DashboardWidget> _insertNewCards(
+  List<DashboardWidget> saved,
+  Iterable<DashboardWidget> added,
+) {
+  final result = [...saved];
+  for (final card in added) {
+    if (result.contains(card)) continue;
+    final at = platformDefaultDashboardWidgets.indexOf(card);
+    final before = platformDefaultDashboardWidgets
+        .take(at < 0 ? 0 : at)
+        .toList()
+        .reversed
+        .firstWhereOrNull(result.contains);
+    result.insert(
+      before == null ? result.length : result.indexOf(before) + 1,
+      card,
+    );
+  }
+  return result;
 }
 
 const _legacyOverrideDnsKey = 'overrideDns';
