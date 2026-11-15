@@ -9259,6 +9259,66 @@ class AppLocalizations {
   String get pickSortPurity {
     return Intl.message('Purity', name: 'pickSortPurity', desc: '', args: []);
   }
+
+  /// `Stability`
+  String get pickHistory {
+    return Intl.message('Stability', name: 'pickHistory', desc: '', args: []);
+  }
+
+  /// `24 hours`
+  String get pickHistoryDay {
+    return Intl.message('24 hours', name: 'pickHistoryDay', desc: '', args: []);
+  }
+
+  /// `7 days`
+  String get pickHistoryWeek {
+    return Intl.message('7 days', name: 'pickHistoryWeek', desc: '', args: []);
+  }
+
+  /// `Stable`
+  String get pickStable {
+    return Intl.message('Stable', name: 'pickStable', desc: '', args: []);
+  }
+
+  /// `Fair`
+  String get pickFair {
+    return Intl.message('Fair', name: 'pickFair', desc: '', args: []);
+  }
+
+  /// `Unstable`
+  String get pickUnstable {
+    return Intl.message('Unstable', name: 'pickUnstable', desc: '', args: []);
+  }
+
+  /// `Not enough data`
+  String get pickNotEnough {
+    return Intl.message(
+      'Not enough data',
+      name: 'pickNotEnough',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Avg {average} ms · {timeouts} timeouts · ±{jitter} ms swing`
+  String pickHistoryStats(Object average, Object timeouts, Object jitter) {
+    return Intl.message(
+      'Avg $average ms · $timeouts timeouts · ±$jitter ms swing',
+      name: 'pickHistoryStats',
+      desc: '',
+      args: [average, timeouts, jitter],
+    );
+  }
+
+  /// `No records yet. While connected, picks are tested every 5 minutes.`
+  String get pickHistoryEmpty {
+    return Intl.message(
+      'No records yet. While connected, picks are tested every 5 minutes.',
+      name: 'pickHistoryEmpty',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<AppLocalizations> {

@@ -1100,5 +1100,14 @@
   "picksTest": "Probar favoritos",
   "pickSortCustom": "Personalizado",
   "pickSortSpeed": "Velocidad",
-  "pickSortPurity": "Pureza"
+  "pickSortPurity": "Pureza",
+  "pickHistory": "Estabilidad",
+  "pickHistoryDay": "24 horas",
+  "pickHistoryWeek": "7 días",
+  "pickStable": "Estable",
+  "pickFair": "Regular",
+  "pickUnstable": "Inestable",
+  "pickNotEnough": "Datos insuficientes",
+  "pickHistoryStats": "Media {average} ms · {timeouts} tiempos agotados · ±{jitter} ms de variación",
+  "pickHistoryEmpty": "Aún no hay registros. Conectado, los favoritos se prueban cada 5 minutos."
 }

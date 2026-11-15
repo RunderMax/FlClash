@@ -14,6 +14,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'card.dart';
+import 'pick_history.dart';
 
 const _builtInTypes = {
   'Direct',
@@ -146,6 +147,13 @@ class _FastestNodesCardState extends ConsumerState<FastestNodesCard> {
         .update((state) => state.copyWith(pickSort: sort));
   }
 
+  void _showHistory(List<String> names) {
+    showSheet<void>(
+      context: context,
+      builder: (_) => PickHistorySheet(names: names),
+    );
+  }
+
   void _choose() {
     showSheet<void>(
       context: context,
@@ -198,6 +206,13 @@ class _FastestNodesCardState extends ConsumerState<FastestNodesCard> {
             glyph: AppGlyphs.bolt,
             title: appLocalizations.fastestNodes,
             trailing: [
+              DashboardIconButton(
+                glyph: AppGlyphs.dataUsage,
+                tooltip: appLocalizations.pickHistory,
+                onPressed: names.isEmpty
+                    ? null
+                    : () => _showHistory([for (final pick in picks) pick.name]),
+              ),
               Transform.translate(
                 offset: const Offset(8, 0),
                 child: DashboardIconButton(

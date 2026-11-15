@@ -1100,5 +1100,14 @@
   "picksTest": "Test picks",
   "pickSortCustom": "Custom",
   "pickSortSpeed": "Speed",
-  "pickSortPurity": "Purity"
+  "pickSortPurity": "Purity",
+  "pickHistory": "Stability",
+  "pickHistoryDay": "24 hours",
+  "pickHistoryWeek": "7 days",
+  "pickStable": "Stable",
+  "pickFair": "Fair",
+  "pickUnstable": "Unstable",
+  "pickNotEnough": "Not enough data",
+  "pickHistoryStats": "Avg {average} ms · {timeouts} timeouts · ±{jitter} ms swing",
+  "pickHistoryEmpty": "No records yet. While connected, picks are tested every 5 minutes."
 }

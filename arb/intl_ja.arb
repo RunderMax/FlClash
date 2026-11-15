@@ -1100,5 +1100,14 @@
   "picksTest": "速度テスト",
   "pickSortCustom": "カスタム",
   "pickSortSpeed": "速度",
-  "pickSortPurity": "クリーン度"
+  "pickSortPurity": "クリーン度",
+  "pickHistory": "安定性",
+  "pickHistoryDay": "24 時間",
+  "pickHistoryWeek": "7 日",
+  "pickStable": "安定",
+  "pickFair": "普通",
+  "pickUnstable": "不安定",
+  "pickNotEnough": "データ不足",
+  "pickHistoryStats": "平均 {average} ms · タイムアウト {timeouts} 回 · 変動 ±{jitter} ms",
+  "pickHistoryEmpty": "まだ記録がありません。接続中は 5 分ごとにテストします。"
 }

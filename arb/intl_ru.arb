@@ -1100,5 +1100,14 @@
   "picksTest": "Проверить избранное",
   "pickSortCustom": "Свой порядок",
   "pickSortSpeed": "Скорость",
-  "pickSortPurity": "Чистота"
+  "pickSortPurity": "Чистота",
+  "pickHistory": "Стабильность",
+  "pickHistoryDay": "24 часа",
+  "pickHistoryWeek": "7 дней",
+  "pickStable": "Стабильно",
+  "pickFair": "Средне",
+  "pickUnstable": "Нестабильно",
+  "pickNotEnough": "Мало данных",
+  "pickHistoryStats": "Среднее {average} мс · таймаутов {timeouts} · разброс ±{jitter} мс",
+  "pickHistoryEmpty": "Записей пока нет. При подключении избранное проверяется каждые 5 минут."
 }

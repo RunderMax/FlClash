@@ -1100,5 +1100,14 @@
   "picksTest": "测速",
   "pickSortCustom": "自定义",
   "pickSortSpeed": "速度",
-  "pickSortPurity": "纯净度"
+  "pickSortPurity": "纯净度",
+  "pickHistory": "稳定性",
+  "pickHistoryDay": "24 小时",
+  "pickHistoryWeek": "7 天",
+  "pickStable": "稳",
+  "pickFair": "一般",
+  "pickUnstable": "不稳",
+  "pickNotEnough": "数据不够",
+  "pickHistoryStats": "平均 {average} ms · 超时 {timeouts} 次 · 波动 ±{jitter} ms",
+  "pickHistoryEmpty": "还没有记录。连着代理时，每 5 分钟自动测一次。"
 }

@@ -1100,5 +1100,14 @@
   "picksTest": "속도 테스트",
   "pickSortCustom": "사용자 지정",
   "pickSortSpeed": "속도",
-  "pickSortPurity": "청정도"
+  "pickSortPurity": "청정도",
+  "pickHistory": "안정성",
+  "pickHistoryDay": "24시간",
+  "pickHistoryWeek": "7일",
+  "pickStable": "안정",
+  "pickFair": "보통",
+  "pickUnstable": "불안정",
+  "pickNotEnough": "데이터 부족",
+  "pickHistoryStats": "평균 {average} ms · 시간 초과 {timeouts}회 · 변동 ±{jitter} ms",
+  "pickHistoryEmpty": "아직 기록이 없습니다. 연결 중에는 5분마다 테스트합니다."
 }
