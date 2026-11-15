@@ -255,11 +255,11 @@ Future<RealProfile> _makeRealProfileTask(MakeRealProfileState data) async {
       ),
   ]);
   rawConfig['mitm'] = realPatchConfig.mitm.coreJson(mitm.mitm);
-  if (realPatchConfig.slothFastest &&
-      realPatchConfig.slothFastestProxies.isNotEmpty) {
-    rawConfig[slothFastestKey] = {
-      'name': slothFastestGroup,
-      'proxies': realPatchConfig.slothFastestProxies,
+  if (realPatchConfig.slothPicks.isNotEmpty) {
+    rawConfig[slothPicksKey] = {
+      'name': slothPicksGroup,
+      'type': 'select',
+      'proxies': realPatchConfig.slothPicks,
     };
   }
   if (rawConfig['profile'] == null) {

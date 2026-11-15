@@ -22,6 +22,9 @@ _AppSettingProps _$AppSettingPropsFromJson(
       ? defaultDashboardWidgets
       : dashboardWidgetsFromJson(json['dashboardWidgets'] as List?),
   onlyStatisticsProxy: json['onlyStatisticsProxy'] as bool? ?? false,
+  pickSort:
+      $enumDecodeNullable(_$PickSortEnumMap, json['pickSort']) ??
+      PickSort.custom,
   showNotificationStopAction:
       json['showNotificationStopAction'] as bool? ?? true,
   autoLaunch: json['autoLaunch'] as bool? ?? false,
@@ -104,6 +107,7 @@ Map<String, dynamic> _$AppSettingPropsToJson(_AppSettingProps instance) =>
           .map((e) => _$DashboardWidgetEnumMap[e]!)
           .toList(),
       'onlyStatisticsProxy': instance.onlyStatisticsProxy,
+      'pickSort': _$PickSortEnumMap[instance.pickSort]!,
       'showNotificationStopAction': instance.showNotificationStopAction,
       'autoLaunch': instance.autoLaunch,
       'silentLaunch': instance.silentLaunch,
@@ -134,6 +138,12 @@ Map<String, dynamic> _$AppSettingPropsToJson(_AppSettingProps instance) =>
       'tableColumnWidths': instance.tableColumnWidths,
       'recordGroupings': instance.recordGroupings,
     };
+
+const _$PickSortEnumMap = {
+  PickSort.custom: 'custom',
+  PickSort.speed: 'speed',
+  PickSort.purity: 'purity',
+};
 
 const _$RequestFeedEnumMap = {
   RequestFeed.recent: 'recent',

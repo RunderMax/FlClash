@@ -18,9 +18,9 @@ const browserUa =
     'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
 const packageName = 'com.follow.clash';
 
-/// The Core reads this overlay key and builds the url-test group from it.
-const slothFastestKey = 'x-sloth-fastest';
-const slothFastestGroup = 'Sloth Auto';
+/// The Core reads this overlay key and builds the picks group from it.
+const slothPicksKey = 'x-sloth-fastest';
+const slothPicksGroup = 'Sloth Pick';
 final unixSocketPath = '/tmp/FlClashSocket_${Random().nextInt(10000)}.sock';
 final windowsPipeName = '\\\\.\\pipe\\FlClashCore_${_randomPipeId()}';
 const helperPort = 47890;

@@ -467,6 +467,8 @@ enum DashboardWidget {
   const DashboardWidget({this.platforms = SupportPlatform.values});
 }
 
+enum PickSort { custom, speed, purity }
+
 enum DnsQueryInitiator { app, rule, direct, proxy, other }
 
 enum IpType { residential, mobile, business, hosting }

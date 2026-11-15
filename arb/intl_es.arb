@@ -1093,12 +1093,12 @@
   "dnsGuard": "Evitar fugas de DNS",
   "dnsGuardOnDesc": "Las consultas DNS van por el proxy",
   "dnsGuardOffDesc": "Usando el DNS del perfil",
-  "fastestNodes": "El más rápido",
-  "fastestNodesSwitch": "Usar el más rápido",
-  "fastestNodesCount": "{count, plural, =1{1 nodo elegido} other{{count} nodos elegidos}}",
+  "fastestNodes": "Favoritos",
   "fastestNodesChoose": "Elegir nodos",
-  "fastestNodesIdle": "Elige algunos nodos y se usa el más rápido",
-  "fastestNodesCurrent": "Usando {name}",
-  "fastestNodesMissing": "Ninguno de los nodos elegidos está en este perfil",
-  "fastestNodesEmpty": "Este perfil aún no tiene nodos"
+  "fastestNodesEmpty": "Este perfil aún no tiene nodos",
+  "picksIdle": "Aún no hay nodos. Elige algunos abajo",
+  "picksTest": "Probar favoritos",
+  "pickSortCustom": "Personalizado",
+  "pickSortSpeed": "Velocidad",
+  "pickSortPurity": "Pureza"
 }

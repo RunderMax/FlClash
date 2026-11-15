@@ -18,16 +18,17 @@ const (
 
 type fastestGroupSpec struct {
 	Name      string   `yaml:"name"`
+	Type      string   `yaml:"type"`
 	Proxies   []string `yaml:"proxies"`
 	URL       string   `yaml:"url"`
 	Interval  int      `yaml:"interval"`
 	Tolerance int      `yaml:"tolerance"`
 }
 
-// applyFastestGroup turns the request into a url-test group of the chosen
-// proxies the profile still has, offered first in its first select group. A
-// name the profile no longer has is dropped, since mihomo refuses a group that
-// names a proxy it cannot find.
+// applyFastestGroup turns the request into a group of the chosen proxies the
+// profile still has, offered last in its first select group so the profile's
+// own default stays first. A name the profile no longer has is dropped, since
+// mihomo refuses a group that names a proxy it cannot find.
 func applyFastestGroup(root *yaml.Node) error {
 	request := deleteMappingValue(root, fastestGroupKey)
 	if request == nil {
@@ -68,13 +69,22 @@ func applyFastestGroup(root *yaml.Node) error {
 		if candidate.Kind != yaml.MappingNode || scalarOf(mappingValue(candidate, "type")) != "select" {
 			continue
 		}
-		offerFirst(candidate, spec.Name)
+		offerLast(candidate, spec.Name)
 		break
 	}
 	return nil
 }
 
 func fastestGroupNode(spec fastestGroupSpec, proxies []string) (*yaml.Node, error) {
+	var node yaml.Node
+	if spec.Type == "select" {
+		err := node.Encode(map[string]any{
+			"name":    spec.Name,
+			"type":    "select",
+			"proxies": proxies,
+		})
+		return &node, err
+	}
 	url, interval, tolerance := spec.URL, spec.Interval, spec.Tolerance
 	if url == "" {
 		url = defaultFastestURL
@@ -85,7 +95,6 @@ func fastestGroupNode(spec fastestGroupSpec, proxies []string) (*yaml.Node, erro
 	if tolerance <= 0 {
 		tolerance = defaultFastestTolerance
 	}
-	var node yaml.Node
 	err := node.Encode(map[string]any{
 		"name":      spec.Name,
 		"type":      "url-test",
@@ -97,13 +106,14 @@ func fastestGroupNode(spec fastestGroupSpec, proxies []string) (*yaml.Node, erro
 	return &node, err
 }
 
-func offerFirst(group *yaml.Node, name string) {
+func offerLast(group *yaml.Node, name string) {
 	entry := &yaml.Node{Kind: yaml.ScalarNode, Tag: "!!str", Value: name}
 	proxies := resolveAlias(mappingValue(group, "proxies"))
-	content := []*yaml.Node{entry}
+	var content []*yaml.Node
 	if proxies != nil && proxies.Kind == yaml.SequenceNode {
 		content = append(content, proxies.Content...)
 	}
+	content = append(content, entry)
 	setMappingValue(group, "proxies", &yaml.Node{Kind: yaml.SequenceNode, Tag: "!!seq", Content: content})
 }
 

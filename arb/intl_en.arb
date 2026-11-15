@@ -1093,12 +1093,12 @@
   "dnsGuard": "Prevent DNS leaks",
   "dnsGuardOnDesc": "Lookups go through the proxy",
   "dnsGuardOffDesc": "Using the profile's own DNS",
-  "fastestNodes": "Fastest pick",
-  "fastestNodesSwitch": "Use the fastest",
-  "fastestNodesCount": "{count, plural, =1{1 node chosen} other{{count} nodes chosen}}",
+  "fastestNodes": "Picks",
   "fastestNodesChoose": "Choose nodes",
-  "fastestNodesIdle": "Pick a few nodes and the fastest of them is used",
-  "fastestNodesCurrent": "Now using {name}",
-  "fastestNodesMissing": "None of the chosen nodes are in this profile",
-  "fastestNodesEmpty": "This profile has no nodes yet"
+  "fastestNodesEmpty": "This profile has no nodes yet",
+  "picksIdle": "No nodes yet. Choose a few below",
+  "picksTest": "Test picks",
+  "pickSortCustom": "Custom",
+  "pickSortSpeed": "Speed",
+  "pickSortPurity": "Purity"
 }

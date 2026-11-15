@@ -9205,36 +9205,9 @@ class AppLocalizations {
     );
   }
 
-  /// `Fastest pick`
+  /// `Picks`
   String get fastestNodes {
-    return Intl.message(
-      'Fastest pick',
-      name: 'fastestNodes',
-      desc: '',
-      args: [],
-    );
-  }
-
-  /// `Use the fastest`
-  String get fastestNodesSwitch {
-    return Intl.message(
-      'Use the fastest',
-      name: 'fastestNodesSwitch',
-      desc: '',
-      args: [],
-    );
-  }
-
-  /// `{count, plural, =1{1 node chosen} other{{count} nodes chosen}}`
-  String fastestNodesCount(num count) {
-    return Intl.plural(
-      count,
-      one: '1 node chosen',
-      other: '$count nodes chosen',
-      name: 'fastestNodesCount',
-      desc: '',
-      args: [count],
-    );
+    return Intl.message('Picks', name: 'fastestNodes', desc: '', args: []);
   }
 
   /// `Choose nodes`
@@ -9242,36 +9215,6 @@ class AppLocalizations {
     return Intl.message(
       'Choose nodes',
       name: 'fastestNodesChoose',
-      desc: '',
-      args: [],
-    );
-  }
-
-  /// `Pick a few nodes and the fastest of them is used`
-  String get fastestNodesIdle {
-    return Intl.message(
-      'Pick a few nodes and the fastest of them is used',
-      name: 'fastestNodesIdle',
-      desc: '',
-      args: [],
-    );
-  }
-
-  /// `Now using {name}`
-  String fastestNodesCurrent(Object name) {
-    return Intl.message(
-      'Now using $name',
-      name: 'fastestNodesCurrent',
-      desc: '',
-      args: [name],
-    );
-  }
-
-  /// `None of the chosen nodes are in this profile`
-  String get fastestNodesMissing {
-    return Intl.message(
-      'None of the chosen nodes are in this profile',
-      name: 'fastestNodesMissing',
       desc: '',
       args: [],
     );
@@ -9285,6 +9228,36 @@ class AppLocalizations {
       desc: '',
       args: [],
     );
+  }
+
+  /// `No nodes yet. Choose a few below`
+  String get picksIdle {
+    return Intl.message(
+      'No nodes yet. Choose a few below',
+      name: 'picksIdle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Test picks`
+  String get picksTest {
+    return Intl.message('Test picks', name: 'picksTest', desc: '', args: []);
+  }
+
+  /// `Custom`
+  String get pickSortCustom {
+    return Intl.message('Custom', name: 'pickSortCustom', desc: '', args: []);
+  }
+
+  /// `Speed`
+  String get pickSortSpeed {
+    return Intl.message('Speed', name: 'pickSortSpeed', desc: '', args: []);
+  }
+
+  /// `Purity`
+  String get pickSortPurity {
+    return Intl.message('Purity', name: 'pickSortPurity', desc: '', args: []);
   }
 }
 

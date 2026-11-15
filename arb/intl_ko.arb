@@ -1093,12 +1093,12 @@
   "dnsGuard": "DNS 유출 방지",
   "dnsGuardOnDesc": "DNS 조회도 프록시로",
   "dnsGuardOffDesc": "프로필 자체 DNS 사용",
-  "fastestNodes": "가장 빠른 노드",
-  "fastestNodesSwitch": "가장 빠른 노드 자동 사용",
-  "fastestNodesCount": "노드 {count}개 선택됨",
+  "fastestNodes": "즐겨찾기",
   "fastestNodesChoose": "노드 선택",
-  "fastestNodesIdle": "몇 개를 고르면 가장 빠른 노드를 씁니다",
-  "fastestNodesCurrent": "{name} 사용 중",
-  "fastestNodesMissing": "선택한 노드가 이 프로필에 없습니다",
-  "fastestNodesEmpty": "이 프로필에는 아직 노드가 없습니다"
+  "fastestNodesEmpty": "이 프로필에는 아직 노드가 없습니다",
+  "picksIdle": "아직 노드가 없습니다. 아래에서 고르세요",
+  "picksTest": "속도 테스트",
+  "pickSortCustom": "사용자 지정",
+  "pickSortSpeed": "속도",
+  "pickSortPurity": "청정도"
 }

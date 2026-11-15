@@ -51,8 +51,8 @@ func TestLoadConfigWithBaseAddsTheFastestGroupOfTheProxiesItStillHas(t *testing.
 	if got := groupMembers(t, fastest); !reflect.DeepEqual(got, []string{"a", "b"}) {
 		t.Errorf("members = %v, want only the proxies the profile has", got)
 	}
-	if got := groupMembers(t, cfg.Proxies["g"]); got[0] != "Fastest" {
-		t.Errorf("select group = %v, want the fastest group first", got)
+	if got := groupMembers(t, cfg.Proxies["g"]); !reflect.DeepEqual(got, []string{"a", "b", "Fastest"}) {
+		t.Errorf("select group = %v, want the fastest group last", got)
 	}
 	written, err := os.ReadFile(configPath)
 	if err != nil {
@@ -60,6 +60,33 @@ func TestLoadConfigWithBaseAddsTheFastestGroupOfTheProxiesItStillHas(t *testing.
 	}
 	if strings.Contains(string(written), fastestGroupKey) {
 		t.Error("the written config still carries the request")
+	}
+}
+
+func TestLoadConfigWithBaseAddsASelectGroupWhenAskedForOne(t *testing.T) {
+	path := writeBaseProfile(t, baseProfile)
+	base, err := handleGetProfileBase(PathParams{Path: path})
+	if err != nil {
+		t.Fatalf("handleGetProfileBase = %v", err)
+	}
+	overlay := overlayOf(t, base, nil, map[string]any{
+		fastestGroupKey: map[string]any{"name": "Picks", "type": "select", "proxies": []string{"b", "a"}},
+	})
+
+	cfg, err := loadConfigWithBase(
+		&SetupBase{Path: path, Overlay: overlay},
+		filepath.Join(t.TempDir(), "config.yaml"),
+	)
+
+	if err != nil {
+		t.Fatalf("loadConfigWithBase = %v", err)
+	}
+	picks := cfg.Proxies["Picks"]
+	if picks == nil || picks.Type() != constant.Selector {
+		t.Fatalf("picks = %v, want a select group", picks)
+	}
+	if got := groupMembers(t, picks); !reflect.DeepEqual(got, []string{"b", "a"}) {
+		t.Errorf("members = %v, want the chosen order", got)
 	}
 }
 

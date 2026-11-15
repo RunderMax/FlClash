@@ -1093,12 +1093,12 @@
   "dnsGuard": "Защита от утечки DNS",
   "dnsGuardOnDesc": "DNS-запросы идут через прокси",
   "dnsGuardOffDesc": "Используется DNS профиля",
-  "fastestNodes": "Самый быстрый",
-  "fastestNodesSwitch": "Использовать самый быстрый",
-  "fastestNodesCount": "{count, plural, one{Выбран {count} узел} few{Выбрано {count} узла} other{Выбрано {count} узлов}}",
+  "fastestNodes": "Избранное",
   "fastestNodesChoose": "Выбрать узлы",
-  "fastestNodesIdle": "Выберите несколько узлов — будет использован самый быстрый",
-  "fastestNodesCurrent": "Используется {name}",
-  "fastestNodesMissing": "Выбранных узлов нет в этом профиле",
-  "fastestNodesEmpty": "В этом профиле пока нет узлов"
+  "fastestNodesEmpty": "В этом профиле пока нет узлов",
+  "picksIdle": "Узлов пока нет. Выберите их ниже",
+  "picksTest": "Проверить избранное",
+  "pickSortCustom": "Свой порядок",
+  "pickSortSpeed": "Скорость",
+  "pickSortPurity": "Чистота"
 }

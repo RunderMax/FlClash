@@ -22,26 +22,20 @@ Future<YamlMap> _configOf(PatchClashConfig patch) async {
 }
 
 void main() {
-  test('asks the core for the fastest group of the chosen nodes', () async {
+  test('asks the core for a select group of the picked nodes', () async {
     final config = await _configOf(
-      const PatchClashConfig(
-        slothFastest: true,
-        slothFastestProxies: ['a', 'b'],
-      ),
+      const PatchClashConfig(slothPicks: ['b', 'a']),
     );
 
-    final request = config[slothFastestKey] as YamlMap;
-    expect(request['name'], slothFastestGroup);
-    expect(request['proxies'], ['a', 'b']);
+    final request = config[slothPicksKey] as YamlMap;
+    expect(request['name'], slothPicksGroup);
+    expect(request['type'], 'select');
+    expect(request['proxies'], ['b', 'a']);
   });
 
-  test('asks for nothing while switched off or with no nodes', () async {
-    final off = await _configOf(
-      const PatchClashConfig(slothFastestProxies: ['a']),
-    );
-    final empty = await _configOf(const PatchClashConfig(slothFastest: true));
+  test('asks for nothing without picks', () async {
+    final config = await _configOf(const PatchClashConfig());
 
-    expect(off.containsKey(slothFastestKey), isFalse);
-    expect(empty.containsKey(slothFastestKey), isFalse);
+    expect(config.containsKey(slothPicksKey), isFalse);
   });
 }

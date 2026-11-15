@@ -1093,12 +1093,12 @@
   "dnsGuard": "防 DNS 泄漏",
   "dnsGuardOnDesc": "问路也走代理",
   "dnsGuardOffDesc": "使用订阅自带的 DNS",
-  "fastestNodes": "自选最快",
-  "fastestNodesSwitch": "自动用最快的",
-  "fastestNodesCount": "已选 {count} 个节点",
+  "fastestNodes": "自选",
   "fastestNodesChoose": "选择节点",
-  "fastestNodesIdle": "勾选几个节点，自动用里面最快的",
-  "fastestNodesCurrent": "正在用 {name}",
-  "fastestNodesMissing": "当前订阅里找不到选中的节点",
-  "fastestNodesEmpty": "订阅里还没有节点"
+  "fastestNodesEmpty": "订阅里还没有节点",
+  "picksIdle": "还没有节点，点下面「选择节点」挑几个",
+  "picksTest": "测速",
+  "pickSortCustom": "自定义",
+  "pickSortSpeed": "速度",
+  "pickSortPurity": "纯净度"
 }
