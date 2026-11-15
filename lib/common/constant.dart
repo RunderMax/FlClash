@@ -9,7 +9,9 @@ import 'package:fl_clash/enum/enum.dart';
 import 'package:fl_clash/models/models.dart';
 import 'package:flutter/widgets.dart';
 
+// Stays FlClash: subscription servers pick the config format from this user agent name.
 const appName = 'FlClash';
+const appDisplayName = 'Sloth Clash';
 const appHelperService = 'FlClashHelperService';
 const coreManifestName = 'manifest.json';
 const browserUa =

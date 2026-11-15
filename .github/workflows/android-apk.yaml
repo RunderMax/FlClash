@@ -24,18 +24,20 @@ jobs:
         with:
           submodules: recursive
 
-      # Without these secrets the APK falls back to a debug key that changes on
+      # Without this secret the APK falls back to a debug key that changes on
       # every runner, so each new build must be uninstalled before installing.
       - name: Setup Android signing
         env:
-          KEYSTORE: ${{ secrets.KEYSTORE }}
-        if: env.KEYSTORE != ''
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+        if: env.KEYSTORE_PASSWORD != ''
         run: |
-          echo "$KEYSTORE" | base64 --decode > android/app/keystore.jks
+          openssl enc -d -aes-256-cbc -pbkdf2 -iter 200000 \
+            -in android/app/keystore.jks.enc -out android/app/keystore.jks \
+            -pass env:KEYSTORE_PASSWORD
           {
-            echo "keyAlias=${{ secrets.KEY_ALIAS }}"
-            echo "storePassword=${{ secrets.STORE_PASSWORD }}"
-            echo "keyPassword=${{ secrets.KEY_PASSWORD }}"
+            echo "keyAlias=sloth"
+            echo "storePassword=$KEYSTORE_PASSWORD"
+            echo "keyPassword=$KEYSTORE_PASSWORD"
           } >> android/local.properties
 
       - name: Setup Go
