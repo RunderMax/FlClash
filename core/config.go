@@ -201,6 +201,7 @@ func applyConfig(params *SetupParams) error {
 	hub.ApplyConfig(cfg)
 	patchSelectGroup(params.SelectedMap)
 	picks.recordPicks(recordedPicksGroup, recordedPicksEvery)
+	reapplyAppRoutes(cfg.Rules)
 	bumpRouteEpoch()
 	updateListeners(cfg)
 	reconcileGeoUpdater()

@@ -5,6 +5,9 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/metacubex/mihomo/component/process"
+	"github.com/metacubex/mihomo/constant"
+	"github.com/metacubex/mihomo/tunnel/statistic"
 	"go.yaml.in/yaml/v3"
 )
 
@@ -73,4 +76,67 @@ func routable(target string, known map[string]bool) bool {
 		return false
 	}
 	return known[target] || builtInTargets[target]
+}
+
+var appliedAppRoutes map[string]string
+
+// A connection keeps the way it was opened on, and apps hold theirs open for
+// minutes, so an app whose route changed has its connections closed.
+func reapplyAppRoutes(rules []constant.Rule) {
+	routes := appRoutesOf(rules)
+	changed := changedApps(appliedAppRoutes, routes)
+	appliedAppRoutes = routes
+	if len(changed) > 0 {
+		go closeAppConnections(changed)
+	}
+}
+
+func appRoutesOf(rules []constant.Rule) map[string]string {
+	routes := map[string]string{}
+	for _, rule := range rules {
+		if rule.RuleType() != constant.ProcessName {
+			continue
+		}
+		if _, seen := routes[rule.Payload()]; !seen {
+			routes[rule.Payload()] = rule.Adapter()
+		}
+	}
+	return routes
+}
+
+func changedApps(before, after map[string]string) map[string]bool {
+	changed := map[string]bool{}
+	for app, target := range before {
+		if after[app] != target {
+			changed[app] = true
+		}
+	}
+	for app, target := range after {
+		if before[app] != target {
+			changed[app] = true
+		}
+	}
+	return changed
+}
+
+func closeAppConnections(apps map[string]bool) {
+	statistic.DefaultManager.Range(func(c statistic.Tracker) bool {
+		if apps[appOf(c.Info().Metadata)] {
+			_ = c.Close()
+		}
+		return true
+	})
+}
+
+// A connection opened while no rule asked for its app was never looked up.
+func appOf(metadata *constant.Metadata) string {
+	if metadata == nil {
+		return ""
+	}
+	if metadata.Process != "" {
+		return metadata.Process
+	}
+	lookup := *metadata
+	name, _ := process.FindPackageName(&lookup)
+	return name
 }

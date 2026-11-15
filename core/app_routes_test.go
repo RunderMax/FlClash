@@ -7,8 +7,10 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/metacubex/mihomo/component/process"
 	"github.com/metacubex/mihomo/config"
 	"github.com/metacubex/mihomo/constant"
+	"github.com/metacubex/mihomo/hub/executor"
 )
 
 func ruleLines(cfg *config.Config) []string {
@@ -122,5 +124,50 @@ x-sloth-app-routes: {at: 1, routes: {com.example.video: a, com.example.gone: gon
 	}
 	if strings.Contains(string(written), appRoutesKey) {
 		t.Error("config.yaml still carries the request")
+	}
+}
+
+func TestAppRoutesOfKeepsTheRuleThatMatchesFirst(t *testing.T) {
+	cfg, err := executor.ParseWithBytes([]byte(`proxies:
+  - {name: a, type: socks5, server: 127.0.0.1, port: 1080}
+rules:
+  - PROCESS-NAME,com.example.video,a
+  - PROCESS-NAME,com.example.video,DIRECT
+  - DOMAIN,example.com,DIRECT
+  - MATCH,a
+`))
+	if err != nil {
+		t.Fatalf("parse = %v", err)
+	}
+
+	if got := appRoutesOf(cfg.Rules); !reflect.DeepEqual(got, map[string]string{"com.example.video": "a"}) {
+		t.Errorf("routes = %v, want the first rule of the app", got)
+	}
+}
+
+func TestChangedAppsNamesEveryAppWhoseWayMoved(t *testing.T) {
+	before := map[string]string{"com.a": "JP", "com.b": "US", "com.c": "DIRECT"}
+	after := map[string]string{"com.a": "JP", "com.b": "SG", "com.d": "REJECT"}
+
+	got := changedApps(before, after)
+
+	want := map[string]bool{"com.b": true, "com.c": true, "com.d": true}
+	if !reflect.DeepEqual(got, want) {
+		t.Errorf("changed = %v, want %v", got, want)
+	}
+}
+
+func TestAppOfLooksUpAConnectionNoRuleLookedUp(t *testing.T) {
+	previous := process.DefaultPackageNameResolver
+	t.Cleanup(func() { process.DefaultPackageNameResolver = previous })
+	process.DefaultPackageNameResolver = func(*constant.Metadata) (string, error) {
+		return "com.looked.up", nil
+	}
+
+	if got := appOf(&constant.Metadata{Process: "com.known"}); got != "com.known" {
+		t.Errorf("app = %q, want the recorded one", got)
+	}
+	if got := appOf(&constant.Metadata{}); got != "com.looked.up" {
+		t.Errorf("app = %q, want the one looked up", got)
 	}
 }
