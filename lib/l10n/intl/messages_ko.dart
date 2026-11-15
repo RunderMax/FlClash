@@ -1635,6 +1635,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "secondsCount": m91,
     "secretKey": MessageLookupByLibrary.simpleMessage("키"),
     "sectionsInEffect": m92,
+    "secureWindow": MessageLookupByLibrary.simpleMessage("최근 앱에서 화면 숨기기"),
+    "secureWindowDesc": MessageLookupByLibrary.simpleMessage(
+      "최근 앱에 빈 화면으로 보이고 스크린샷도 막습니다",
+    ),
     "select": MessageLookupByLibrary.simpleMessage("선택"),
     "selectAll": MessageLookupByLibrary.simpleMessage("모두 선택"),
     "selectRuleSet": MessageLookupByLibrary.simpleMessage("규칙 세트를 선택하세요"),

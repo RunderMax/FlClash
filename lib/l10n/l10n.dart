@@ -9424,6 +9424,26 @@ class AppLocalizations {
       args: [],
     );
   }
+
+  /// `Hide from recent apps`
+  String get secureWindow {
+    return Intl.message(
+      'Hide from recent apps',
+      name: 'secureWindow',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `The app shows blank in recents, and screenshots are blocked`
+  String get secureWindowDesc {
+    return Intl.message(
+      'The app shows blank in recents, and screenshots are blocked',
+      name: 'secureWindowDesc',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<AppLocalizations> {

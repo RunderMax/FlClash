@@ -25,6 +25,7 @@ _AppSettingProps _$AppSettingPropsFromJson(
   pickSort:
       $enumDecodeNullable(_$PickSortEnumMap, json['pickSort']) ??
       PickSort.custom,
+  secureWindow: json['secureWindow'] as bool? ?? false,
   showNotificationStopAction:
       json['showNotificationStopAction'] as bool? ?? true,
   autoLaunch: json['autoLaunch'] as bool? ?? false,
@@ -108,6 +109,7 @@ Map<String, dynamic> _$AppSettingPropsToJson(_AppSettingProps instance) =>
           .toList(),
       'onlyStatisticsProxy': instance.onlyStatisticsProxy,
       'pickSort': _$PickSortEnumMap[instance.pickSort]!,
+      'secureWindow': instance.secureWindow,
       'showNotificationStopAction': instance.showNotificationStopAction,
       'autoLaunch': instance.autoLaunch,
       'silentLaunch': instance.silentLaunch,

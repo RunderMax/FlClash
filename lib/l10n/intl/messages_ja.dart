@@ -1663,6 +1663,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "secondsCount": m91,
     "secretKey": MessageLookupByLibrary.simpleMessage("キー"),
     "sectionsInEffect": m92,
+    "secureWindow": MessageLookupByLibrary.simpleMessage("履歴で画面を隠す"),
+    "secureWindowDesc": MessageLookupByLibrary.simpleMessage(
+      "最近使ったアプリでは空白になり、スクリーンショットもできません",
+    ),
     "select": MessageLookupByLibrary.simpleMessage("選択"),
     "selectAll": MessageLookupByLibrary.simpleMessage("すべて選択"),
     "selectRuleSet": MessageLookupByLibrary.simpleMessage("ルールセットを選択してください"),

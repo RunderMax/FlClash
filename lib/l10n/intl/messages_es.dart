@@ -2107,6 +2107,12 @@ class MessageLookup extends MessageLookupByLibrary {
     "secondsCount": m91,
     "secretKey": MessageLookupByLibrary.simpleMessage("Clave"),
     "sectionsInEffect": m92,
+    "secureWindow": MessageLookupByLibrary.simpleMessage(
+      "Ocultar en apps recientes",
+    ),
+    "secureWindowDesc": MessageLookupByLibrary.simpleMessage(
+      "La app aparece en blanco en recientes y se bloquean las capturas",
+    ),
     "select": MessageLookupByLibrary.simpleMessage("Seleccionar"),
     "selectAll": MessageLookupByLibrary.simpleMessage("Seleccionar todo"),
     "selectRuleSet": MessageLookupByLibrary.simpleMessage(

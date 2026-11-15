@@ -34,6 +34,12 @@ class PrivacyHardeningCard extends ConsumerWidget {
     void setBlockQuic(bool value) => ref
         .read(patchClashConfigProvider.notifier)
         .update((state) => state.copyWith(slothBlockQuic: value));
+    final secureWindow = ref.watch(
+      appSettingProvider.select((state) => state.secureWindow),
+    );
+    void setSecureWindow(bool value) => ref
+        .read(appSettingProvider.notifier)
+        .update((state) => state.copyWith(secureWindow: value));
     void setBlockAds(bool value) => ref
         .read(patchClashConfigProvider.notifier)
         .update((state) => state.copyWith(slothBlockAds: value));
@@ -73,7 +79,7 @@ class PrivacyHardeningCard extends ConsumerWidget {
             onChanged: setBlockQuic,
           ),
           DashboardSwitchRow(
-            glyph: AppGlyphs.eyeOff,
+            glyph: AppGlyphs.broom,
             title: appLocalizations.blockAds,
             subtitle: appLocalizations.blockAdsDesc,
             value: blockAds,
@@ -83,6 +89,18 @@ class PrivacyHardeningCard extends ConsumerWidget {
             onTap: () => setBlockAds(!blockAds),
             onChanged: setBlockAds,
           ),
+          if (plugin != null)
+            DashboardSwitchRow(
+              glyph: AppGlyphs.eyeOff,
+              title: appLocalizations.secureWindow,
+              subtitle: appLocalizations.secureWindowDesc,
+              value: secureWindow,
+              iconSize: _rowIcon,
+              padding: _rowPadding,
+              radius: AppCorner.md,
+              onTap: () => setSecureWindow(!secureWindow),
+              onChanged: setSecureWindow,
+            ),
           if (plugin != null)
             _LinkRow(
               title: appLocalizations.killSwitch,

@@ -2048,6 +2048,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "secondsCount": m91,
     "secretKey": MessageLookupByLibrary.simpleMessage("Ключ"),
     "sectionsInEffect": m92,
+    "secureWindow": MessageLookupByLibrary.simpleMessage("Скрывать в недавних"),
+    "secureWindowDesc": MessageLookupByLibrary.simpleMessage(
+      "В недавних приложениях экран пустой, снимки экрана запрещены",
+    ),
     "select": MessageLookupByLibrary.simpleMessage("Выбрать"),
     "selectAll": MessageLookupByLibrary.simpleMessage("Выбрать всё"),
     "selectRuleSet": MessageLookupByLibrary.simpleMessage(

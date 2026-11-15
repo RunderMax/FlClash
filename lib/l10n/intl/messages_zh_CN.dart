@@ -1507,6 +1507,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "secondsCount": m91,
     "secretKey": MessageLookupByLibrary.simpleMessage("密钥"),
     "sectionsInEffect": m92,
+    "secureWindow": MessageLookupByLibrary.simpleMessage("最近任务里隐藏画面"),
+    "secureWindowDesc": MessageLookupByLibrary.simpleMessage(
+      "最近任务里只显示空白，同时禁止截屏",
+    ),
     "select": MessageLookupByLibrary.simpleMessage("选中"),
     "selectAll": MessageLookupByLibrary.simpleMessage("全选"),
     "selectRuleSet": MessageLookupByLibrary.simpleMessage("请选择规则集"),

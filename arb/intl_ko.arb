@@ -1120,5 +1120,7 @@
   "blockQuicStun": "QUIC와 STUN 차단",
   "blockQuicStunDesc": "프록시가 알아볼 수 있는 연결로 바뀝니다. 일부 영상 통화가 안 될 수 있습니다",
   "blockAds": "광고와 추적기 차단",
-  "blockAdsDesc": "알려진 광고·추적 사이트를 거부합니다"
+  "blockAdsDesc": "알려진 광고·추적 사이트를 거부합니다",
+  "secureWindow": "최근 앱에서 화면 숨기기",
+  "secureWindowDesc": "최근 앱에 빈 화면으로 보이고 스크린샷도 막습니다"
 }

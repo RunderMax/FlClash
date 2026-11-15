@@ -1120,5 +1120,7 @@
   "blockQuicStun": "QUIC と STUN をブロック",
   "blockQuicStunDesc": "プロキシが判別できる接続に切り替えます。一部のビデオ通話がつながらない場合があります",
   "blockAds": "広告とトラッカーをブロック",
-  "blockAdsDesc": "既知の広告・追跡サイトを拒否します"
+  "blockAdsDesc": "既知の広告・追跡サイトを拒否します",
+  "secureWindow": "履歴で画面を隠す",
+  "secureWindowDesc": "最近使ったアプリでは空白になり、スクリーンショットもできません"
 }

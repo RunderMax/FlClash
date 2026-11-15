@@ -289,6 +289,12 @@ class App {
     };
   }
 
+  Future<bool?> updateSecureWindow(bool value) {
+    return methodChannel.invokeMethod<bool>('updateSecureWindow', {
+      'value': value,
+    });
+  }
+
   Future<bool?> openVpnSettings() {
     return methodChannel.invokeMethod<bool>('openVpnSettings');
   }

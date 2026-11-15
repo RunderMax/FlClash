@@ -287,6 +287,7 @@ abstract class AppSettingProps with _$AppSettingProps {
     List<DashboardWidget> dashboardWidgets,
     @Default(false) bool onlyStatisticsProxy,
     @Default(PickSort.custom) PickSort pickSort,
+    @Default(false) bool secureWindow,
     @Default(true) bool showNotificationStopAction,
     @Default(false) bool autoLaunch,
     @Default(false) bool silentLaunch,

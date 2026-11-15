@@ -1120,5 +1120,7 @@
   "blockQuicStun": "Bloquear QUIC y STUN",
   "blockQuicStunDesc": "Las páginas usan conexiones que el proxy reconoce; algunas videollamadas pueden fallar",
   "blockAds": "Bloquear anuncios y rastreadores",
-  "blockAdsDesc": "Rechaza sitios conocidos de anuncios y rastreo"
+  "blockAdsDesc": "Rechaza sitios conocidos de anuncios y rastreo",
+  "secureWindow": "Ocultar en apps recientes",
+  "secureWindowDesc": "La app aparece en blanco en recientes y se bloquean las capturas"
 }

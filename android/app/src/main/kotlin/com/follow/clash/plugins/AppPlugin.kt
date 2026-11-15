@@ -22,6 +22,7 @@ import android.os.Looper
 import android.provider.MediaStore
 import android.provider.Settings
 import android.security.KeyChain
+import android.view.WindowManager
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -193,6 +194,20 @@ class AppPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAware 
                 val value = call.argument<Boolean>("value")
                 updateExcludeFromRecents(value)
                 result.success(true)
+            }
+
+            "updateSecureWindow" -> {
+                val value = call.argument<Boolean>("value") == true
+                onMainThread {
+                    activity?.window?.run {
+                        if (value) {
+                            addFlags(WindowManager.LayoutParams.FLAG_SECURE)
+                        } else {
+                            clearFlags(WindowManager.LayoutParams.FLAG_SECURE)
+                        }
+                    }
+                    result.success(true)
+                }
             }
 
             "initShortcuts" -> {
