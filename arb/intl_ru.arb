@@ -1076,5 +1076,18 @@
   "fakeipFilterDesc": "Эти домены получают реальные IP вместо Fake-IP. В режиме whitelist Fake-IP получают только они.",
   "fallbackFilterGeositeDesc": "Домены из этих категорий GeoSite сразу разрешаются через Fallback.",
   "fallbackFilterIpcidrDesc": "Если Nameserver возвращает IP из этих диапазонов, используется ответ Fallback.",
-  "fallbackFilterDomainDesc": "Эти домены сразу разрешаются через Fallback."
+  "fallbackFilterDomainDesc": "Эти домены сразу разрешаются через Fallback.",
+  "privacyCheck": "Проверка приватности",
+  "dnsLeak": "Утечка DNS",
+  "webrtcLeak": "Утечка WebRTC",
+  "leakSafe": "Безопасно",
+  "leakPossible": "Возможна утечка",
+  "udpUnreachable": "UDP заблокирован",
+  "checkNoResult": "Нет результата",
+  "privacyCheckIdle": "Нажмите кнопку, чтобы проверить",
+  "privacyCheckNeedsVpn": "Подключитесь, чтобы проверить",
+  "privacyCheckFailed": "Проверка не удалась",
+  "runCheck": "Проверить",
+  "dnsResolverCount": "{count, plural, one{{count} резолвер} few{{count} резолвера} other{{count} резолверов}}",
+  "dnsRealIp": "Реальный IP"
 }

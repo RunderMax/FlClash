@@ -1076,5 +1076,18 @@
   "fakeipFilterDesc": "이 도메인에는 Fake-IP 대신 실제 IP를 반환합니다. whitelist 모드에서는 이 도메인만 Fake-IP를 사용합니다.",
   "fallbackFilterGeositeDesc": "이 GeoSite 분류의 도메인은 바로 Fallback으로 확인합니다.",
   "fallbackFilterIpcidrDesc": "Nameserver가 이 범위의 IP를 반환하면 Fallback 결과를 사용합니다.",
-  "fallbackFilterDomainDesc": "이 도메인은 바로 Fallback으로 확인합니다."
+  "fallbackFilterDomainDesc": "이 도메인은 바로 Fallback으로 확인합니다.",
+  "privacyCheck": "개인정보 검사",
+  "dnsLeak": "DNS 유출",
+  "webrtcLeak": "WebRTC 유출",
+  "leakSafe": "안전",
+  "leakPossible": "유출 가능성",
+  "udpUnreachable": "UDP 차단됨",
+  "checkNoResult": "결과 없음",
+  "privacyCheckIdle": "버튼을 눌러 검사하세요",
+  "privacyCheckNeedsVpn": "연결한 후 검사할 수 있습니다",
+  "privacyCheckFailed": "검사 실패",
+  "runCheck": "검사",
+  "dnsResolverCount": "리졸버 {count}개",
+  "dnsRealIp": "실제 IP"
 }

@@ -1076,5 +1076,18 @@
   "fakeipFilterDesc": "Ces domaines reçoivent leur vraie IP au lieu d’une Fake-IP. En mode whitelist, eux seuls reçoivent une Fake-IP.",
   "fallbackFilterGeositeDesc": "Les domaines de ces catégories GeoSite sont résolus directement par Fallback.",
   "fallbackFilterIpcidrDesc": "Si Nameserver renvoie une IP de ces plages, la réponse de Fallback est utilisée.",
-  "fallbackFilterDomainDesc": "Ces domaines sont résolus directement par Fallback."
+  "fallbackFilterDomainDesc": "Ces domaines sont résolus directement par Fallback.",
+  "privacyCheck": "Contrôle de confidentialité",
+  "dnsLeak": "Fuite DNS",
+  "webrtcLeak": "Fuite WebRTC",
+  "leakSafe": "Sûr",
+  "leakPossible": "Fuite possible",
+  "udpUnreachable": "UDP bloqué",
+  "checkNoResult": "Aucun résultat",
+  "privacyCheckIdle": "Touchez le bouton pour lancer le contrôle",
+  "privacyCheckNeedsVpn": "Connectez-vous pour lancer le contrôle",
+  "privacyCheckFailed": "Échec du contrôle",
+  "runCheck": "Contrôler",
+  "dnsResolverCount": "{count, plural, =1{1 résolveur} other{{count} résolveurs}}",
+  "dnsRealIp": "IP réelle"
 }

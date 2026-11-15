@@ -163,6 +163,7 @@ const _$DashboardWidgetEnumMap = {
   DashboardWidget.vpnButton: 'vpnButton',
   DashboardWidget.networkTakeover: 'networkTakeover',
   DashboardWidget.serviceStatus: 'serviceStatus',
+  DashboardWidget.privacyCheck: 'privacyCheck',
   DashboardWidget.profiles: 'profiles',
   DashboardWidget.proxyGroups: 'proxyGroups',
   DashboardWidget.connectionStats: 'connectionStats',

@@ -9072,6 +9072,108 @@ class AppLocalizations {
       args: [],
     );
   }
+
+  /// `Privacy check`
+  String get privacyCheck {
+    return Intl.message(
+      'Privacy check',
+      name: 'privacyCheck',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `DNS leak`
+  String get dnsLeak {
+    return Intl.message('DNS leak', name: 'dnsLeak', desc: '', args: []);
+  }
+
+  /// `WebRTC leak`
+  String get webrtcLeak {
+    return Intl.message('WebRTC leak', name: 'webrtcLeak', desc: '', args: []);
+  }
+
+  /// `Safe`
+  String get leakSafe {
+    return Intl.message('Safe', name: 'leakSafe', desc: '', args: []);
+  }
+
+  /// `Possible leak`
+  String get leakPossible {
+    return Intl.message(
+      'Possible leak',
+      name: 'leakPossible',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `UDP blocked`
+  String get udpUnreachable {
+    return Intl.message(
+      'UDP blocked',
+      name: 'udpUnreachable',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `No result`
+  String get checkNoResult {
+    return Intl.message('No result', name: 'checkNoResult', desc: '', args: []);
+  }
+
+  /// `Tap the button to run the check`
+  String get privacyCheckIdle {
+    return Intl.message(
+      'Tap the button to run the check',
+      name: 'privacyCheckIdle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Connect first to run the check`
+  String get privacyCheckNeedsVpn {
+    return Intl.message(
+      'Connect first to run the check',
+      name: 'privacyCheckNeedsVpn',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Check failed`
+  String get privacyCheckFailed {
+    return Intl.message(
+      'Check failed',
+      name: 'privacyCheckFailed',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Run check`
+  String get runCheck {
+    return Intl.message('Run check', name: 'runCheck', desc: '', args: []);
+  }
+
+  /// `{count, plural, =1{1 resolver} other{{count} resolvers}}`
+  String dnsResolverCount(num count) {
+    return Intl.plural(
+      count,
+      one: '1 resolver',
+      other: '$count resolvers',
+      name: 'dnsResolverCount',
+      desc: '',
+      args: [count],
+    );
+  }
+
+  /// `Real IP`
+  String get dnsRealIp {
+    return Intl.message('Real IP', name: 'dnsRealIp', desc: '', args: []);
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<AppLocalizations> {
