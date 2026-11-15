@@ -1,0 +1,60 @@
+name: ios-vpn-test
+
+on:
+  push:
+    branches:
+      - ios-test
+    paths:
+      - tools/ios-vpn-test/**
+      - .github/workflows/ios-vpn-test.yaml
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ipa:
+    runs-on: macos-latest
+    permissions:
+      contents: write
+    defaults:
+      run:
+        working-directory: tools/ios-vpn-test
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build
+        run: |
+          brew install xcodegen
+          xcodegen generate
+          xcodebuild -project SlothVPNTest.xcodeproj -target SlothVPNTest \
+            -configuration Release -sdk iphoneos \
+            CODE_SIGNING_ALLOWED=NO SYMROOT="$PWD/build" build
+
+      # The signing tool on the phone replaces this ad-hoc signature, keeping
+      # the entitlements it finds.
+      - name: Package
+        run: |
+          app=build/Release-iphoneos/SlothVPNTest.app
+          codesign --force --sign - --entitlements Signing/Tunnel.entitlements "$app/PlugIns/Tunnel.appex"
+          codesign --force --sign - --entitlements Signing/App.entitlements "$app"
+          codesign -d --entitlements - "$app/PlugIns/Tunnel.appex"
+          mkdir -p Payload
+          cp -R "$app" Payload/
+          zip -qry SlothVPNTest.ipa Payload
+
+      - name: Upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: SlothVPNTest
+          path: tools/ios-vpn-test/SlothVPNTest.ipa
+
+      - name: Publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release delete iphone-vpn-test --cleanup-tag --yes || true
+          gh release create iphone-vpn-test SlothVPNTest.ipa --target "$GITHUB_SHA" \
+            --prerelease --title "iPhone VPN test" \
+            --notes "Sign with your own certificate, then tap 连接."

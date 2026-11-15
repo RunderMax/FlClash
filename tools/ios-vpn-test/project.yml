@@ -1,0 +1,43 @@
+name: SlothVPNTest
+options:
+  deploymentTarget:
+    iOS: "15.0"
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+    CODE_SIGNING_ALLOWED: "NO"
+    CODE_SIGNING_REQUIRED: "NO"
+    CODE_SIGN_IDENTITY: ""
+    MARKETING_VERSION: "1.0"
+    CURRENT_PROJECT_VERSION: "1"
+    TARGETED_DEVICE_FAMILY: "1"
+targets:
+  SlothVPNTest:
+    type: application
+    platform: iOS
+    sources: [App]
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.sloth.clash.vpntest
+    info:
+      path: App/Info.plist
+      properties:
+        CFBundleDisplayName: Sloth 测试
+        UILaunchScreen: {}
+        UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait]
+    dependencies:
+      - target: Tunnel
+  Tunnel:
+    type: app-extension
+    platform: iOS
+    sources: [Tunnel]
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.sloth.clash.vpntest.tunnel
+    info:
+      path: Tunnel/Info.plist
+      properties:
+        CFBundleDisplayName: Sloth Tunnel
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.networkextension.packet-tunnel
+          NSExtensionPrincipalClass: $(PRODUCT_MODULE_NAME).PacketTunnelProvider
