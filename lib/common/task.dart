@@ -4,6 +4,7 @@ import 'dart:io';
 
 import 'package:fl_clash/common/common.dart';
 import 'package:fl_clash/common/mitm_module.dart';
+import 'package:fl_clash/common/pick_history.dart';
 import 'package:fl_clash/enum/enum.dart';
 import 'package:fl_clash/models/models.dart';
 import 'package:flutter/foundation.dart';
@@ -260,7 +261,9 @@ Future<RealProfile> _makeRealProfileTask(MakeRealProfileState data) async {
       'name': slothPicksGroup,
       'type': 'select',
       'proxies': realPatchConfig.slothPicks,
-      'record': true,
+      'record': realPatchConfig.slothPickRecord
+          ? pickHistoryInterval.inMinutes
+          : 0,
     };
   }
   if (rawConfig['profile'] == null) {

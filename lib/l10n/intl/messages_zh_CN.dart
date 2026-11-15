@@ -1187,11 +1187,15 @@ class MessageLookup extends MessageLookupByLibrary {
     "pickHistory": MessageLookupByLibrary.simpleMessage("稳定性"),
     "pickHistoryDay": MessageLookupByLibrary.simpleMessage("24 小时"),
     "pickHistoryEmpty": MessageLookupByLibrary.simpleMessage(
-      "还没有记录。连着代理时，每 5 分钟自动测一次。",
+      "还没有记录。连着代理并且在 Wi‑Fi 下时，每 3 小时测一次。",
     ),
     "pickHistoryStats": m76,
     "pickHistoryWeek": MessageLookupByLibrary.simpleMessage("7 天"),
     "pickNotEnough": MessageLookupByLibrary.simpleMessage("数据不够"),
+    "pickRecord": MessageLookupByLibrary.simpleMessage("记录稳定性"),
+    "pickRecordDesc": MessageLookupByLibrary.simpleMessage(
+      "每 3 小时测一次，只在 Wi‑Fi 下",
+    ),
     "pickSortCustom": MessageLookupByLibrary.simpleMessage("自定义"),
     "pickSortPurity": MessageLookupByLibrary.simpleMessage("纯净度"),
     "pickSortSpeed": MessageLookupByLibrary.simpleMessage("速度"),

@@ -1109,5 +1109,7 @@
   "pickUnstable": "불안정",
   "pickNotEnough": "데이터 부족",
   "pickHistoryStats": "평균 {average} ms · 시간 초과 {timeouts}회 · 변동 ±{jitter} ms",
-  "pickHistoryEmpty": "아직 기록이 없습니다. 연결 중에는 5분마다 테스트합니다."
+  "pickHistoryEmpty": "아직 기록이 없습니다. Wi-Fi로 연결된 동안 3시간마다 테스트합니다.",
+  "pickRecord": "안정성 기록",
+  "pickRecordDesc": "3시간마다, Wi-Fi에서만"
 }

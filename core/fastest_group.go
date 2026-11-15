@@ -2,6 +2,7 @@ package core
 
 import (
 	"fmt"
+	"time"
 
 	"go.yaml.in/yaml/v3"
 )
@@ -23,11 +24,16 @@ type fastestGroupSpec struct {
 	URL       string   `yaml:"url"`
 	Interval  int      `yaml:"interval"`
 	Tolerance int      `yaml:"tolerance"`
-	Record    bool     `yaml:"record"`
+	// Minutes between two records of the members' delays; zero keeps none.
+	Record int `yaml:"record"`
 }
 
-// The group the last applied config asked to have its members' delays kept.
-var recordedPicksGroup string
+// The group the last applied config asked to have its members' delays kept,
+// and how often.
+var (
+	recordedPicksGroup string
+	recordedPicksEvery time.Duration
+)
 
 // applyFastestGroup turns the request into a group of the chosen proxies the
 // profile still has, offered last in its first select group so the profile's
@@ -65,8 +71,9 @@ func applyFastestGroup(root *yaml.Node) error {
 	if err != nil {
 		return err
 	}
-	if spec.Record {
+	if spec.Record > 0 {
 		recordedPicksGroup = spec.Name
+		recordedPicksEvery = time.Duration(spec.Record) * time.Minute
 	}
 	content := make([]*yaml.Node, 0, len(groups.Content)+1)
 	content = append(append(content, groups.Content...), group)

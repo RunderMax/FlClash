@@ -1109,5 +1109,7 @@
   "pickUnstable": "Inestable",
   "pickNotEnough": "Datos insuficientes",
   "pickHistoryStats": "Media {average} ms · {timeouts} tiempos agotados · ±{jitter} ms de variación",
-  "pickHistoryEmpty": "Aún no hay registros. Conectado, los favoritos se prueban cada 5 minutos."
+  "pickHistoryEmpty": "Aún no hay registros. Conectado por Wi-Fi, los favoritos se prueban cada 3 horas.",
+  "pickRecord": "Registrar estabilidad",
+  "pickRecordDesc": "Cada 3 horas, solo con Wi-Fi"
 }

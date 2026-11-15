@@ -945,6 +945,7 @@ _PatchClashConfig _$PatchClashConfigFromJson(Map<String, dynamic> json) =>
               ?.map((e) => e as String)
               .toList() ??
           const [],
+      slothPickRecord: json['sloth-pick-record'] as bool? ?? true,
     );
 
 Map<String, dynamic> _$PatchClashConfigToJson(_PatchClashConfig instance) =>
@@ -992,6 +993,7 @@ Map<String, dynamic> _$PatchClashConfigToJson(_PatchClashConfig instance) =>
           .toList(),
       'mitm': instance.mitm,
       'sloth-picks': instance.slothPicks,
+      'sloth-pick-record': instance.slothPickRecord,
     };
 
 const _$ModeEnumMap = {

@@ -1109,5 +1109,7 @@
   "pickUnstable": "Нестабильно",
   "pickNotEnough": "Мало данных",
   "pickHistoryStats": "Среднее {average} мс · таймаутов {timeouts} · разброс ±{jitter} мс",
-  "pickHistoryEmpty": "Записей пока нет. При подключении избранное проверяется каждые 5 минут."
+  "pickHistoryEmpty": "Записей пока нет. При подключении по Wi-Fi избранное проверяется каждые 3 часа.",
+  "pickRecord": "Записывать стабильность",
+  "pickRecordDesc": "Каждые 3 часа, только по Wi-Fi"
 }

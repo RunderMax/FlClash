@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"runtime"
 	"sync"
 	"time"
 
@@ -18,11 +19,13 @@ import (
 // app need not ask for it.
 const pickHistoryFile = "sloth-history.jsonl"
 
+// A due record is checked for this often; the clock behind a Go timer stands
+// still while the phone sleeps, so the wall clock decides when one is due.
 var (
-	pickHistoryInterval = 5 * time.Minute
-	pickHistoryKeep     = 7 * 24 * time.Hour
-	pickHistoryTimeout  = 5 * time.Second
-	pickHistoryURL      = defaultFastestURL
+	pickHistoryCheck   = 5 * time.Minute
+	pickHistoryKeep    = 7 * 24 * time.Hour
+	pickHistoryTimeout = 5 * time.Second
+	pickHistoryURL     = defaultFastestURL
 )
 
 type pickSample struct {
@@ -32,47 +35,68 @@ type pickSample struct {
 }
 
 type pickRecorder struct {
-	mu      sync.Mutex
-	group   string
-	started bool
-	pruned  time.Time
+	mu       sync.Mutex
+	group    string
+	every    time.Duration
+	started  bool
+	recorded time.Time
+	pruned   time.Time
 }
 
 var picks = &pickRecorder{}
 
-// recordPicks names the group whose members are tested on every tick; an
+// recordPicks names the group whose members are tested every [every]; an
 // empty name pauses the record without losing it.
-func (r *pickRecorder) recordPicks(group string) {
+func (r *pickRecorder) recordPicks(group string, every time.Duration) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
-	r.group = group
+	r.group, r.every = group, every
 	if group == "" || r.started {
 		return
 	}
 	r.started = true
+	r.recorded = lastPickSample(filepath.Join(constant.Path.HomeDir(), pickHistoryFile))
 	go r.run()
 }
 
-func (r *pickRecorder) currentGroup() string {
+// due names the group when a record is due at [now] and marks it taken.
+func (r *pickRecorder) due(now time.Time) string {
 	r.mu.Lock()
 	defer r.mu.Unlock()
+	if r.group == "" || now.Sub(r.recorded) < r.every {
+		return ""
+	}
+	r.recorded = now
 	return r.group
 }
 
 func (r *pickRecorder) run() {
-	ticker := time.NewTicker(pickHistoryInterval)
+	ticker := time.NewTicker(pickHistoryCheck)
 	defer ticker.Stop()
 	for {
-		r.tick(time.Now())
+		if !onFreeNetwork() {
+			<-ticker.C
+			continue
+		}
+		if name := r.due(time.Now()); name != "" {
+			r.tick(name, time.Now())
+		}
 		<-ticker.C
 	}
 }
 
-func (r *pickRecorder) tick(now time.Time) {
-	name := r.currentGroup()
-	if name == "" {
-		return
+// Android leaves this file while it is on a network that costs nothing.
+const unmeteredMarker = "sloth-unmetered"
+
+var onFreeNetwork = func() bool {
+	if runtime.GOOS != "android" {
+		return true
 	}
+	_, err := os.Stat(filepath.Join(constant.Path.HomeDir(), unmeteredMarker))
+	return err == nil
+}
+
+func (r *pickRecorder) tick(name string, now time.Time) {
 	members := groupProxies(tunnel.Proxies()[name])
 	if len(members) == 0 {
 		return
@@ -168,4 +192,24 @@ func prunePickHistory(path string, before time.Time) error {
 		return err
 	}
 	return os.Rename(temporary, path)
+}
+
+func lastPickSample(path string) time.Time {
+	file, err := os.Open(path)
+	if err != nil {
+		return time.Time{}
+	}
+	defer file.Close()
+	var last int64
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		var sample pickSample
+		if json.Unmarshal(scanner.Bytes(), &sample) == nil && sample.Time > last {
+			last = sample.Time
+		}
+	}
+	if last == 0 {
+		return time.Time{}
+	}
+	return time.Unix(last, 0)
 }

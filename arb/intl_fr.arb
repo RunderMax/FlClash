@@ -1109,5 +1109,7 @@
   "pickUnstable": "Instable",
   "pickNotEnough": "Pas assez de données",
   "pickHistoryStats": "Moy. {average} ms · {timeouts} expirations · écart ±{jitter} ms",
-  "pickHistoryEmpty": "Aucun relevé pour l’instant. Connecté, chaque favori est testé toutes les 5 minutes."
+  "pickHistoryEmpty": "Aucun relevé pour l’instant. Connecté en Wi-Fi, chaque favori est testé toutes les 3 heures.",
+  "pickRecord": "Suivre la stabilité",
+  "pickRecordDesc": "Toutes les 3 heures, en Wi-Fi seulement"
 }

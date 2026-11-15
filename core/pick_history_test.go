@@ -53,10 +53,10 @@ func TestLoadConfigWithBaseNamesTheGroupToRecord(t *testing.T) {
 		t.Fatalf("handleGetProfileBase = %v", err)
 	}
 	overlay := overlayOf(t, base, nil, map[string]any{
-		fastestGroupKey: map[string]any{"name": "Picks", "type": "select", "proxies": []string{"a"}, "record": true},
+		fastestGroupKey: map[string]any{"name": "Picks", "type": "select", "proxies": []string{"a"}, "record": 180},
 	})
-	recordedPicksGroup = ""
-	t.Cleanup(func() { recordedPicksGroup = "" })
+	recordedPicksGroup, recordedPicksEvery = "", 0
+	t.Cleanup(func() { recordedPicksGroup, recordedPicksEvery = "", 0 })
 
 	if _, err := loadConfigWithBase(
 		&SetupBase{Path: path, Overlay: overlay},
@@ -64,7 +64,35 @@ func TestLoadConfigWithBaseNamesTheGroupToRecord(t *testing.T) {
 	); err != nil {
 		t.Fatalf("loadConfigWithBase = %v", err)
 	}
-	if recordedPicksGroup != "Picks" {
-		t.Errorf("recorded group = %q, want Picks", recordedPicksGroup)
+	if recordedPicksGroup != "Picks" || recordedPicksEvery != 3*time.Hour {
+		t.Errorf("recorded = %q every %v, want Picks every 3h", recordedPicksGroup, recordedPicksEvery)
+	}
+}
+
+func TestARecordIsDueOnlyOnceItsIntervalHasPassed(t *testing.T) {
+	start := time.Unix(1_800_000_000, 0)
+	r := &pickRecorder{group: "Picks", every: 3 * time.Hour, recorded: start}
+
+	if got := r.due(start.Add(2 * time.Hour)); got != "" {
+		t.Errorf("due after 2h = %q, want nothing", got)
+	}
+	if got := r.due(start.Add(3 * time.Hour)); got != "Picks" {
+		t.Errorf("due after 3h = %q, want Picks", got)
+	}
+	if got := r.due(start.Add(3*time.Hour + time.Minute)); got != "" {
+		t.Errorf("due right after a record = %q, want nothing", got)
+	}
+}
+
+func TestTheLastSampleIsReadBackFromTheHistory(t *testing.T) {
+	path := filepath.Join(t.TempDir(), pickHistoryFile)
+	if err := appendPickSamples(path, []pickSample{{Time: 100, Name: "a"}, {Time: 300, Name: "b"}}); err != nil {
+		t.Fatalf("append = %v", err)
+	}
+	if got := lastPickSample(path); got.Unix() != 300 {
+		t.Errorf("last = %v, want 300", got.Unix())
+	}
+	if got := lastPickSample(filepath.Join(t.TempDir(), "none")); !got.IsZero() {
+		t.Errorf("last of nothing = %v, want zero", got)
 	}
 }

@@ -13,6 +13,7 @@ import android.os.HandlerThread
 import androidx.core.content.getSystemService
 import com.follow.clash.common.GlobalState
 import com.follow.clash.core.Core
+import java.io.File
 import java.net.Inet4Address
 import java.net.Inet6Address
 import java.net.InetAddress
@@ -129,6 +130,7 @@ object NetworkObserver {
             currentDnsList = dnsList
             Core.updateDNS(dnsList.joinToString(","))
         }
+        markUnmetered(preferred?.key)
         val network = preferred?.key ?: return
         // Sockets protected onto the network we left stay bound to it; closing
         // them makes apps reconnect now instead of after a TCP timeout.
@@ -139,6 +141,23 @@ object NetworkObserver {
     }
 }
 
+// The Core records the picks' delays only on a network that costs nothing, and
+// it cannot ask Android which one it is on, so the answer is left as a file.
+private fun markUnmetered(network: Network?) {
+    val capabilities = network?.let {
+        GlobalState.application
+            .getSystemService<ConnectivityManager>()
+            ?.getNetworkCapabilities(it)
+    }
+    val unmetered = capabilities
+        ?.hasCapability(NetworkCapabilities.NET_CAPABILITY_NOT_METERED) == true
+    val marker = File(GlobalState.application.filesDir, UNMETERED_MARKER)
+    runCatching {
+        if (unmetered) marker.createNewFile() else marker.delete()
+    }
+}
+
+private const val UNMETERED_MARKER = "sloth-unmetered"
 private const val DNS_PORT = 53
 private const val DNS_UPDATE_DELAY_MILLIS = 200L
 

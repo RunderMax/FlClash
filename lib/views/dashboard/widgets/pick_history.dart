@@ -1,8 +1,11 @@
 import 'package:fl_clash/common/common.dart';
 import 'package:fl_clash/common/pick_history.dart';
+import 'package:fl_clash/providers/providers.dart';
+import 'package:fl_clash/ui/icons/icons.dart';
 import 'package:fl_clash/views/dashboard/style.dart';
 import 'package:fl_clash/widgets/widgets.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:path/path.dart' show join;
 
 import 'card.dart';
@@ -35,16 +38,16 @@ DashboardChipTone _stabilityTone(PickStability stability) =>
       PickStability.fair || PickStability.unknown => DashboardChipTone.idle,
     };
 
-class PickHistorySheet extends StatefulWidget {
+class PickHistorySheet extends ConsumerStatefulWidget {
   const PickHistorySheet({super.key, required this.names});
 
   final List<String> names;
 
   @override
-  State<PickHistorySheet> createState() => _PickHistorySheetState();
+  ConsumerState<PickHistorySheet> createState() => _PickHistorySheetState();
 }
 
-class _PickHistorySheetState extends State<PickHistorySheet> {
+class _PickHistorySheetState extends ConsumerState<PickHistorySheet> {
   _Range _range = _Range.day;
   Map<String, List<PickSample>>? _history;
   late final int _now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
@@ -74,6 +77,12 @@ class _PickHistorySheetState extends State<PickHistorySheet> {
     final appLocalizations = context.appLocalizations;
     final history = _history;
     final names = widget.names;
+    final recording = ref.watch(
+      patchClashConfigProvider.select((state) => state.slothPickRecord),
+    );
+    void setRecording(bool value) => ref
+        .read(patchClashConfigProvider.notifier)
+        .update((state) => state.copyWith(slothPickRecord: value));
     return Scaffold(
       title: appLocalizations.pickHistory,
       body: history == null
@@ -92,6 +101,17 @@ class _PickHistorySheetState extends State<PickHistorySheet> {
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       spacing: 8,
                       children: [
+                        DashboardSwitchRow(
+                          glyph: AppGlyphs.dataUsage,
+                          title: appLocalizations.pickRecord,
+                          subtitle: appLocalizations.pickRecordDesc,
+                          value: recording,
+                          iconSize: 38,
+                          padding: const EdgeInsets.fromLTRB(10, 10, 12, 10),
+                          radius: AppCorner.md,
+                          onTap: () => setRecording(!recording),
+                          onChanged: setRecording,
+                        ),
                         _RangePicker(
                           range: _range,
                           onChanged: (range) => setState(() => _range = range),

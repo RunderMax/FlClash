@@ -6,8 +6,9 @@ import 'dart:math';
 /// Written by the Core next to the app's own data, one JSON sample a line.
 const pickHistoryFile = 'sloth-history.jsonl';
 
-/// The Core tests the picks this often.
-const pickHistoryInterval = Duration(minutes: 5);
+/// The Core tests the picks this often, and only on a free network, so a
+/// record costs next to no battery or data.
+const pickHistoryInterval = Duration(hours: 3);
 
 enum PickStability { stable, fair, unstable, unknown }
 

@@ -1109,5 +1109,7 @@
   "pickUnstable": "不安定",
   "pickNotEnough": "データ不足",
   "pickHistoryStats": "平均 {average} ms · タイムアウト {timeouts} 回 · 変動 ±{jitter} ms",
-  "pickHistoryEmpty": "まだ記録がありません。接続中は 5 分ごとにテストします。"
+  "pickHistoryEmpty": "まだ記録がありません。Wi-Fi で接続中は 3 時間ごとにテストします。",
+  "pickRecord": "安定性を記録",
+  "pickRecordDesc": "3 時間ごと、Wi-Fi のときだけ"
 }

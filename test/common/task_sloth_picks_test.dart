@@ -31,6 +31,15 @@ void main() {
     expect(request['name'], slothPicksGroup);
     expect(request['type'], 'select');
     expect(request['proxies'], ['b', 'a']);
+    expect(request['record'], 180);
+  });
+
+  test('records nothing once the record is switched off', () async {
+    final config = await _configOf(
+      const PatchClashConfig(slothPicks: ['a'], slothPickRecord: false),
+    );
+
+    expect((config[slothPicksKey] as YamlMap)['record'], 0);
   });
 
   test('asks for nothing without picks', () async {

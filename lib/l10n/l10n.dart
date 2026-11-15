@@ -9310,11 +9310,31 @@ class AppLocalizations {
     );
   }
 
-  /// `No records yet. While connected, picks are tested every 5 minutes.`
+  /// `No records yet. While connected on Wi-Fi, picks are tested every 3 hours.`
   String get pickHistoryEmpty {
     return Intl.message(
-      'No records yet. While connected, picks are tested every 5 minutes.',
+      'No records yet. While connected on Wi-Fi, picks are tested every 3 hours.',
       name: 'pickHistoryEmpty',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Record stability`
+  String get pickRecord {
+    return Intl.message(
+      'Record stability',
+      name: 'pickRecord',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Every 3 hours, on Wi-Fi only`
+  String get pickRecordDesc {
+    return Intl.message(
+      'Every 3 hours, on Wi-Fi only',
+      name: 'pickRecordDesc',
       desc: '',
       args: [],
     );

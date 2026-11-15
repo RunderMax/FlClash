@@ -1311,11 +1311,15 @@ class MessageLookup extends MessageLookupByLibrary {
     "pickHistory": MessageLookupByLibrary.simpleMessage("安定性"),
     "pickHistoryDay": MessageLookupByLibrary.simpleMessage("24 時間"),
     "pickHistoryEmpty": MessageLookupByLibrary.simpleMessage(
-      "まだ記録がありません。接続中は 5 分ごとにテストします。",
+      "まだ記録がありません。Wi-Fi で接続中は 3 時間ごとにテストします。",
     ),
     "pickHistoryStats": m76,
     "pickHistoryWeek": MessageLookupByLibrary.simpleMessage("7 日"),
     "pickNotEnough": MessageLookupByLibrary.simpleMessage("データ不足"),
+    "pickRecord": MessageLookupByLibrary.simpleMessage("安定性を記録"),
+    "pickRecordDesc": MessageLookupByLibrary.simpleMessage(
+      "3 時間ごと、Wi-Fi のときだけ",
+    ),
     "pickSortCustom": MessageLookupByLibrary.simpleMessage("カスタム"),
     "pickSortPurity": MessageLookupByLibrary.simpleMessage("クリーン度"),
     "pickSortSpeed": MessageLookupByLibrary.simpleMessage("速度"),

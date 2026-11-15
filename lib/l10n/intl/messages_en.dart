@@ -1534,11 +1534,15 @@ class MessageLookup extends MessageLookupByLibrary {
     "pickHistory": MessageLookupByLibrary.simpleMessage("Stability"),
     "pickHistoryDay": MessageLookupByLibrary.simpleMessage("24 hours"),
     "pickHistoryEmpty": MessageLookupByLibrary.simpleMessage(
-      "No records yet. While connected, picks are tested every 5 minutes.",
+      "No records yet. While connected on Wi-Fi, picks are tested every 3 hours.",
     ),
     "pickHistoryStats": m76,
     "pickHistoryWeek": MessageLookupByLibrary.simpleMessage("7 days"),
     "pickNotEnough": MessageLookupByLibrary.simpleMessage("Not enough data"),
+    "pickRecord": MessageLookupByLibrary.simpleMessage("Record stability"),
+    "pickRecordDesc": MessageLookupByLibrary.simpleMessage(
+      "Every 3 hours, on Wi-Fi only",
+    ),
     "pickSortCustom": MessageLookupByLibrary.simpleMessage("Custom"),
     "pickSortPurity": MessageLookupByLibrary.simpleMessage("Purity"),
     "pickSortSpeed": MessageLookupByLibrary.simpleMessage("Speed"),

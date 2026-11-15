@@ -1109,5 +1109,7 @@
   "pickUnstable": "不稳",
   "pickNotEnough": "数据不够",
   "pickHistoryStats": "平均 {average} ms · 超时 {timeouts} 次 · 波动 ±{jitter} ms",
-  "pickHistoryEmpty": "还没有记录。连着代理时，每 5 分钟自动测一次。"
+  "pickHistoryEmpty": "还没有记录。连着代理并且在 Wi‑Fi 下时，每 3 小时测一次。",
+  "pickRecord": "记录稳定性",
+  "pickRecordDesc": "每 3 小时测一次，只在 Wi‑Fi 下"
 }

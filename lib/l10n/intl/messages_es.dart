@@ -1647,12 +1647,16 @@ class MessageLookup extends MessageLookupByLibrary {
     "pickHistory": MessageLookupByLibrary.simpleMessage("Estabilidad"),
     "pickHistoryDay": MessageLookupByLibrary.simpleMessage("24 horas"),
     "pickHistoryEmpty": MessageLookupByLibrary.simpleMessage(
-      "Aún no hay registros. Conectado, los favoritos se prueban cada 5 minutos.",
+      "Aún no hay registros. Conectado por Wi-Fi, los favoritos se prueban cada 3 horas.",
     ),
     "pickHistoryStats": m76,
     "pickHistoryWeek": MessageLookupByLibrary.simpleMessage("7 días"),
     "pickNotEnough": MessageLookupByLibrary.simpleMessage(
       "Datos insuficientes",
+    ),
+    "pickRecord": MessageLookupByLibrary.simpleMessage("Registrar estabilidad"),
+    "pickRecordDesc": MessageLookupByLibrary.simpleMessage(
+      "Cada 3 horas, solo con Wi-Fi",
     ),
     "pickSortCustom": MessageLookupByLibrary.simpleMessage("Personalizado"),
     "pickSortPurity": MessageLookupByLibrary.simpleMessage("Pureza"),

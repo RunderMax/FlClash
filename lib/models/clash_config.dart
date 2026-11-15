@@ -2195,6 +2195,7 @@ abstract class PatchClashConfig with _$PatchClashConfig {
     Set<GeneralOverrideKey> generalOverrideKeys,
     @Default(defaultMitm) Mitm mitm,
     @Default([]) @JsonKey(name: 'sloth-picks') List<String> slothPicks,
+    @Default(true) @JsonKey(name: 'sloth-pick-record') bool slothPickRecord,
   }) = _PatchClashConfig;
 
   factory PatchClashConfig.fromJson(Map<String, Object?> json) =>

@@ -1608,11 +1608,17 @@ class MessageLookup extends MessageLookupByLibrary {
     "pickHistory": MessageLookupByLibrary.simpleMessage("Стабильность"),
     "pickHistoryDay": MessageLookupByLibrary.simpleMessage("24 часа"),
     "pickHistoryEmpty": MessageLookupByLibrary.simpleMessage(
-      "Записей пока нет. При подключении избранное проверяется каждые 5 минут.",
+      "Записей пока нет. При подключении по Wi-Fi избранное проверяется каждые 3 часа.",
     ),
     "pickHistoryStats": m76,
     "pickHistoryWeek": MessageLookupByLibrary.simpleMessage("7 дней"),
     "pickNotEnough": MessageLookupByLibrary.simpleMessage("Мало данных"),
+    "pickRecord": MessageLookupByLibrary.simpleMessage(
+      "Записывать стабильность",
+    ),
+    "pickRecordDesc": MessageLookupByLibrary.simpleMessage(
+      "Каждые 3 часа, только по Wi-Fi",
+    ),
     "pickSortCustom": MessageLookupByLibrary.simpleMessage("Свой порядок"),
     "pickSortPurity": MessageLookupByLibrary.simpleMessage("Чистота"),
     "pickSortSpeed": MessageLookupByLibrary.simpleMessage("Скорость"),

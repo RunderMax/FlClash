@@ -1109,5 +1109,7 @@
   "pickUnstable": "Unstable",
   "pickNotEnough": "Not enough data",
   "pickHistoryStats": "Avg {average} ms · {timeouts} timeouts · ±{jitter} ms swing",
-  "pickHistoryEmpty": "No records yet. While connected, picks are tested every 5 minutes."
+  "pickHistoryEmpty": "No records yet. While connected on Wi-Fi, picks are tested every 3 hours.",
+  "pickRecord": "Record stability",
+  "pickRecordDesc": "Every 3 hours, on Wi-Fi only"
 }
