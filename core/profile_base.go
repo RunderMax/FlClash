@@ -153,6 +153,9 @@ func mergeProfileBase(base *SetupBase) (*yaml.Node, error) {
 	if rules != nil {
 		setMappingValue(root, "rules", rules)
 	}
+	if err := applyFastestGroup(root); err != nil {
+		return nil, err
+	}
 	if retag {
 		retagShortIDs(root)
 	}

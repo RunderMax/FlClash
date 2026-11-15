@@ -1,6 +1,7 @@
 package core
 
 import (
+	"bytes"
 	"errors"
 	"os"
 	"path/filepath"
@@ -24,6 +25,7 @@ import (
 	LC "github.com/metacubex/mihomo/listener/config"
 	"github.com/metacubex/mihomo/log"
 	"github.com/metacubex/mihomo/tunnel"
+	"go.yaml.in/yaml/v3"
 )
 
 var (
@@ -109,7 +111,40 @@ func loadConfig(path string) (*config.Config, error) {
 	if err != nil {
 		return nil, err
 	}
+	if bytes.Contains(buf, []byte(fastestGroupKey)) {
+		return loadConfigWithFastestGroup(buf, path)
+	}
 	cfg, err := executor.ParseWithBytes(buf)
+	if err != nil {
+		return nil, err
+	}
+	return withPlatformLimits(cfg), nil
+}
+
+// The file is rewritten with the group in place, as the Android service reads
+// it again on its own without this step.
+func loadConfigWithFastestGroup(buf []byte, path string) (*config.Config, error) {
+	var document yaml.Node
+	if err := yaml.Unmarshal(buf, &document); err != nil {
+		return nil, err
+	}
+	root, err := documentMapping(&document)
+	if err != nil {
+		return nil, err
+	}
+	if err := applyFastestGroup(root); err != nil {
+		return nil, err
+	}
+	retagShortIDs(root)
+	merged := &yaml.Node{Kind: yaml.DocumentNode, Content: []*yaml.Node{root}}
+	raw := config.DefaultRawConfig()
+	if err := merged.Decode(raw); err != nil {
+		return nil, err
+	}
+	if err := writeConfigDocument(path, merged); err != nil {
+		return nil, err
+	}
+	cfg, err := config.ParseRawConfig(raw)
 	if err != nil {
 		return nil, err
 	}

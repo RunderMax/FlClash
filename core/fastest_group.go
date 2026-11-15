@@ -1,0 +1,148 @@
+package core
+
+import (
+	"fmt"
+
+	"go.yaml.in/yaml/v3"
+)
+
+// The host asks for its url-test group by this key, since the profile's
+// groups and proxies stay in the Core and never reach it.
+const fastestGroupKey = "x-sloth-fastest"
+
+const (
+	defaultFastestURL       = "https://www.gstatic.com/generate_204"
+	defaultFastestInterval  = 300
+	defaultFastestTolerance = 50
+)
+
+type fastestGroupSpec struct {
+	Name      string   `yaml:"name"`
+	Proxies   []string `yaml:"proxies"`
+	URL       string   `yaml:"url"`
+	Interval  int      `yaml:"interval"`
+	Tolerance int      `yaml:"tolerance"`
+}
+
+// applyFastestGroup turns the request into a url-test group of the chosen
+// proxies the profile still has, offered first in its first select group. A
+// name the profile no longer has is dropped, since mihomo refuses a group that
+// names a proxy it cannot find.
+func applyFastestGroup(root *yaml.Node) error {
+	request := deleteMappingValue(root, fastestGroupKey)
+	if request == nil {
+		return nil
+	}
+	var spec fastestGroupSpec
+	if err := resolveAlias(request).Decode(&spec); err != nil {
+		return fmt.Errorf("%s: %w", fastestGroupKey, err)
+	}
+	groups := resolveAlias(mappingValue(root, "proxy-groups"))
+	if spec.Name == "" || groups == nil || groups.Kind != yaml.SequenceNode {
+		return nil
+	}
+	known := namesOf(resolveAlias(mappingValue(root, "proxies")))
+	for _, group := range groups.Content {
+		if nameOf(group) == spec.Name {
+			return nil
+		}
+	}
+	proxies := make([]string, 0, len(spec.Proxies))
+	for _, name := range spec.Proxies {
+		if known[name] {
+			proxies = append(proxies, name)
+		}
+	}
+	if len(proxies) == 0 {
+		return nil
+	}
+	group, err := fastestGroupNode(spec, proxies)
+	if err != nil {
+		return err
+	}
+	content := make([]*yaml.Node, 0, len(groups.Content)+1)
+	content = append(append(content, groups.Content...), group)
+	setMappingValue(root, "proxy-groups", &yaml.Node{Kind: yaml.SequenceNode, Tag: "!!seq", Content: content})
+	for _, candidate := range groups.Content {
+		candidate = resolveAlias(candidate)
+		if candidate.Kind != yaml.MappingNode || scalarOf(mappingValue(candidate, "type")) != "select" {
+			continue
+		}
+		offerFirst(candidate, spec.Name)
+		break
+	}
+	return nil
+}
+
+func fastestGroupNode(spec fastestGroupSpec, proxies []string) (*yaml.Node, error) {
+	url, interval, tolerance := spec.URL, spec.Interval, spec.Tolerance
+	if url == "" {
+		url = defaultFastestURL
+	}
+	if interval <= 0 {
+		interval = defaultFastestInterval
+	}
+	if tolerance <= 0 {
+		tolerance = defaultFastestTolerance
+	}
+	var node yaml.Node
+	err := node.Encode(map[string]any{
+		"name":      spec.Name,
+		"type":      "url-test",
+		"proxies":   proxies,
+		"url":       url,
+		"interval":  interval,
+		"tolerance": tolerance,
+	})
+	return &node, err
+}
+
+func offerFirst(group *yaml.Node, name string) {
+	entry := &yaml.Node{Kind: yaml.ScalarNode, Tag: "!!str", Value: name}
+	proxies := resolveAlias(mappingValue(group, "proxies"))
+	content := []*yaml.Node{entry}
+	if proxies != nil && proxies.Kind == yaml.SequenceNode {
+		content = append(content, proxies.Content...)
+	}
+	setMappingValue(group, "proxies", &yaml.Node{Kind: yaml.SequenceNode, Tag: "!!seq", Content: content})
+}
+
+func namesOf(items *yaml.Node) map[string]bool {
+	names := map[string]bool{}
+	if items == nil || items.Kind != yaml.SequenceNode {
+		return names
+	}
+	for _, item := range items.Content {
+		if name := nameOf(item); name != "" {
+			names[name] = true
+		}
+	}
+	return names
+}
+
+func nameOf(item *yaml.Node) string {
+	item = resolveAlias(item)
+	if item == nil || item.Kind != yaml.MappingNode {
+		return ""
+	}
+	return scalarOf(mappingValue(item, "name"))
+}
+
+func scalarOf(node *yaml.Node) string {
+	node = resolveAlias(node)
+	if node == nil || node.Kind != yaml.ScalarNode {
+		return ""
+	}
+	return node.Value
+}
+
+func deleteMappingValue(mapping *yaml.Node, key string) *yaml.Node {
+	for i := 0; i+1 < len(mapping.Content); i += 2 {
+		if name := mapping.Content[i]; name.Kind == yaml.ScalarNode && name.Value == key {
+			value := mapping.Content[i+1]
+			mapping.Content = append(mapping.Content[:i:i], mapping.Content[i+2:]...)
+			return value
+		}
+	}
+	return nil
+}
