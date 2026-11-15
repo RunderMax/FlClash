@@ -260,6 +260,7 @@ Future<RealProfile> _makeRealProfileTask(MakeRealProfileState data) async {
       'name': slothPicksGroup,
       'type': 'select',
       'proxies': realPatchConfig.slothPicks,
+      'record': true,
     };
   }
   if (rawConfig['profile'] == null) {

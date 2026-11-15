@@ -23,7 +23,11 @@ type fastestGroupSpec struct {
 	URL       string   `yaml:"url"`
 	Interval  int      `yaml:"interval"`
 	Tolerance int      `yaml:"tolerance"`
+	Record    bool     `yaml:"record"`
 }
+
+// The group the last applied config asked to have its members' delays kept.
+var recordedPicksGroup string
 
 // applyFastestGroup turns the request into a group of the chosen proxies the
 // profile still has, offered last in its first select group so the profile's
@@ -60,6 +64,9 @@ func applyFastestGroup(root *yaml.Node) error {
 	group, err := fastestGroupNode(spec, proxies)
 	if err != nil {
 		return err
+	}
+	if spec.Record {
+		recordedPicksGroup = spec.Name
 	}
 	content := make([]*yaml.Node, 0, len(groups.Content)+1)
 	content = append(append(content, groups.Content...), group)

@@ -164,6 +164,7 @@ func runningConfigPath() string {
 }
 
 func loadSetupConfig(params *SetupParams) (*config.Config, error) {
+	recordedPicksGroup = ""
 	path := runningConfigPath()
 	if params.Base != nil {
 		return loadConfigWithBase(params.Base, path)
@@ -198,6 +199,7 @@ func applyConfig(params *SetupParams) error {
 	currentConfig = cfg
 	hub.ApplyConfig(cfg)
 	patchSelectGroup(params.SelectedMap)
+	picks.recordPicks(recordedPicksGroup)
 	bumpRouteEpoch()
 	updateListeners(cfg)
 	reconcileGeoUpdater()
