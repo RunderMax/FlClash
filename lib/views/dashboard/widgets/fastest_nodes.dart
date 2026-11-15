@@ -269,6 +269,7 @@ class _FastestNodesCardState extends ConsumerState<FastestNodesCard> {
             for (final pick in picks) ...[
               _PickTile(
                 pick: pick,
+                number: names.indexOf(pick.name) + 1,
                 selected: pick.name == current,
                 onTap: () => _select(pick.name),
               ),
@@ -309,13 +310,20 @@ class _FastestNodesCardState extends ConsumerState<FastestNodesCard> {
 class _PickTile extends StatelessWidget {
   const _PickTile({
     required this.pick,
+    required this.number,
     required this.selected,
     required this.onTap,
   });
 
   final _Pick pick;
+
+  /// The pick's place in the custom order, worn on its mark.
+  final int number;
   final bool selected;
   final VoidCallback onTap;
+
+  static const _mark = 26.0;
+  static const _border = 1.5;
 
   @override
   Widget build(BuildContext context) {
@@ -327,80 +335,120 @@ class _PickTile extends StatelessWidget {
     final delay = pick.delay;
     final ip = pick.ip;
     final quality = pick.quality;
-    final tile = DashboardBlock(
-      radius: AppCorner.md,
-      padding: EdgeInsets.fromLTRB(14, selected ? 36 : 10, 12, 10),
-      onTap: onTap,
-      semanticLabel: selected
-          ? '${pick.name} ${appLocalizations.pickInUse}'
-          : pick.name,
-      child: Row(
-        spacing: 10,
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              spacing: 2,
-              children: [
-                Text(
-                  pick.name,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: AppTextStyle.subheadline.of(context, emphasized: true),
-                ),
-                Text(
-                  ip == null ? '-' : '${ip.ip} · ${ip.countryCode}',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: secondary,
-                ),
-                if (quality != null)
-                  Text(
-                    [
-                      quality.type.label(context),
-                      [
-                        appLocalizations.ipQualityShort,
-                        quality.level.label(context),
-                      ].join(' '),
-                    ].join(' · '),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: secondary.copyWith(
-                      color: quality.level.color(context),
-                    ),
-                  ),
-              ],
+    final duration = context.motionDuration(commonDuration);
+    final shape = AppShape.all(AppCorner.md);
+    // The mark and the frame both say which pick carries traffic, so a
+    // glance finds it without reading.
+    return TweenAnimationBuilder<double>(
+      tween: Tween(end: selected ? 1 : 0),
+      duration: duration,
+      curve: Curves.easeOutCubic,
+      builder: (context, emphasis, child) => DecoratedBox(
+        position: DecorationPosition.foreground,
+        decoration: ShapeDecoration(
+          shape: shape.copyWith(
+            side: BorderSide(
+              color: colorScheme.primary.withValues(alpha: emphasis),
+              width: _border,
             ),
           ),
-          Text(
-            switch (delay) {
-              null => '-',
-              < 0 => appLocalizations.timeout,
-              final delay => '$delay ms',
-            },
-            style: AppTextStyle.footnote
-                .of(context, emphasized: true)
-                .toTabular
-                .copyWith(color: colorScheme.delayColor(delay)),
-          ),
-          if (selected) const SelectionCheck(),
-        ],
-      ),
-    );
-    if (!selected) return tile;
-    return Stack(
-      children: [
-        tile,
-        PositionedDirectional(
-          top: 8,
-          end: 10,
-          child: DashboardChip(
-            label: appLocalizations.pickInUse,
-            tone: DashboardChipTone.ok,
-            dot: true,
-          ),
         ),
-      ],
+        child: child,
+      ),
+      child: DashboardBlock(
+        radius: AppCorner.md,
+        padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
+        onTap: onTap,
+        semanticLabel: selected
+            ? '${pick.name} ${appLocalizations.pickInUse}'
+            : pick.name,
+        child: Row(
+          spacing: 10,
+          children: [
+            AnimatedSwitcher(
+              duration: duration,
+              transitionBuilder: (child, animation) =>
+                  ScaleTransition(scale: animation, child: child),
+              child: selected
+                  ? const SelectionBadge(key: ValueKey(true), size: _mark)
+                  : SizedBox.square(
+                      key: const ValueKey(false),
+                      dimension: _mark,
+                      child: DecoratedBox(
+                        decoration: ShapeDecoration(
+                          shape: AppShape.circle,
+                          color: DashboardColors.of(context).card,
+                        ),
+                        child: Center(
+                          child: Text(
+                            '$number',
+                            style: AppTextStyle.caption1
+                                .of(context, emphasized: true)
+                                .toTabular
+                                .copyWith(color: colorScheme.onSurfaceVariant),
+                          ),
+                        ),
+                      ),
+                    ),
+            ),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                spacing: 2,
+                children: [
+                  AnimatedDefaultTextStyle(
+                    duration: duration,
+                    style: AppTextStyle.subheadline
+                        .of(context, emphasized: true)
+                        .copyWith(
+                          color: selected
+                              ? colorScheme.primary
+                              : colorScheme.onSurface,
+                        ),
+                    child: Text(
+                      pick.name,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  Text(
+                    ip == null ? '-' : '${ip.ip} · ${ip.countryCode}',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: secondary,
+                  ),
+                  if (quality != null)
+                    Text(
+                      [
+                        quality.type.label(context),
+                        [
+                          appLocalizations.ipQualityShort,
+                          quality.level.label(context),
+                        ].join(' '),
+                      ].join(' · '),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: secondary.copyWith(
+                        color: quality.level.color(context),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+            Text(
+              switch (delay) {
+                null => '-',
+                < 0 => appLocalizations.timeout,
+                final delay => '$delay ms',
+              },
+              style: AppTextStyle.footnote
+                  .of(context, emphasized: true)
+                  .toTabular
+                  .copyWith(color: colorScheme.delayColor(delay)),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
