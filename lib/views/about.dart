@@ -174,6 +174,7 @@ class _AboutHero extends StatelessWidget {
                   'assets/images/icon.png',
                   width: _logoSize - _logoInset * 2,
                   height: _logoSize - _logoInset * 2,
+                  color: colorScheme.onSurface,
                 ),
               ),
             ),
