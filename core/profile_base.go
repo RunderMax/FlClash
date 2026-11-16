@@ -103,6 +103,7 @@ func loadConfigWithBase(base *SetupBase, configPath string) (*config.Config, err
 	if err != nil {
 		return nil, err
 	}
+	readGuardRequest(document.Content[0])
 	raw := config.DefaultRawConfig()
 	if err := document.Decode(raw); err != nil {
 		return nil, err

@@ -199,6 +199,9 @@ func handleChangeProxy(params *ChangeProxyParams) *ChangeProxyResult {
 	}
 	changed := selector.Now() != before
 	refreshRouteLocked(routeUnchanged)
+	if app, ok := strings.CutPrefix(params.GroupName, appPickGroupPrefix); ok && changed {
+		go closeAppConnections(map[string]bool{app: true})
+	}
 	return &ChangeProxyResult{Changed: changed}
 }
 

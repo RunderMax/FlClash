@@ -19,8 +19,11 @@ func init() {
 		sendMessage(DelayMessage, &Delay{Url: url, Name: name, Value: delayValue(delay, timedOut)})
 	}
 	statistic.DefaultRequestNotify = func(c statistic.Tracker) {
+		blocked := guardJoined(c)
 		notifyProbeRoute(c)
-		noteAppExit(c)
+		if !blocked {
+			noteAppExit(c)
+		}
 		if hasEventListener() {
 			sendMessage(RequestMessage, c)
 			watchRequestTraffic(c)

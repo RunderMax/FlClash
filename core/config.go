@@ -111,7 +111,8 @@ func loadConfig(path string) (*config.Config, error) {
 	if err != nil {
 		return nil, err
 	}
-	if bytes.Contains(buf, []byte(fastestGroupKey)) || bytes.Contains(buf, []byte(appRoutesKey)) {
+	if bytes.Contains(buf, []byte(fastestGroupKey)) || bytes.Contains(buf, []byte(appRoutesKey)) ||
+		bytes.Contains(buf, []byte(guardKey)) {
 		return loadConfigWithRequests(buf, path)
 	}
 	cfg, err := executor.ParseWithBytes(buf)
@@ -136,6 +137,7 @@ func loadConfigWithRequests(buf []byte, path string) (*config.Config, error) {
 		return nil, err
 	}
 	applyAppRoutes(root)
+	readGuardRequest(root)
 	retagShortIDs(root)
 	merged := &yaml.Node{Kind: yaml.DocumentNode, Content: []*yaml.Node{root}}
 	raw := config.DefaultRawConfig()
@@ -166,6 +168,7 @@ func runningConfigPath() string {
 
 func loadSetupConfig(params *SetupParams) (*config.Config, error) {
 	recordedPicksGroup, recordedPicksEvery = "", 0
+	loadedGuard = guardRequest{}
 	path := runningConfigPath()
 	if params.Base != nil {
 		return loadConfigWithBase(params.Base, path)
@@ -197,11 +200,18 @@ func applyConfig(params *SetupParams) error {
 		cfg = fallback
 	}
 
+	guard := newGuardState(loadedGuard)
+	if guard != nil {
+		armGuard(cfg)
+	}
+	currentGuard.Store(guard)
 	currentConfig = cfg
 	hub.ApplyConfig(cfg)
 	patchSelectGroup(params.SelectedMap)
 	picks.recordPicks(recordedPicksGroup, recordedPicksEvery)
 	reapplyAppRoutes(cfg.Rules)
+	warmGuard(guard, cfg.Rules)
+	steering.reset(cfg.Proxies)
 	bumpRouteEpoch()
 	updateListeners(cfg)
 	reconcileGeoUpdater()

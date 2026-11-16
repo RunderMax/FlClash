@@ -2,6 +2,7 @@ package core
 
 import (
 	"regexp"
+	"slices"
 	"strconv"
 	"strings"
 
@@ -35,10 +36,12 @@ func applyAppRoutes(root *yaml.Node) {
 	if routes == nil || routes.Kind != yaml.MappingNode {
 		return
 	}
-	known := namesOf(resolveAlias(mappingValue(root, "proxies")))
-	for name := range namesOf(resolveAlias(mappingValue(root, "proxy-groups"))) {
+	nodes := namesOf(resolveAlias(mappingValue(root, "proxies")))
+	known := namesOf(resolveAlias(mappingValue(root, "proxy-groups")))
+	for name := range nodes {
 		known[name] = true
 	}
+	addAppPickGroups(root, resolveAlias(mappingValue(request, "picks")), routes, nodes, known)
 	var added []*yaml.Node
 	for i := 0; i+1 < len(routes.Content); i += 2 {
 		app, target := scalarOf(routes.Content[i]), scalarOf(routes.Content[i+1])
@@ -68,6 +71,70 @@ func applyAppRoutes(root *yaml.Node) {
 	content = append(content, added...)
 	content = append(content, existing[at:]...)
 	setMappingValue(root, "rules", &yaml.Node{Kind: yaml.SequenceNode, Tag: "!!seq", Content: content})
+}
+
+type appPickSpec struct {
+	Proxies []string `yaml:"proxies"`
+	Auto    bool     `yaml:"auto"`
+}
+
+// An app routed to its own picks gets a hidden group of the ones the profile
+// still has.
+func addAppPickGroups(root, picks, routes *yaml.Node, nodes, known map[string]bool) {
+	if picks == nil || picks.Kind != yaml.MappingNode {
+		return
+	}
+	groups := resolveAlias(mappingValue(root, "proxy-groups"))
+	var content []*yaml.Node
+	if groups != nil && !isNull(groups) {
+		if groups.Kind != yaml.SequenceNode {
+			return
+		}
+		content = append(content, groups.Content...)
+	}
+	targets := map[string]string{}
+	for i := 0; i+1 < len(routes.Content); i += 2 {
+		targets[scalarOf(routes.Content[i])] = scalarOf(routes.Content[i+1])
+	}
+	added := 0
+	for i := 0; i+1 < len(picks.Content); i += 2 {
+		app := scalarOf(picks.Content[i])
+		name := appPickGroupPrefix + app
+		var spec appPickSpec
+		if !appPackagePattern.MatchString(app) || targets[app] != name || known[name] ||
+			resolveAlias(picks.Content[i+1]).Decode(&spec) != nil {
+			continue
+		}
+		var members []string
+		for _, member := range spec.Proxies {
+			if nodes[member] && !slices.Contains(members, member) {
+				members = append(members, member)
+			}
+		}
+		group, err := appPickGroupNode(name, members, spec.Auto)
+		if len(members) == 0 || err != nil {
+			continue
+		}
+		content = append(content, group)
+		known[name] = true
+		added++
+	}
+	if added > 0 {
+		setMappingValue(root, "proxy-groups", &yaml.Node{Kind: yaml.SequenceNode, Tag: "!!seq", Content: content})
+	}
+}
+
+func appPickGroupNode(name string, members []string, auto bool) (*yaml.Node, error) {
+	group := map[string]any{"name": name, "type": "select", "proxies": members, "hidden": true}
+	if auto {
+		group["type"] = "url-test"
+		group["url"] = defaultFastestURL
+		group["interval"] = defaultFastestInterval
+		group["tolerance"] = defaultFastestTolerance
+	}
+	var node yaml.Node
+	err := node.Encode(group)
+	return &node, err
 }
 
 // mihomo trims each rule field, so a padded name would not resolve.

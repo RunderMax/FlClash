@@ -1,6 +1,7 @@
 package core
 
 import (
+	"encoding/json"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -169,5 +170,75 @@ func TestAppOfLooksUpAConnectionNoRuleLookedUp(t *testing.T) {
 	}
 	if got := appOf(&constant.Metadata{}); got != "com.looked.up" {
 		t.Errorf("app = %q, want the one looked up", got)
+	}
+}
+
+func groupFields(t *testing.T, proxy constant.Proxy) (members []string, hidden bool) {
+	t.Helper()
+	buf, err := json.Marshal(proxy)
+	if err != nil {
+		t.Fatalf("marshal %s: %v", proxy.Name(), err)
+	}
+	var fields struct {
+		All    []string `json:"all"`
+		Hidden bool     `json:"hidden"`
+	}
+	if err := json.Unmarshal(buf, &fields); err != nil {
+		t.Fatalf("unmarshal %s: %v", proxy.Name(), err)
+	}
+	return fields.All, fields.Hidden
+}
+
+func TestLoadConfigWithBaseGivesAnAppAGroupOfItsOwnPicks(t *testing.T) {
+	path := writeBaseProfile(t, baseProfile)
+	base, err := handleGetProfileBase(PathParams{Path: path})
+	if err != nil {
+		t.Fatalf("handleGetProfileBase = %v", err)
+	}
+	video, chat := appPickGroupPrefix+"com.example.video", appPickGroupPrefix+"com.example.chat"
+	gone := appPickGroupPrefix + "com.example.gone"
+	overlay := overlayOf(t, base, nil, map[string]any{
+		appRoutesKey: map[string]any{
+			"routes": map[string]any{
+				"com.example.chat":  chat,
+				"com.example.gone":  gone,
+				"com.example.video": video,
+				"com.example.web":   "a",
+			},
+			"picks": map[string]any{
+				"com.example.chat":  map[string]any{"proxies": []string{"a"}, "auto": true},
+				"com.example.gone":  map[string]any{"proxies": []string{"gone"}},
+				"com.example.video": map[string]any{"proxies": []string{"b", "gone", "a", "b"}},
+				"com.example.web":   map[string]any{"proxies": []string{"a"}},
+			},
+		},
+	})
+
+	cfg, err := loadConfigWithBase(&SetupBase{Path: path, Overlay: overlay}, filepath.Join(t.TempDir(), "config.yaml"))
+
+	if err != nil {
+		t.Fatalf("loadConfigWithBase = %v", err)
+	}
+	if group := cfg.Proxies[video]; group == nil || group.Type() != constant.Selector {
+		t.Fatalf("video group = %v, want a select group", group)
+	}
+	if members, hidden := groupFields(t, cfg.Proxies[video]); !reflect.DeepEqual(members, []string{"b", "a"}) || !hidden {
+		t.Errorf("video group = %v hidden %v, want [b a] hidden", members, hidden)
+	}
+	if group := cfg.Proxies[chat]; group == nil || group.Type() != constant.URLTest {
+		t.Errorf("chat group = %v, want a url-test group", group)
+	}
+	for _, name := range []string{gone, appPickGroupPrefix + "com.example.web"} {
+		if cfg.Proxies[name] != nil {
+			t.Errorf("made %s, which no route takes or no member is left in", name)
+		}
+	}
+	want := []string{
+		"ProcessName,com.example.chat," + chat,
+		"ProcessName,com.example.video," + video,
+		"ProcessName,com.example.web,a",
+	}
+	if got := ruleLines(cfg); !reflect.DeepEqual(got[:len(want)], want) {
+		t.Errorf("rules = %v, want %v first", got, want)
 	}
 }

@@ -71,7 +71,7 @@ func noteAppExit(tracker statistic.Tracker) {
 		return
 	}
 	node := info.Chain[0]
-	if node == "REJECT" || node == "REJECT-DROP" {
+	if node == "REJECT" || node == "REJECT-DROP" || node == guardOutbound {
 		return
 	}
 	appExits.note(info.RulePayload, node, info.Start)
@@ -89,7 +89,11 @@ func (r *appExitRecorder) note(app, node string, at time.Time) {
 	if !looking {
 		apps = map[string]int64{}
 		r.waiting[node] = apps
-		go func() { r.settle(node, lookupAppExit(node)) }()
+		go func() {
+			exit := lookupAppExit(node)
+			purity.observe(node, exit.ip)
+			r.settle(node, exit)
+		}()
 	}
 	if _, seen := apps[app]; !seen {
 		apps[app] = at.UnixMilli()
