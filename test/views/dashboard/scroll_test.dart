@@ -17,6 +17,12 @@ void main() {
       overrides: [profilesProvider.overrideWith(TestProfiles.new)],
     );
     globalState.container = container;
+    container
+        .read(appSettingProvider.notifier)
+        .update(
+          (state) =>
+              state.copyWith(dashboardWidgets: dashboardGridCards.toList()),
+        );
   });
 
   tearDown(() => container.dispose());

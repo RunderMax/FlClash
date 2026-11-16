@@ -58,6 +58,12 @@ void main() {
     );
     globalState.container = container;
     container.listen(appSettingProvider, (_, _) {});
+    container
+        .read(appSettingProvider.notifier)
+        .update(
+          (state) =>
+              state.copyWith(dashboardWidgets: dashboardGridCards.toList()),
+        );
     final requests = container.read(requestsProvider.notifier);
     requests.value = FixedList<TrackerInfo>(500);
     requests.addRequest(_request('gamma.test', 10));

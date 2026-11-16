@@ -24,6 +24,22 @@ const _servicePairColumnMin = 290.0;
 
 const _maxColumnWidth = 440.0;
 
+/// The cards the desktop grid draws itself; any other saved card joins it in
+/// lanes below its rows.
+const dashboardGridCards = {
+  DashboardWidget.currentOutbound,
+  DashboardWidget.networkSpeed,
+  DashboardWidget.outboundMode,
+  DashboardWidget.vpnButton,
+  DashboardWidget.networkTakeover,
+  DashboardWidget.intranetIp,
+  DashboardWidget.serviceStatus,
+  DashboardWidget.profiles,
+  DashboardWidget.proxyGroups,
+  DashboardWidget.connectionStats,
+  DashboardWidget.memoryInfo,
+};
+
 class DashboardView extends ConsumerStatefulWidget {
   const DashboardView({super.key, this.platform});
 
@@ -126,7 +142,8 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
 /// Four columns fill the window, the tables taking what the rows above them
 /// leave. A window too short for the tables, and every two column one, gets
 /// the summary cards instead, so no list scrolls inside a page that scrolls.
-class _DesktopDashboard extends StatelessWidget {
+/// Saved cards the grid has no place for make the page scroll instead.
+class _DesktopDashboard extends ConsumerWidget {
   const _DesktopDashboard({
     required this.platform,
     required this.columns,
@@ -138,7 +155,15 @@ class _DesktopDashboard extends StatelessWidget {
   final double gap;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final extras = [
+      for (final card in ref.watch(
+        dashboardStateProvider.select((state) => state.dashboardWidgets),
+      ))
+        if (card.platforms.contains(platform) &&
+            !dashboardGridCards.contains(card))
+          card,
+    ];
     final density = DashboardDensityScope.of(context);
     final compact = density.isCompact;
     final scale = DashboardDensityScope.scaleOf(context);
@@ -220,6 +245,8 @@ class _DesktopDashboard extends StatelessWidget {
                   middleHeight,
                   row(const [(1, ServiceStatusCard()), (1, MemoryInfo())]),
                 ),
+                if (extras.isNotEmpty)
+                  _ExtraCards(cards: extras, lanes: 1, gap: gap),
                 sized(summaryHeight, summaries),
               ],
             ),
@@ -253,6 +280,32 @@ class _DesktopDashboard extends StatelessWidget {
             ]),
           ),
         ];
+        const tables = [
+          Expanded(
+            flex: 3,
+            child: RepaintBoundary(child: ConnectionsTableCard()),
+          ),
+          Expanded(flex: 2, child: RepaintBoundary(child: ProxyGroupsCard())),
+        ];
+        Widget tablesRow() => Row(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          spacing: gap,
+          children: tables,
+        );
+        if (extras.isNotEmpty) {
+          return SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            padding: padding,
+            child: Column(
+              spacing: gap,
+              children: [
+                ...rows,
+                _ExtraCards(cards: extras, lanes: 2, gap: gap),
+                sized(tablesHeight, tablesRow()),
+              ],
+            ),
+          );
+        }
         final rowsHeight =
             padding.vertical +
             topHeight +
@@ -272,24 +325,7 @@ class _DesktopDashboard extends StatelessWidget {
                 children: [
                   ...rows,
                   if (tablesFit)
-                    Expanded(
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        spacing: gap,
-                        children: const [
-                          Expanded(
-                            flex: 3,
-                            child: RepaintBoundary(
-                              child: ConnectionsTableCard(),
-                            ),
-                          ),
-                          Expanded(
-                            flex: 2,
-                            child: RepaintBoundary(child: ProxyGroupsCard()),
-                          ),
-                        ],
-                      ),
-                    )
+                    Expanded(child: tablesRow())
                   else if (fills)
                     Expanded(child: summaries)
                   else
@@ -300,6 +336,44 @@ class _DesktopDashboard extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+}
+
+/// Laid out as on a phone, in lanes that each take the height of their cards.
+class _ExtraCards extends StatelessWidget {
+  const _ExtraCards({
+    required this.cards,
+    required this.lanes,
+    required this.gap,
+  });
+
+  final List<DashboardWidget> cards;
+  final int lanes;
+  final double gap;
+
+  @override
+  Widget build(BuildContext context) {
+    return DashboardDensityScope(
+      density: DashboardDensity.mobile,
+      scale: DashboardDensityScope.scaleOf(context),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        spacing: gap,
+        children: [
+          for (var lane = 0; lane < lanes; lane++)
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                spacing: gap,
+                children: [
+                  for (var index = lane; index < cards.length; index += lanes)
+                    RepaintBoundary(child: cards[index].card),
+                ],
+              ),
+            ),
+        ],
+      ),
     );
   }
 }

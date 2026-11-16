@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:fl_clash/common/common.dart';
 import 'package:fl_clash/enum/enum.dart';
 import 'package:fl_clash/models/models.dart';
@@ -38,12 +40,17 @@ void main() {
 
   late ProviderContainer container;
 
+  void saveCards(List<DashboardWidget> cards) => container
+      .read(appSettingProvider.notifier)
+      .update((state) => state.copyWith(dashboardWidgets: cards));
+
   setUp(() {
     container = ProviderContainer(
       overrides: [profilesProvider.overrideWith(TestProfiles.new)],
     );
     globalState.container = container;
     container.listen(groupsProvider, (_, _) {});
+    saveCards(dashboardGridCards.toList());
   });
 
   void seedGroups(int count) {
@@ -414,6 +421,58 @@ void main() {
     expect(find.byType(ConnectionsTableCard), findsNothing);
     expect(find.byType(OutboundModeBar), findsNothing);
     expect(rectOf(tester, CurrentOutboundCard).width, 560);
+
+    await teardown(tester);
+  });
+
+  testWidgets('saved cards the grid lacks follow its rows in two lanes, the '
+      'page scrolling to the tables', (tester) async {
+    saveCards([
+      ...dashboardGridCards,
+      DashboardWidget.privacyHardening,
+      DashboardWidget.fastestNodes,
+    ]);
+    await pumpDashboard(tester, const Size(1220, 824));
+
+    final intranet = rectOf(tester, IntranetIpCard);
+    final hardening = rectOf(tester, PrivacyHardeningCard);
+    final picks = rectOf(tester, FastestNodesCard);
+    expect(hardening.top, intranet.bottom + 16);
+    expect(picks.top, hardening.top);
+    expect(picks.left, closeTo(hardening.right + 16, 0.01));
+    expect(hardening.width, closeTo(picks.width, 0.01));
+    expect(scrollExtentOf(tester), greaterThan(0));
+    expect(tester.takeException(), isNull);
+
+    await tester.scrollUntilVisible(
+      find.byType(ConnectionsTableCard),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    final lanesBottom = math.max(
+      rectOf(tester, PrivacyHardeningCard).bottom,
+      rectOf(tester, FastestNodesCard).bottom,
+    );
+    expect(
+      rectOf(tester, ConnectionsTableCard).top,
+      closeTo(lanesBottom + 16, 0.01),
+    );
+    expect(tester.takeException(), isNull);
+
+    await teardown(tester);
+  });
+
+  testWidgets('a mid-width window stacks the cards the grid lacks', (
+    tester,
+  ) async {
+    saveCards([...dashboardGridCards, DashboardWidget.fastestNodes]);
+    await pumpDashboard(tester, const Size(800, 900));
+
+    final current = rectOf(tester, CurrentOutboundCard);
+    final picks = rectOf(tester, FastestNodesCard);
+    expect(picks.width, closeTo(current.width, 0.01));
+    expect(picks.top, greaterThan(rectOf(tester, MemoryInfo).bottom));
+    expect(tester.takeException(), isNull);
 
     await teardown(tester);
   });
