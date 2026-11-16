@@ -119,6 +119,8 @@ const List<DashboardWidget> defaultDashboardWidgets = [
   DashboardWidget.intranetIp,
   DashboardWidget.serviceStatus,
   DashboardWidget.privacyCheck,
+  DashboardWidget.privacyHardening,
+  DashboardWidget.fastestNodes,
   DashboardWidget.profiles,
   DashboardWidget.proxyGroups,
   DashboardWidget.connectionStats,

@@ -50,6 +50,39 @@ void main() {
     });
   });
 
+  group('releaseCarries', () {
+    const suffix = 'windows-amd64-setup.exe';
+    Map<String, dynamic> release(List<String> names) => {
+      'tag_name': 'v1.2.3',
+      'assets': [
+        for (final name in names) {'name': name},
+      ],
+    };
+
+    test('waits for the file of this build', () {
+      expect(
+        releaseCarries(
+          release(['FlClash-1.2.3-android-arm64-v8a.apk']),
+          suffix,
+        ),
+        isFalse,
+      );
+      expect(
+        releaseCarries(
+          release(['FlClash-1.2.3-windows-amd64-setup.exe']),
+          suffix,
+        ),
+        isTrue,
+      );
+    });
+
+    test('trusts a release that lists no files, or a build that cannot '
+        'update itself', () {
+      expect(releaseCarries({'tag_name': 'v1.2.3'}, suffix), isTrue);
+      expect(releaseCarries(release(const []), null), isTrue);
+    });
+  });
+
   test('releaseAssetName drops the tag prefix', () {
     expect(
       releaseAssetName('v0.9.3', 'android-arm64-v8a.apk'),

@@ -111,7 +111,9 @@ class Request {
     final version = globalState.packageInfo.version;
     final hasUpdate =
         compareVersions(remoteVersion.replaceAll('v', ''), version) > 0;
-    return hasUpdate ? release : null;
+    return hasUpdate && releaseCarries(release, selfUpdateSuffix)
+        ? release
+        : null;
   }
 
   /// The release page redirect still answers once the hourly API quota is spent.

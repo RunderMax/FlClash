@@ -59,6 +59,17 @@ String releaseAssetName(String tag, String suffix) {
   return '$appName-$version-$suffix';
 }
 
+/// The Windows installer reaches a release some minutes after the APK; a
+/// release read off the redirect lists no files and is taken at its word.
+bool releaseCarries(Map<String, dynamic> release, String? suffix) {
+  final assets = release['assets'];
+  if (suffix == null || assets is! List) {
+    return true;
+  }
+  final name = releaseAssetName(release['tag_name'] as String, suffix);
+  return assets.any((asset) => asset is Map && asset['name'] == name);
+}
+
 Uri releaseAssetUri(String tag, String name) {
   return Uri.https('github.com', '/$repository/releases/download/$tag/$name');
 }
