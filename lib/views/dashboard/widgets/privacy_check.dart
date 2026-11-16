@@ -68,6 +68,11 @@ class _PrivacyCheckCardState extends ConsumerState<PrivacyCheckCard> {
     final dnsGuard = ref.watch(
       patchClashConfigProvider.select((state) => state.dnsGuard),
     );
+    final stunDropped =
+        ref.watch(
+          patchClashConfigProvider.select((state) => state.slothBlockQuic),
+        ) &&
+        ref.watch(capturesAppSocketsProvider);
     final running = check.phase == PrivacyCheckPhase.running;
     final report = check.report;
     final hint = !connected
@@ -114,9 +119,14 @@ class _PrivacyCheckCardState extends ConsumerState<PrivacyCheckCard> {
             _LeakRow(
               title: appLocalizations.webrtcLeak,
               verdict: report.webRtc.verdict,
-              unreachableLabel: appLocalizations.udpUnreachable,
+              unreachableLabel: stunDropped
+                  ? appLocalizations.stunBlocked
+                  : appLocalizations.udpUnreachable,
+              unreachableSafe: stunDropped,
               running: running,
-              detail: _webRtcDetail(context, report.webRtc),
+              detail: stunDropped && report.webRtc.mapped == null
+                  ? appLocalizations.stunBlockedDesc
+                  : _webRtcDetail(context, report.webRtc),
             ),
           ],
           const SizedBox(height: 8),
@@ -147,7 +157,8 @@ String _dnsDetail(BuildContext context, DnsCheck dns) {
   };
   return [
     [
-      dns.fakeIp ? 'Fake-IP' : appLocalizations.dnsRealIp,
+      if (dns.fakeIp case final fakeIp?)
+        fakeIp ? 'Fake-IP' : appLocalizations.dnsRealIp,
       appLocalizations.dnsResolverCount(dns.resolvers.length),
     ].join(' · '),
     if (places.isNotEmpty) places.take(3).join('\n'),
@@ -181,6 +192,7 @@ class _LeakRow extends StatelessWidget {
     required this.title,
     required this.verdict,
     required this.unreachableLabel,
+    this.unreachableSafe = false,
     required this.running,
     required this.detail,
   });
@@ -188,6 +200,9 @@ class _LeakRow extends StatelessWidget {
   final String title;
   final LeakVerdict verdict;
   final String unreachableLabel;
+
+  /// Set where nothing got through because a rule the user chose stops it.
+  final bool unreachableSafe;
   final bool running;
   final String detail;
 
@@ -207,7 +222,7 @@ class _LeakRow extends StatelessWidget {
             ),
             LeakVerdict.unreachable => (
               unreachableLabel,
-              DashboardChipTone.idle,
+              unreachableSafe ? DashboardChipTone.ok : DashboardChipTone.idle,
             ),
           };
     return DashboardBlock(

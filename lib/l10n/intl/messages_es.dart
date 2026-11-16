@@ -398,10 +398,10 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "appRouteBlock": MessageLookupByLibrary.simpleMessage("Sin red"),
     "appRouteBlockDesc": MessageLookupByLibrary.simpleMessage(
-      "La app no puede conectarse mientras la VPN esté activa",
+      "La app no puede conectarse mientras el proxy esté activo",
     ),
     "appRouteDirectDesc": MessageLookupByLibrary.simpleMessage(
-      "Evita el proxy y usa la red del teléfono",
+      "Evita el proxy y usa la red de este dispositivo",
     ),
     "appRouteFollow": MessageLookupByLibrary.simpleMessage("Seguir las reglas"),
     "appRouteFollowDesc": MessageLookupByLibrary.simpleMessage(
@@ -1874,7 +1874,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "pureBlackMode": MessageLookupByLibrary.simpleMessage("Modo negro puro"),
     "pureOnly": MessageLookupByLibrary.simpleMessage("Bloquear nodos impuros"),
     "pureOnlyDesc": MessageLookupByLibrary.simpleMessage(
-      "El tráfico por proxy solo pasa por nodos «Buena»; la VPN sigue activa",
+      "El tráfico por proxy solo pasa por nodos «Buena»; el proxy sigue activo",
     ),
     "pureOnlyEverywhere": MessageLookupByLibrary.simpleMessage(
       "Ya activo para todas las apps en Refuerzo de privacidad",
@@ -2326,6 +2326,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "strictRoute": MessageLookupByLibrary.simpleMessage("Ruta estricta"),
     "strictRouteDesc": MessageLookupByLibrary.simpleMessage(
       "La ruta estricta evita que el tráfico, como el DNS, eluda TUN y, con IPv6 desactivado, bloquea las conexiones IPv6 de este dispositivo.",
+    ),
+    "stunBlocked": MessageLookupByLibrary.simpleMessage("Bloqueado"),
+    "stunBlockedDesc": MessageLookupByLibrary.simpleMessage(
+      "El bloqueo de QUIC y STUN está activo: las páginas no ven tu dirección",
     ),
     "style": MessageLookupByLibrary.simpleMessage("Estilo"),
     "submit": MessageLookupByLibrary.simpleMessage("Enviar"),

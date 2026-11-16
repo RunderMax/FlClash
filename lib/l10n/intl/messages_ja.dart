@@ -329,7 +329,7 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "appRouteBlock": MessageLookupByLibrary.simpleMessage("通信を禁止"),
     "appRouteBlockDesc": MessageLookupByLibrary.simpleMessage(
-      "VPN がオンの間、このアプリは通信できません",
+      "プロキシがオンの間、このアプリは通信できません",
     ),
     "appRouteDirectDesc": MessageLookupByLibrary.simpleMessage(
       "プロキシを通さず端末の回線で接続します",
@@ -1481,7 +1481,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "pureBlackMode": MessageLookupByLibrary.simpleMessage("ピュアブラックモード"),
     "pureOnly": MessageLookupByLibrary.simpleMessage("クリーンでなければ遮断"),
     "pureOnlyDesc": MessageLookupByLibrary.simpleMessage(
-      "プロキシ経由の通信は「良好」なノードだけを通します。VPN は切れません",
+      "プロキシ経由の通信は「良好」なノードだけを通します。プロキシ自体は切れません",
     ),
     "pureOnlyEverywhere": MessageLookupByLibrary.simpleMessage(
       "「プライバシー強化」ですべてのアプリに適用中",
@@ -1839,6 +1839,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "strictRoute": MessageLookupByLibrary.simpleMessage("厳格なルーティング"),
     "strictRouteDesc": MessageLookupByLibrary.simpleMessage(
       "厳格なルーティングは DNS などの通信が TUN を迂回するのを防ぎます。IPv6 がオフの場合、この端末の IPv6 通信は遮断されます。",
+    ),
+    "stunBlocked": MessageLookupByLibrary.simpleMessage("ブロック済み"),
+    "stunBlockedDesc": MessageLookupByLibrary.simpleMessage(
+      "「QUIC と STUN をブロック」がオンなので、ページはあなたのアドレスを取得できません",
     ),
     "style": MessageLookupByLibrary.simpleMessage("スタイル"),
     "submit": MessageLookupByLibrary.simpleMessage("送信"),

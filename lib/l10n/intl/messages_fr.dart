@@ -400,10 +400,10 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "appRouteBlock": MessageLookupByLibrary.simpleMessage("Pas de réseau"),
     "appRouteBlockDesc": MessageLookupByLibrary.simpleMessage(
-      "L\'app ne peut pas se connecter tant que le VPN est actif",
+      "L\'app ne peut pas se connecter tant que le proxy est actif",
     ),
     "appRouteDirectDesc": MessageLookupByLibrary.simpleMessage(
-      "Contourne le proxy et utilise le réseau du téléphone",
+      "Contourne le proxy et utilise le réseau de cet appareil",
     ),
     "appRouteFollow": MessageLookupByLibrary.simpleMessage("Suivre les règles"),
     "appRouteFollowDesc": MessageLookupByLibrary.simpleMessage(
@@ -1880,7 +1880,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "Bloquer les nœuds impurs",
     ),
     "pureOnlyDesc": MessageLookupByLibrary.simpleMessage(
-      "Le trafic proxy ne passe que par des nœuds « Bonne » ; le VPN reste actif",
+      "Le trafic proxy ne passe que par des nœuds « Bonne » ; le proxy reste actif",
     ),
     "pureOnlyEverywhere": MessageLookupByLibrary.simpleMessage(
       "Déjà actif pour toutes les apps dans Renforcement",
@@ -2326,6 +2326,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "strictRoute": MessageLookupByLibrary.simpleMessage("Route stricte"),
     "strictRouteDesc": MessageLookupByLibrary.simpleMessage(
       "La route stricte empêche le trafic tel que le DNS de contourner TUN et, avec IPv6 désactivé, bloque les connexions IPv6 de cet appareil.",
+    ),
+    "stunBlocked": MessageLookupByLibrary.simpleMessage("Bloqué"),
+    "stunBlockedDesc": MessageLookupByLibrary.simpleMessage(
+      "Le blocage de QUIC et STUN est actif : les pages ne voient pas votre adresse",
     ),
     "style": MessageLookupByLibrary.simpleMessage("Style"),
     "submit": MessageLookupByLibrary.simpleMessage("Valider"),

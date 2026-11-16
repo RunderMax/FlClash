@@ -330,10 +330,10 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "appRouteBlock": MessageLookupByLibrary.simpleMessage("네트워크 차단"),
     "appRouteBlockDesc": MessageLookupByLibrary.simpleMessage(
-      "VPN이 켜져 있는 동안 이 앱은 인터넷을 쓸 수 없어요",
+      "프록시가 켜져 있는 동안 이 앱은 인터넷을 쓸 수 없어요",
     ),
     "appRouteDirectDesc": MessageLookupByLibrary.simpleMessage(
-      "프록시 없이 휴대폰 자체 네트워크로 연결해요",
+      "프록시 없이 이 기기 자체 네트워크로 연결해요",
     ),
     "appRouteFollow": MessageLookupByLibrary.simpleMessage("규칙 따르기"),
     "appRouteFollowDesc": MessageLookupByLibrary.simpleMessage("프로필 규칙대로 연결해요"),
@@ -1460,7 +1460,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "pureBlackMode": MessageLookupByLibrary.simpleMessage("퓨어 블랙 모드"),
     "pureOnly": MessageLookupByLibrary.simpleMessage("청정하지 않으면 차단"),
     "pureOnlyDesc": MessageLookupByLibrary.simpleMessage(
-      "프록시를 거치는 연결은 「양호」 노드만 통과해요. VPN은 꺼지지 않아요",
+      "프록시를 거치는 연결은 「양호」 노드만 통과해요. 프록시 자체는 꺼지지 않아요",
     ),
     "pureOnlyEverywhere": MessageLookupByLibrary.simpleMessage(
       "「개인정보 강화」에서 모든 앱에 켜져 있어요",
@@ -1808,6 +1808,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "strictRoute": MessageLookupByLibrary.simpleMessage("엄격한 라우팅"),
     "strictRouteDesc": MessageLookupByLibrary.simpleMessage(
       "엄격한 라우팅은 DNS 등의 트래픽이 TUN을 우회하지 못하게 하며, IPv6가 꺼져 있으면 이 기기의 IPv6 연결을 차단합니다.",
+    ),
+    "stunBlocked": MessageLookupByLibrary.simpleMessage("차단됨"),
+    "stunBlockedDesc": MessageLookupByLibrary.simpleMessage(
+      "「QUIC와 STUN 차단」이 켜져 있어 웹페이지가 주소를 알 수 없어요",
     ),
     "style": MessageLookupByLibrary.simpleMessage("스타일"),
     "submit": MessageLookupByLibrary.simpleMessage("제출"),

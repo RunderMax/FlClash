@@ -377,10 +377,10 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "appRouteBlock": MessageLookupByLibrary.simpleMessage("No network"),
     "appRouteBlockDesc": MessageLookupByLibrary.simpleMessage(
-      "The app cannot go online while the VPN is on",
+      "The app cannot go online while the proxy is on",
     ),
     "appRouteDirectDesc": MessageLookupByLibrary.simpleMessage(
-      "Skips the proxy and uses the phone\'s own network",
+      "Skips the proxy and uses this device\'s own network",
     ),
     "appRouteFollow": MessageLookupByLibrary.simpleMessage("Follow the rules"),
     "appRouteFollowDesc": MessageLookupByLibrary.simpleMessage(
@@ -1737,7 +1737,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "pureBlackMode": MessageLookupByLibrary.simpleMessage("Pure black mode"),
     "pureOnly": MessageLookupByLibrary.simpleMessage("Block impure nodes"),
     "pureOnlyDesc": MessageLookupByLibrary.simpleMessage(
-      "Proxied traffic only goes through Good nodes; the VPN stays on",
+      "Proxied traffic only goes through Good nodes; the proxy itself stays on",
     ),
     "pureOnlyEverywhere": MessageLookupByLibrary.simpleMessage(
       "Already on for every app in Privacy hardening",
@@ -2151,6 +2151,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "strictRoute": MessageLookupByLibrary.simpleMessage("Strict route"),
     "strictRouteDesc": MessageLookupByLibrary.simpleMessage(
       "Strict route keeps traffic such as DNS from bypassing TUN, and with IPv6 off it blocks this device\'s IPv6 connections.",
+    ),
+    "stunBlocked": MessageLookupByLibrary.simpleMessage("Blocked"),
+    "stunBlockedDesc": MessageLookupByLibrary.simpleMessage(
+      "Block QUIC and STUN is on, so pages cannot learn your address",
     ),
     "style": MessageLookupByLibrary.simpleMessage("Style"),
     "submit": MessageLookupByLibrary.simpleMessage("Submit"),

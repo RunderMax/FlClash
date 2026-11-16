@@ -320,10 +320,8 @@ class MessageLookup extends MessageLookupByLibrary {
       "节点不是「优」时，这个软件上不了网",
     ),
     "appRouteBlock": MessageLookupByLibrary.simpleMessage("禁止联网"),
-    "appRouteBlockDesc": MessageLookupByLibrary.simpleMessage(
-      "开着 VPN 时这个软件上不了网",
-    ),
-    "appRouteDirectDesc": MessageLookupByLibrary.simpleMessage("不走代理，用手机自己的网络"),
+    "appRouteBlockDesc": MessageLookupByLibrary.simpleMessage("代理开着时，这个软件上不了网"),
+    "appRouteDirectDesc": MessageLookupByLibrary.simpleMessage("不走代理，直接用本机的网络"),
     "appRouteFollow": MessageLookupByLibrary.simpleMessage("跟随规则"),
     "appRouteFollowDesc": MessageLookupByLibrary.simpleMessage("按订阅里的规则走"),
     "appRouteMissing": MessageLookupByLibrary.simpleMessage("订阅里已经没有这个了"),
@@ -1347,7 +1345,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "pureBlackMode": MessageLookupByLibrary.simpleMessage("纯黑模式"),
     "pureOnly": MessageLookupByLibrary.simpleMessage("不纯净就断网"),
     "pureOnlyDesc": MessageLookupByLibrary.simpleMessage(
-      "走代理的连接只放行「优」的节点，VPN 不会断开",
+      "走代理的连接只放行「优」的节点，代理本身不会关掉",
     ),
     "pureOnlyEverywhere": MessageLookupByLibrary.simpleMessage(
       "「隐私加固」里已对所有软件打开",
@@ -1661,6 +1659,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "strictRoute": MessageLookupByLibrary.simpleMessage("严格路由"),
     "strictRouteDesc": MessageLookupByLibrary.simpleMessage(
       "严格路由防止 DNS 等流量绕过虚拟网卡，关闭 IPv6 时会阻断本机的 IPv6 连接。",
+    ),
+    "stunBlocked": MessageLookupByLibrary.simpleMessage("已挡住"),
+    "stunBlockedDesc": MessageLookupByLibrary.simpleMessage(
+      "「挡掉 QUIC 和 STUN」开着，网页拿不到你的地址",
     ),
     "style": MessageLookupByLibrary.simpleMessage("风格"),
     "submit": MessageLookupByLibrary.simpleMessage("提交"),

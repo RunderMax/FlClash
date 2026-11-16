@@ -389,10 +389,10 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "appRouteBlock": MessageLookupByLibrary.simpleMessage("Без сети"),
     "appRouteBlockDesc": MessageLookupByLibrary.simpleMessage(
-      "Пока VPN включён, приложение не выйдет в сеть",
+      "Пока прокси включён, приложение не выйдет в сеть",
     ),
     "appRouteDirectDesc": MessageLookupByLibrary.simpleMessage(
-      "В обход прокси, через сеть телефона",
+      "В обход прокси, через сеть этого устройства",
     ),
     "appRouteFollow": MessageLookupByLibrary.simpleMessage("По правилам"),
     "appRouteFollowDesc": MessageLookupByLibrary.simpleMessage(
@@ -1829,7 +1829,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "Блокировать нечистые узлы",
     ),
     "pureOnlyDesc": MessageLookupByLibrary.simpleMessage(
-      "Трафик через прокси идёт только через узлы «Хороший»; VPN остаётся включённым",
+      "Трафик через прокси идёт только через узлы «Хороший»; сам прокси остаётся включённым",
     ),
     "pureOnlyEverywhere": MessageLookupByLibrary.simpleMessage(
       "Уже включено для всех приложений в «Усилении приватности»",
@@ -2263,6 +2263,10 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "strictRouteDesc": MessageLookupByLibrary.simpleMessage(
       "Строгая маршрутизация не даёт трафику вроде DNS обходить TUN, а при выключенном IPv6 блокирует IPv6-соединения этого устройства.",
+    ),
+    "stunBlocked": MessageLookupByLibrary.simpleMessage("Заблокировано"),
+    "stunBlockedDesc": MessageLookupByLibrary.simpleMessage(
+      "Блокировка QUIC и STUN включена: страницы не узнают ваш адрес",
     ),
     "style": MessageLookupByLibrary.simpleMessage("Стиль"),
     "submit": MessageLookupByLibrary.simpleMessage("Отправить"),

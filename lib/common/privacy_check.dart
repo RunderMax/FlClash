@@ -26,7 +26,9 @@ class DnsCheck {
     required this.verdict,
   });
 
-  final bool fakeIp;
+  /// Null where the requests went through the proxy port, which looks host
+  /// names up at the far end rather than here.
+  final bool? fakeIp;
   final List<IpPlace> resolvers;
   final LeakVerdict verdict;
 }
@@ -63,11 +65,17 @@ const _timeout = Duration(seconds: 6);
 
 /// Every request here leaves through a plain socket, so it takes the same path
 /// through the VPN and its rules as any other app, not the core's own proxy port.
+/// Where nothing captures the app's own sockets, as under a desktop system
+/// proxy, [findProxy] sends the web requests the way a browser goes; STUN
+/// stays a plain socket, as a page's WebRTC does.
 /// [realIp] is the address the network itself gives out, found without the
 /// proxy; a leak is anything that shows it or its provider.
-Future<PrivacyReport> runPrivacyCheck({String? realIp}) async {
+Future<PrivacyReport> runPrivacyCheck({
+  String? realIp,
+  String Function(Uri url)? findProxy,
+}) async {
   final client = HttpClient()
-    ..findProxy = ((_) => 'DIRECT')
+    ..findProxy = findProxy ?? ((_) => 'DIRECT')
     ..connectionTimeout = _timeout;
   try {
     final exit = await _lookupPlace(client, null);
@@ -75,7 +83,7 @@ Future<PrivacyReport> runPrivacyCheck({String? realIp}) async {
         ? null
         : await _lookupPlaceOrBare(client, realIp);
     final results = await Future.wait([
-      _checkDns(client, exit, real),
+      _checkDns(client, exit, real, localLookups: findProxy == null),
       _checkWebRtc(client, exit, real),
     ]);
     return PrivacyReport(
@@ -130,9 +138,10 @@ String _randomHex(int length) {
 Future<DnsCheck> _checkDns(
   HttpClient client,
   IpPlace exit,
-  IpPlace? real,
-) async {
-  final fakeIp = await _resolvesToFakeIp();
+  IpPlace? real, {
+  required bool localLookups,
+}) async {
+  final fakeIp = localLookups ? await _resolvesToFakeIp() : null;
   final session = _randomHex(40);
   var seen = <String, int>{};
   for (var round = 0; round < _dnsProbeRounds; round++) {

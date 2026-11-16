@@ -9122,6 +9122,21 @@ class AppLocalizations {
     return Intl.message('No result', name: 'checkNoResult', desc: '', args: []);
   }
 
+  /// `Blocked`
+  String get stunBlocked {
+    return Intl.message('Blocked', name: 'stunBlocked', desc: '', args: []);
+  }
+
+  /// `Block QUIC and STUN is on, so pages cannot learn your address`
+  String get stunBlockedDesc {
+    return Intl.message(
+      'Block QUIC and STUN is on, so pages cannot learn your address',
+      name: 'stunBlockedDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Tap the button to run the check`
   String get privacyCheckIdle {
     return Intl.message(
@@ -9514,10 +9529,10 @@ class AppLocalizations {
     );
   }
 
-  /// `Skips the proxy and uses the phone's own network`
+  /// `Skips the proxy and uses this device's own network`
   String get appRouteDirectDesc {
     return Intl.message(
-      'Skips the proxy and uses the phone\'s own network',
+      'Skips the proxy and uses this device\'s own network',
       name: 'appRouteDirectDesc',
       desc: '',
       args: [],
@@ -9534,10 +9549,10 @@ class AppLocalizations {
     );
   }
 
-  /// `The app cannot go online while the VPN is on`
+  /// `The app cannot go online while the proxy is on`
   String get appRouteBlockDesc {
     return Intl.message(
-      'The app cannot go online while the VPN is on',
+      'The app cannot go online while the proxy is on',
       name: 'appRouteBlockDesc',
       desc: '',
       args: [],
@@ -9584,10 +9599,10 @@ class AppLocalizations {
     );
   }
 
-  /// `Proxied traffic only goes through Good nodes; the VPN stays on`
+  /// `Proxied traffic only goes through Good nodes; the proxy itself stays on`
   String get pureOnlyDesc {
     return Intl.message(
-      'Proxied traffic only goes through Good nodes; the VPN stays on',
+      'Proxied traffic only goes through Good nodes; the proxy itself stays on',
       name: 'pureOnlyDesc',
       desc: '',
       args: [],
