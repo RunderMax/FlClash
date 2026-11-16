@@ -39,29 +39,49 @@ List<String> nodeNamesOf(List<Group> groups) {
   }.toList();
 }
 
+bool _offersPicks(Group group) =>
+    group.type == GroupType.Selector &&
+    group.all.any((proxy) => proxy.name == slothPicksGroup);
+
+/// mihomo's own GLOBAL lists every group, the picks among them, yet traffic
+/// enters it only in global mode.
+bool _isBuiltInGlobal(Group group) =>
+    group.name == GroupName.GLOBAL.name && group.hidden == true;
+
 /// The select group the Core offered the picks group in.
 Group? _hostGroup(List<Group> groups) => groups.firstWhereOrNull(
-  (group) =>
-      group.type == GroupType.Selector &&
-      group.all.any((proxy) => proxy.name == slothPicksGroup),
+  (group) => !_isBuiltInGlobal(group) && _offersPicks(group),
 );
+
+/// The groups a pick has to be chosen in to carry traffic in [mode].
+@visibleForTesting
+List<Group> pickEntryGroups(List<Group> groups, Mode mode) {
+  final global = groups.getGroup(GroupName.GLOBAL.name);
+  return {
+    ?_hostGroup(groups),
+    if (mode == Mode.global && global != null && _offersPicks(global)) global,
+  }.toList();
+}
+
+/// Where traffic enters the proxies before any request has shown it.
+String? _entryOf(List<Group> groups, Mode mode) =>
+    mode == Mode.global ? GroupName.GLOBAL.name : _hostGroup(groups)?.name;
 
 /// The nodes traffic goes through now: what each group recent traffic entered
 /// has chosen at present, so a switch shows at once, and nodes rules name
-/// themselves. With no traffic seen yet, the group the picks are offered in
-/// stands for it.
+/// themselves. With no traffic seen yet, [entry] stands for it.
 Set<String> _inUse(
   List<Group> groups,
   Map<String, String> selectedMap,
   PickRoutes routes,
-  String? host,
+  String? entry,
 ) {
   final starts = {
     for (final name in routes.groups)
       if (groups.getGroup(name) != null) name,
   };
-  if (starts.isEmpty && routes.nodes.isEmpty && host != null) {
-    starts.add(host);
+  if (starts.isEmpty && routes.nodes.isEmpty && entry != null) {
+    starts.add(entry);
   }
   return {
     ...routes.nodes,
@@ -167,13 +187,23 @@ class _FastestNodesCardState extends ConsumerState<FastestNodesCard> {
     }
     final actions = ref.read(proxiesActionProvider.notifier);
     await actions.changeProxy(groupName: slothPicksGroup, proxyName: name);
-    final host = _hostGroup(ref.read(groupsProvider));
-    if (host != null && host.now != slothPicksGroup) {
-      await actions.changeProxy(
-        groupName: host.name,
-        proxyName: slothPicksGroup,
+    final selectedMap = ref.read(selectedMapProvider);
+    final entries = pickEntryGroups(
+      ref.read(groupsProvider),
+      ref.read(patchClashConfigProvider).mode,
+    );
+    for (final group in entries) {
+      final selected = group.getCurrentSelectedName(
+        selectedMap[group.name] ?? '',
       );
+      if (selected != slothPicksGroup) {
+        await actions.changeProxy(
+          groupName: group.name,
+          proxyName: slothPicksGroup,
+        );
+      }
     }
+    actions.updateGroupsDebounce();
   }
 
   void _setAuto(bool auto) {
@@ -235,11 +265,14 @@ class _FastestNodesCardState extends ConsumerState<FastestNodesCard> {
       patchClashConfigProvider.select((state) => state.slothPickAuto),
     );
     final groups = ref.watch(groupsProvider);
+    final mode = ref.watch(
+      patchClashConfigProvider.select((state) => state.mode),
+    );
     final inUse = _inUse(
       groups,
       ref.watch(selectedMapProvider),
       ref.watch(pickRoutesStateProvider),
-      _hostGroup(groups)?.name,
+      _entryOf(groups, mode),
     );
     _watchPicks(names);
     final picks = _sorted([for (final name in names) _pickOf(name)], sort);
