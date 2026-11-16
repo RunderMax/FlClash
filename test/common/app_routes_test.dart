@@ -55,10 +55,77 @@ void main() {
     });
 
     test('hands no Android package to a desktop Core', () {
-      final desktop = routed.appRoutesFor(android: false);
+      final desktop = routed
+          .copyWith(slothAppPureOnly: ['com.example.chat'])
+          .appRoutesFor(android: false);
 
       expect(desktop.slothAppRoutes, isEmpty);
+      expect(desktop.slothAppPureOnly, isEmpty);
       expect(desktop.findProcessMode, FindProcessMode.off);
+    });
+
+    test('looks processes up for an app that is only guarded', () {
+      const guarded = PatchClashConfig(slothAppPureOnly: ['com.example.chat']);
+
+      expect(
+        guarded.appRoutesFor(android: true).findProcessMode,
+        FindProcessMode.strict,
+      );
+    });
+  });
+
+  group('an app of its own picks', () {
+    const app = 'com.example.video';
+
+    test('takes its picks group and gives it back with no picks', () {
+      final picked = const PatchClashConfig().withAppPicks(app, ['JP', 'US']);
+
+      expect(picked.slothAppRoutes, {app: appPicksGroupOf(app)});
+      expect(picked.usesOwnPicks(app), isTrue);
+
+      final cleared = picked.withAppPicks(app, const []);
+      expect(cleared.slothAppRoutes, isEmpty);
+      expect(cleared.slothAppPicks, isEmpty);
+    });
+
+    test('keeps its picks while it goes another way', () {
+      final elsewhere = const PatchClashConfig()
+          .withAppPicks(app, ['JP'])
+          .withAppRoute(app, 'DIRECT');
+
+      expect(elsewhere.slothAppPicks, {
+        app: ['JP'],
+      });
+      expect(elsewhere.appPicksRequest, isEmpty);
+      expect(elsewhere.withAppPicks(app, const []).slothAppRoutes, {
+        app: 'DIRECT',
+      });
+    });
+
+    test('asks the Core for each group with its switch', () {
+      final config = const PatchClashConfig()
+          .withAppPicks(app, ['JP', 'US'])
+          .withAppAuto(app, true);
+
+      expect(config.appPicksRequest, {
+        app: {
+          'proxies': ['JP', 'US'],
+          'auto': true,
+        },
+      });
+      expect(config.withAppAuto(app, false).slothAppAuto, isEmpty);
+    });
+
+    test('lists the apps only guarded after the routed ones', () {
+      final config =
+          const PatchClashConfig(slothAppRoutes: {'com.example.b': 'DIRECT'})
+              .withAppPureOnly('com.example.a', true)
+              .withAppPureOnly('com.example.b', true);
+
+      expect(config.appRouteApps, ['com.example.b', 'com.example.a']);
+      expect(config.withAppPureOnly('com.example.a', false).slothAppPureOnly, [
+        'com.example.b',
+      ]);
     });
   });
 
@@ -112,6 +179,45 @@ void main() {
       final config = await _configOf(const PatchClashConfig());
 
       expect(config.containsKey(slothAppRoutesKey), isFalse);
+      expect(config.containsKey(slothGuardKey), isFalse);
+    });
+
+    test('asks for an app its picks group, auto or not', () async {
+      final config = await _configOf(
+        const PatchClashConfig()
+            .withAppPicks('com.example.video', ['JP'])
+            .withAppAuto('com.example.video', true),
+      );
+
+      final request = config[slothAppRoutesKey] as YamlMap;
+      expect(request['picks'], {
+        'com.example.video': {
+          'proxies': ['JP'],
+          'auto': true,
+        },
+      });
+    });
+
+    test('asks for the guard with either switch on', () async {
+      final config = await _configOf(
+        const PatchClashConfig(
+          slothPureOnly: true,
+          slothAppPureOnly: ['com.example.chat'],
+        ),
+      );
+
+      expect(config[slothGuardKey], {
+        'all': true,
+        'apps': ['com.example.chat'],
+      });
+    });
+
+    test('makes the picks group pick by itself when it is automatic', () async {
+      final config = await _configOf(
+        const PatchClashConfig(slothPicks: ['JP'], slothPickAuto: true),
+      );
+
+      expect((config[slothPicksKey] as YamlMap)['type'], 'url-test');
     });
   });
 }

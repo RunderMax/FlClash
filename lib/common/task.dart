@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:fl_clash/common/app_routes.dart';
 import 'package:fl_clash/common/common.dart';
 import 'package:fl_clash/common/hardening.dart';
 import 'package:fl_clash/common/mitm_module.dart';
@@ -260,7 +261,7 @@ Future<RealProfile> _makeRealProfileTask(MakeRealProfileState data) async {
   if (realPatchConfig.slothPicks.isNotEmpty) {
     rawConfig[slothPicksKey] = {
       'name': slothPicksGroup,
-      'type': 'select',
+      'type': realPatchConfig.slothPickAuto ? 'url-test' : 'select',
       'proxies': realPatchConfig.slothPicks,
       'record': realPatchConfig.slothPickRecord
           ? pickHistoryInterval.inMinutes
@@ -396,6 +397,14 @@ Future<RealProfile> _makeRealProfileTask(MakeRealProfileState data) async {
     rawConfig[slothAppRoutesKey] = {
       'at': leadingRules.length,
       'routes': realPatchConfig.slothAppRoutes,
+      'picks': realPatchConfig.appPicksRequest,
+    };
+  }
+  if (realPatchConfig.slothPureOnly ||
+      realPatchConfig.slothAppPureOnly.isNotEmpty) {
+    rawConfig[slothGuardKey] = {
+      'all': realPatchConfig.slothPureOnly,
+      'apps': realPatchConfig.slothAppPureOnly,
     };
   }
   rawConfig['rules'] = [...leadingRules, ...rules];

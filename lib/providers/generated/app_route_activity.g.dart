@@ -65,3 +65,55 @@ abstract class _$ActiveRoutedApps extends $Notifier<Set<String>> {
     return element.handleCreate(ref, build);
   }
 }
+
+@ProviderFor(GuardBlocked)
+final guardBlockedProvider = GuardBlockedProvider._();
+
+final class GuardBlockedProvider
+    extends $NotifierProvider<GuardBlocked, GuardBlocks> {
+  GuardBlockedProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'guardBlockedProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$guardBlockedHash();
+
+  @$internal
+  @override
+  GuardBlocked create() => GuardBlocked();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(GuardBlocks value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<GuardBlocks>(value),
+    );
+  }
+}
+
+String _$guardBlockedHash() => r'5180c7c54f1577849b3f88c174394ceece02a6b9';
+
+abstract class _$GuardBlocked extends $Notifier<GuardBlocks> {
+  GuardBlocks build();
+  @$mustCallSuper
+  @override
+  WhenComplete runBuild() {
+    final ref = this.ref as $Ref<GuardBlocks, GuardBlocks>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<GuardBlocks, GuardBlocks>,
+              GuardBlocks,
+              Object?,
+              Object?
+            >;
+    return element.handleCreate(ref, build);
+  }
+}

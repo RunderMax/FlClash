@@ -22,6 +22,10 @@ const packageName = 'com.follow.clash';
 const slothPicksKey = 'x-sloth-fastest';
 const slothPicksGroup = 'Sloth Pick';
 const slothAppRoutesKey = 'x-sloth-app-routes';
+const slothGuardKey = 'x-sloth-guard';
+
+/// What the Core names the way a connection takes once the guard stops it.
+const slothGuardOutbound = 'Sloth Guard';
 final unixSocketPath = '/tmp/FlClashSocket_${Random().nextInt(10000)}.sock';
 final windowsPipeName = '\\\\.\\pipe\\FlClashCore_${_randomPipeId()}';
 const helperPort = 47890;

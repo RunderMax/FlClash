@@ -2201,6 +2201,15 @@ abstract class PatchClashConfig with _$PatchClashConfig {
     @Default({})
     @JsonKey(name: 'sloth-app-routes')
     Map<String, String> slothAppRoutes,
+    @Default(false) @JsonKey(name: 'sloth-pick-auto') bool slothPickAuto,
+    @Default({})
+    @JsonKey(name: 'sloth-app-picks')
+    Map<String, List<String>> slothAppPicks,
+    @Default([]) @JsonKey(name: 'sloth-app-auto') List<String> slothAppAuto,
+    @Default(false) @JsonKey(name: 'sloth-pure-only') bool slothPureOnly,
+    @Default([])
+    @JsonKey(name: 'sloth-app-pure-only')
+    List<String> slothAppPureOnly,
   }) = _PatchClashConfig;
 
   factory PatchClashConfig.fromJson(Map<String, Object?> json) =>
