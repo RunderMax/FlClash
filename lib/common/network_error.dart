@@ -28,6 +28,14 @@ final class _Failure {
       detail = null;
 }
 
+final _untrustedIssuers = <String, String>{};
+
+/// Who signed a certificate the app refused names whatever stands between it
+/// and the host, which a failed request then shows.
+void noteUntrustedCertificate(String host, String issuer) {
+  _untrustedIssuers[host] = issuer;
+}
+
 String? networkErrorMessage(Object error, AppLocalizations appLocalizations) {
   final failure = _failureOf(error);
   return failure == null ? null : _messageOf(failure, appLocalizations);
@@ -63,7 +71,7 @@ _Failure _fromDio(DioException error) {
           ? _Failure.httpStatus(statusCode)
           : const _Failure(_Kind.unknown);
     case DioExceptionType.connectionError || DioExceptionType.unknown:
-      return _fromTransport(error.error) ??
+      return _fromTransport(error.error, error.requestOptions.uri.host) ??
           _Failure(
             error.type == DioExceptionType.connectionError
                 ? _Kind.connection
@@ -73,9 +81,12 @@ _Failure _fromDio(DioException error) {
   }
 }
 
-_Failure? _fromTransport(Object? cause) {
+_Failure? _fromTransport(Object? cause, String host) {
   return switch (cause) {
-    TlsException() => const _Failure(_Kind.tls),
+    TlsException(:final osError, :final message) => _Failure(
+      _Kind.tls,
+      detail: _untrustedIssuers[host] ?? osError?.message ?? message,
+    ),
     TimeoutException() => const _Failure(_Kind.timeout),
     SocketException(:final message)
         when message.startsWith('Failed host lookup') =>
@@ -120,7 +131,10 @@ String _messageOf(_Failure failure, AppLocalizations appLocalizations) {
     _Kind.timeout => appLocalizations.networkTimeoutError,
     _Kind.hostLookup => appLocalizations.networkHostLookupError,
     _Kind.connection => appLocalizations.networkConnectionError,
-    _Kind.tls => appLocalizations.networkTlsError,
+    _Kind.tls => [
+      appLocalizations.networkTlsError,
+      if (failure.detail case final detail? when detail.isNotEmpty) detail,
+    ].join('\n'),
     _Kind.cancelled => appLocalizations.networkCancelledError,
     _Kind.httpStatus => _httpStatusMessage(
       failure.statusCode ?? 0,

@@ -82,6 +82,7 @@ class FlClashHttpOverrides extends HttpOverrides {
       'check: $checkCertificate',
       logLevel: LogLevel.warning,
     );
+    noteUntrustedCertificate(host, certificate.issuer);
     return !checkCertificate;
   }
 

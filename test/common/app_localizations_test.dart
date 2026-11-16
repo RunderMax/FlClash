@@ -61,7 +61,7 @@ void main() {
           DioExceptionType.unknown,
           cause: const HandshakeException('CERTIFICATE_VERIFY_FAILED'),
         ),
-        (l) => l.networkTlsError,
+        (l) => '${l.networkTlsError}\nCERTIFICATE_VERIFY_FAILED',
       ),
       'bad certificate': (
         dioError(DioExceptionType.badCertificate),
@@ -96,6 +96,19 @@ void main() {
         );
       });
     }
+  });
+
+  test('a refused certificate names who signed it', () {
+    noteUntrustedCertificate('api.example', 'CN=Local Intercept CA');
+    final error = DioException(
+      requestOptions: RequestOptions(path: 'https://api.example/'),
+      error: const HandshakeException('Handshake error in client'),
+    );
+
+    expect(
+      networkErrorMessage(error, appLocalizations),
+      '${appLocalizations.networkTlsError}\nCN=Local Intercept CA',
+    );
   });
 
   test('keeps the detail of an unclassified Dio failure', () {
