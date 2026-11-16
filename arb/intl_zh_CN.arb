@@ -1137,5 +1137,15 @@
   "appRouteMissing": "订阅里已经没有这个了",
   "appExits": "用过的 IP",
   "appRouteTo": "分配到",
-  "appRoutesTest": "测速"
+  "appRoutesTest": "测速",
+  "pureOnly": "不纯净就断网",
+  "pureOnlyDesc": "走代理的连接只放行「优」的节点，VPN 不会断开",
+  "pureOnlyStopped": "刚刚挡住了 {count} 个连接",
+  "appPureOnlyDesc": "节点不是「优」时，这个软件上不了网",
+  "pureOnlyEverywhere": "「隐私加固」里已对所有软件打开",
+  "autoSwitch": "自动切换",
+  "autoSwitchDesc": "先挑「优」的节点，再看谁最快",
+  "appRoutePicksDesc": "选几个节点，在卡片上点一下就能换",
+  "appRoutePicksCount": "{count} 个节点",
+  "guardStopped": "已阻断"
 }

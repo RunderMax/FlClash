@@ -1137,5 +1137,15 @@
   "appRouteMissing": "Ya no está en el perfil",
   "appExits": "IP usadas",
   "appRouteTo": "Enviar por",
-  "appRoutesTest": "Medir velocidad"
+  "appRoutesTest": "Medir velocidad",
+  "pureOnly": "Bloquear nodos impuros",
+  "pureOnlyDesc": "El tráfico por proxy solo pasa por nodos «Buena»; la VPN sigue activa",
+  "pureOnlyStopped": "{count, plural, =1{1 conexión bloqueada hace un momento} other{{count} conexiones bloqueadas hace un momento}}",
+  "appPureOnlyDesc": "Si el nodo no es «Buena», la app no puede conectarse",
+  "pureOnlyEverywhere": "Ya activo para todas las apps en Refuerzo de privacidad",
+  "autoSwitch": "Cambiar automáticamente",
+  "autoSwitchDesc": "Primero los nodos «Buena», luego el más rápido",
+  "appRoutePicksDesc": "Elige algunos nodos y cámbialos con un toque en la tarjeta",
+  "appRoutePicksCount": "{count, plural, =1{1 nodo} other{{count} nodos}}",
+  "guardStopped": "Bloqueado"
 }

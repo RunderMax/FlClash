@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:fl_clash/common/common.dart';
 import 'package:fl_clash/models/models.dart';
 import 'package:fl_clash/plugins/app.dart';
+import 'package:fl_clash/providers/app_route_activity.dart';
 import 'package:fl_clash/providers/providers.dart';
 import 'package:fl_clash/ui/icons/icons.dart';
 import 'package:fl_clash/views/dashboard/layout.dart';
@@ -72,6 +73,15 @@ class PrivacyHardeningCard extends ConsumerWidget {
     void setBlockAds(bool value) => ref
         .read(patchClashConfigProvider.notifier)
         .update((state) => state.copyWith(slothBlockAds: value));
+    final pureOnly = ref.watch(
+      patchClashConfigProvider.select((state) => state.slothPureOnly),
+    );
+    void setPureOnly(bool value) => ref
+        .read(patchClashConfigProvider.notifier)
+        .update((state) => state.copyWith(slothPureOnly: value));
+    final stopped = pureOnly
+        ? ref.watch(guardBlockedProvider.select((state) => state.count))
+        : 0;
     final plugin = app;
     return DashboardCard(
       semanticLabel: appLocalizations.privacyHardening,
@@ -85,6 +95,19 @@ class PrivacyHardeningCard extends ConsumerWidget {
             title: appLocalizations.privacyHardening,
           ),
           const SizedBox(height: 4),
+          DashboardSwitchRow(
+            glyph: AppGlyphs.filter,
+            title: appLocalizations.pureOnly,
+            subtitle: stopped > 0
+                ? appLocalizations.pureOnlyStopped(stopped)
+                : appLocalizations.pureOnlyDesc,
+            value: pureOnly,
+            iconSize: _rowIcon,
+            padding: _rowPadding,
+            radius: AppCorner.md,
+            onTap: () => setPureOnly(!pureOnly),
+            onChanged: setPureOnly,
+          ),
           DashboardSwitchRow(
             glyph: AppGlyphs.vpn,
             title: appLocalizations.blockBypass,

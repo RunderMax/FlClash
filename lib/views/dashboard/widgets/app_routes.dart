@@ -11,6 +11,7 @@ import 'package:fl_clash/providers/app_route_activity.dart';
 import 'package:fl_clash/providers/providers.dart';
 import 'package:fl_clash/ui/icons/icons.dart';
 import 'package:fl_clash/views/dashboard/layout.dart';
+import 'package:fl_clash/views/dashboard/style.dart';
 import 'package:fl_clash/widgets/widgets.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -29,6 +30,8 @@ String _targetLabel(BuildContext context, String target) {
     appRouteDirect => appLocalizations.direct,
     appRouteBlock => appLocalizations.appRouteBlock,
     slothPicksGroup => appLocalizations.fastestNodes,
+    _ when target.startsWith(appPicksGroupPrefix) =>
+      appLocalizations.fastestNodes,
     _ => target,
   };
 }
@@ -45,11 +48,32 @@ Set<String> _reachable(List<Group> groups) => {
 bool _measured(String target) =>
     target != appRouteDirect && target != appRouteBlock;
 
-bool _missing(String target, Set<String> reachable) =>
-    target != appRouteDirect &&
-    target != appRouteBlock &&
-    reachable.isNotEmpty &&
-    !reachable.contains(target);
+/// An app's own picks group comes after the Core applies them, so the picks
+/// stand for it meanwhile.
+bool _missing(
+  String target,
+  Set<String> reachable, [
+  List<String> picks = const [],
+]) {
+  if (reachable.isEmpty ||
+      target == appRouteDirect ||
+      target == appRouteBlock) {
+    return false;
+  }
+  if (target.startsWith(appPicksGroupPrefix)) {
+    return !picks.any(reachable.contains);
+  }
+  return !reachable.contains(target);
+}
+
+/// What a speed test times: an app's own picks stand in for its group.
+Set<String> _timed(PatchClashConfig config) => {
+  for (final MapEntry(key: app, value: target) in config.slothAppRoutes.entries)
+    if (config.usesOwnPicks(app))
+      ...?config.slothAppPicks[app]
+    else if (_measured(target))
+      target,
+};
 
 Color _targetColor(BuildContext context, String target, bool missing) {
   final colorScheme = context.colorScheme;
@@ -91,8 +115,8 @@ class _AppRoutesCardState extends ConsumerState<AppRoutesCard> {
   @override
   void initState() {
     super.initState();
-    final routed = ref.read(patchClashConfigProvider).slothAppRoutes;
-    if (routed.isNotEmpty && ref.read(packagesProvider).isEmpty) {
+    final listed = ref.read(patchClashConfigProvider).appRouteApps;
+    if (listed.isNotEmpty && ref.read(packagesProvider).isEmpty) {
       unawaited(
         ref
             .read(systemActionProvider.notifier)
@@ -103,7 +127,9 @@ class _AppRoutesCardState extends ConsumerState<AppRoutesCard> {
     void testLater() => runAfterFrame(_testUnmeasured);
     ref.listenManual(groupsProvider, (_, _) => testLater());
     ref.listenManual(
-      patchClashConfigProvider.select((state) => state.slothAppRoutes),
+      patchClashConfigProvider.select(
+        (state) => (state.slothAppRoutes, state.slothAppPicks),
+      ),
       (_, _) => testLater(),
     );
     testLater();
@@ -114,11 +140,9 @@ class _AppRoutesCardState extends ConsumerState<AppRoutesCard> {
     if (!mounted || ref.read(groupsProvider).isEmpty) {
       return;
     }
-    final routes = ref.read(patchClashConfigProvider).slothAppRoutes;
     _test([
-      for (final target in routes.values.toSet())
-        if (_measured(target) &&
-            _tested.add(target) &&
+      for (final target in _timed(ref.read(patchClashConfigProvider)))
+        if (_tested.add(target) &&
             ref.read(delayProvider(proxyName: target)) == null)
           target,
     ]);
@@ -143,9 +167,7 @@ class _AppRoutesCardState extends ConsumerState<AppRoutesCard> {
     final appLocalizations = context.appLocalizations;
     final colorScheme = context.colorScheme;
     final mobile = !DashboardDensityScope.of(context).isDesktop;
-    final routes = ref.watch(
-      patchClashConfigProvider.select((state) => state.slothAppRoutes),
-    );
+    final config = ref.watch(patchClashConfigProvider);
     final labels = {
       for (final package in ref.watch(packagesProvider))
         package.packageName: package.label,
@@ -153,8 +175,13 @@ class _AppRoutesCardState extends ConsumerState<AppRoutesCard> {
     final reachable = _reachable(ref.watch(groupsProvider));
     final exits = ref.watch(appExitsProvider).value ?? const {};
     final active = ref.watch(activeRoutedAppsProvider);
-    final shown = routes.entries.take(_cardRows).toList();
-    final hidden = routes.length - shown.length;
+    final blocked = ref.watch(
+      guardBlockedProvider.select((state) => state.apps),
+    );
+    final apps = config.appRouteApps;
+    final timed = _timed(config);
+    final shown = apps.take(_cardRows).toList();
+    final hidden = apps.length - shown.length;
     return DashboardCard(
       semanticLabel: appLocalizations.appRoutes,
       child: Column(
@@ -170,9 +197,7 @@ class _AppRoutesCardState extends ConsumerState<AppRoutesCard> {
                 child: DashboardIconButton(
                   glyph: AppGlyphs.speed,
                   tooltip: appLocalizations.appRoutesTest,
-                  onPressed: routes.values.any(_measured)
-                      ? () => _test(routes.values.toSet())
-                      : null,
+                  onPressed: timed.isNotEmpty ? () => _test(timed) : null,
                 ),
               ),
             ],
@@ -186,14 +211,26 @@ class _AppRoutesCardState extends ConsumerState<AppRoutesCard> {
                   .copyWith(color: colorScheme.onSurfaceVariant),
             )
           else
-            for (final MapEntry(key: packageName, value: target) in shown) ...[
+            for (final packageName in shown) ...[
               _RouteRow(
                 packageName: packageName,
                 label: labels[packageName] ?? packageName,
-                target: target,
-                missing: _missing(target, reachable),
+                target: config.slothAppRoutes[packageName],
+                picks: config.usesOwnPicks(packageName)
+                    ? config.slothAppPicks[packageName] ?? const []
+                    : null,
+                auto: config.slothAppAuto.contains(packageName),
+                missing: switch (config.slothAppRoutes[packageName]) {
+                  final target? => _missing(
+                    target,
+                    reachable,
+                    config.slothAppPicks[packageName] ?? const [],
+                  ),
+                  null => false,
+                },
                 latest: exits[packageName]?.firstOrNull,
                 active: active.contains(packageName),
+                blocked: blocked.contains(packageName),
               ),
               const SizedBox(height: 6),
             ],
@@ -244,29 +281,130 @@ class _RouteRow extends ConsumerWidget {
     required this.packageName,
     required this.label,
     required this.target,
+    required this.picks,
+    required this.auto,
     required this.missing,
     required this.latest,
     required this.active,
+    required this.blocked,
   });
 
   final String packageName;
   final String label;
-  final String target;
+
+  /// None while the app only has the guard and follows the rules.
+  final String? target;
+
+  /// Set while the app takes its own picks.
+  final List<String>? picks;
+  final bool auto;
   final bool missing;
   final AppExit? latest;
   final bool active;
+  final bool blocked;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final appLocalizations = context.appLocalizations;
     final colorScheme = context.colorScheme;
-    final color = _targetColor(context, target, missing);
-    final targetLabel = _targetLabel(context, target);
-    final delay = _measured(target)
-        ? ref.watch(delayProvider(proxyName: target))
+    final target = this.target;
+    final picks = this.picks;
+    final current = picks == null
+        ? null
+        : ref.watch(selectedProxyNameProvider(appPicksGroupOf(packageName)));
+    final color = target == null
+        ? colorScheme.onSurfaceVariant
+        : _targetColor(context, target, missing);
+    final targetLabel = switch (target) {
+      null => appLocalizations.appRouteFollow,
+      _ when current != null && current.isNotEmpty => current,
+      final target => _targetLabel(context, target),
+    };
+    final timed = picks != null
+        ? current
+        : target != null && _measured(target)
+        ? target
         : null;
+    final delay = timed == null || timed.isEmpty
+        ? null
+        : ref.watch(delayProvider(proxyName: timed));
+    final inUse = active && !blocked;
+    final row = Row(
+      children: [
+        InUseBadge(inUse: inUse),
+        PackageIcon(packageName: packageName, size: _cardIcon),
+        const SizedBox(width: 10),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            spacing: 2,
+            children: [
+              AnimatedDefaultTextStyle(
+                duration: context.motionDuration(commonDuration),
+                style: AppTextStyle.subheadline
+                    .of(context, emphasized: true)
+                    .copyWith(
+                      color: inUse
+                          ? colorScheme.primary
+                          : colorScheme.onSurface,
+                    ),
+                child: Text(
+                  label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              if (latest case final latest?)
+                _ExitLine(
+                  exit: latest,
+                  style: AppTextStyle.caption1
+                      .of(context)
+                      .copyWith(color: colorScheme.onSurfaceVariant),
+                ),
+            ],
+          ),
+        ),
+        const SizedBox(width: 8),
+        if (missing)
+          Padding(
+            padding: const EdgeInsetsDirectional.only(end: 4),
+            child: GlyphIcon(AppGlyphs.warning, size: 16, color: color),
+          ),
+        Flexible(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            spacing: 2,
+            children: [
+              Text(
+                targetLabel,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: AppTextStyle.footnote
+                    .of(context, emphasized: true)
+                    .copyWith(color: color),
+              ),
+              if (blocked)
+                Text(
+                  appLocalizations.guardStopped,
+                  style: AppTextStyle.caption1
+                      .of(context, emphasized: true)
+                      .copyWith(color: colorScheme.error),
+                )
+              else if (delay != null)
+                Text(
+                  delay < 0 ? appLocalizations.timeout : '$delay ms',
+                  style: AppTextStyle.caption1
+                      .of(context, emphasized: true)
+                      .toTabular
+                      .copyWith(color: colorScheme.delayColor(delay)),
+                ),
+            ],
+          ),
+        ),
+      ],
+    );
     return InUseFrame(
-      inUse: active,
+      inUse: inUse,
       radius: AppCorner.md,
       child: DashboardBlock(
         radius: AppCorner.md,
@@ -275,76 +413,110 @@ class _RouteRow extends ConsumerWidget {
         semanticLabel: [
           label,
           targetLabel,
-          if (active) appLocalizations.pickInUse,
+          if (auto && picks != null) appLocalizations.auto,
+          if (inUse) appLocalizations.pickInUse,
+          if (blocked) appLocalizations.guardStopped,
           if (missing) appLocalizations.appRouteMissing,
         ].join(' '),
-        child: Row(
-          children: [
-            InUseBadge(inUse: active),
-            PackageIcon(packageName: packageName, size: _cardIcon),
-            const SizedBox(width: 10),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                spacing: 2,
+        child: picks == null || picks.isEmpty
+            ? row
+            : Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                spacing: 8,
                 children: [
-                  AnimatedDefaultTextStyle(
-                    duration: context.motionDuration(commonDuration),
-                    style: AppTextStyle.subheadline
-                        .of(context, emphasized: true)
-                        .copyWith(
-                          color: active
-                              ? colorScheme.primary
-                              : colorScheme.onSurface,
-                        ),
-                    child: Text(
-                      label,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
+                  row,
+                  _PicksBar(
+                    packageName: packageName,
+                    picks: picks,
+                    auto: auto,
+                    current: current,
                   ),
-                  if (latest case final latest?)
-                    _ExitLine(
-                      exit: latest,
-                      style: AppTextStyle.caption1
-                          .of(context)
-                          .copyWith(color: colorScheme.onSurfaceVariant),
-                    ),
                 ],
               ),
+      ),
+    );
+  }
+}
+
+/// Switches an app between its own picks in one tap; picking a node by hand
+/// turns the automatic choice off.
+class _PicksBar extends ConsumerWidget {
+  const _PicksBar({
+    required this.packageName,
+    required this.picks,
+    required this.auto,
+    required this.current,
+  });
+
+  final String packageName;
+  final List<String> picks;
+  final bool auto;
+  final String? current;
+
+  void _setAuto(WidgetRef ref, bool auto) {
+    ref
+        .read(patchClashConfigProvider.notifier)
+        .update((state) => state.withAppAuto(packageName, auto));
+  }
+
+  Future<void> _pick(WidgetRef ref, String node) async {
+    if (auto) {
+      _setAuto(ref, false);
+    }
+    await ref
+        .read(proxiesActionProvider.notifier)
+        .changeProxy(groupName: appPicksGroupOf(packageName), proxyName: node);
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final background = DashboardColors.of(context).card;
+    final style = AppTextStyle.footnote.of(context, emphasized: true);
+    Widget pill(
+      String label, {
+      required bool selected,
+      required VoidCallback onTap,
+    }) => DashboardConnectedButton(
+      selected: selected,
+      first: true,
+      last: true,
+      outer: AppCorner.full,
+      inner: AppCorner.full,
+      background: background,
+      semanticLabel: label,
+      onTap: onTap,
+      builder: (foreground) => SizedBox(
+        height: 30,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          child: Center(
+            widthFactor: 1,
+            child: Text(
+              label,
+              maxLines: 1,
+              style: style.copyWith(color: foreground),
             ),
-            const SizedBox(width: 8),
-            if (missing)
-              Padding(
-                padding: const EdgeInsetsDirectional.only(end: 4),
-                child: GlyphIcon(AppGlyphs.warning, size: 16, color: color),
-              ),
-            Flexible(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                spacing: 2,
-                children: [
-                  Text(
-                    targetLabel,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: AppTextStyle.footnote
-                        .of(context, emphasized: true)
-                        .copyWith(color: color),
-                  ),
-                  if (delay != null)
-                    Text(
-                      delay < 0 ? appLocalizations.timeout : '$delay ms',
-                      style: AppTextStyle.caption1
-                          .of(context, emphasized: true)
-                          .toTabular
-                          .copyWith(color: colorScheme.delayColor(delay)),
-                    ),
-                ],
-              ),
-            ),
-          ],
+          ),
         ),
+      ),
+    );
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        spacing: 6,
+        children: [
+          pill(
+            context.appLocalizations.auto,
+            selected: auto,
+            onTap: () => _setAuto(ref, !auto),
+          ),
+          for (final node in picks)
+            pill(
+              node,
+              selected: !auto && node == current,
+              onTap: () => unawaited(_pick(ref, node)),
+            ),
+        ],
       ),
     );
   }
@@ -364,7 +536,7 @@ class _AppsPageState extends ConsumerState<_AppsPage> {
 
   /// Taken once, so an app routed from this page keeps its row in place.
   late final Set<String> _pinned = {
-    ...ref.read(patchClashConfigProvider).slothAppRoutes.keys,
+    ...ref.read(patchClashConfigProvider).appRouteApps,
   };
 
   @override
@@ -431,8 +603,10 @@ class _AppsPageState extends ConsumerState<_AppsPage> {
   Widget build(BuildContext context) {
     final appLocalizations = context.appLocalizations;
     final packages = ref.watch(packagesProvider);
-    final routes = ref.watch(
-      patchClashConfigProvider.select((state) => state.slothAppRoutes),
+    final (:routes, :picks) = ref.watch(
+      patchClashConfigProvider.select(
+        (state) => (routes: state.slothAppRoutes, picks: state.slothAppPicks),
+      ),
     );
     final reachable = _reachable(ref.watch(groupsProvider));
     final query = SearchQuery(_query);
@@ -489,7 +663,12 @@ class _AppsPageState extends ConsumerState<_AppsPage> {
                               package: package,
                               target: target,
                               missing:
-                                  target != null && _missing(target, reachable),
+                                  target != null &&
+                                  _missing(
+                                    target,
+                                    reachable,
+                                    picks[package.packageName] ?? const [],
+                                  ),
                             ),
                           );
                         },
@@ -559,11 +738,89 @@ class _TargetsPage extends ConsumerStatefulWidget {
 class _TargetsPageState extends ConsumerState<_TargetsPage> {
   String _query = '';
 
+  String get _ownPicks => appPicksGroupOf(widget.packageName);
+
+  void _update(PatchClashConfig Function(PatchClashConfig state) change) {
+    ref.read(patchClashConfigProvider.notifier).update(change);
+  }
+
+  /// Its own picks leave the page open, for the switches that come with them.
   void _choose(String? target) {
-    ref
-        .read(patchClashConfigProvider.notifier)
-        .update((state) => state.withAppRoute(widget.packageName, target));
+    if (target == _ownPicks) {
+      _choosePicks();
+      return;
+    }
+    _update((state) => state.withAppRoute(widget.packageName, target));
     Navigator.of(context).pop();
+  }
+
+  void _choosePicks() {
+    final picks = ref
+        .read(patchClashConfigProvider)
+        .slothAppPicks[widget.packageName];
+    unawaited(
+      showInSheet<void>(
+        context,
+        builder: (_) => PicksSheet(
+          candidates: nodeNamesOf(ref.read(groupsProvider)),
+          picks: picks ?? const [],
+          onConfirm: (picks) =>
+              _update((state) => state.withAppPicks(widget.packageName, picks)),
+        ),
+      ),
+    );
+  }
+
+  List<Widget> _switches({
+    required bool ownPicks,
+    required bool auto,
+    required bool guarded,
+    required bool guardAll,
+  }) {
+    final appLocalizations = context.appLocalizations;
+    final packageName = widget.packageName;
+    void setGuarded(bool value) =>
+        _update((state) => state.withAppPureOnly(packageName, value));
+    void setAuto(bool value) =>
+        _update((state) => state.withAppAuto(packageName, value));
+    return [
+      if (ownPicks)
+        DecorationListItem(
+          leading: const GlyphIcon(AppGlyphs.swap),
+          title: Text(
+            appLocalizations.autoSwitch,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+          subtitle: Text(
+            appLocalizations.autoSwitchDesc,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+          trailing: Switch(value: auto, onChanged: setAuto),
+          onPressed: () => setAuto(!auto),
+        ),
+      DecorationListItem(
+        leading: const GlyphIcon(AppGlyphs.filter),
+        title: Text(
+          appLocalizations.pureOnly,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
+        subtitle: Text(
+          guardAll
+              ? appLocalizations.pureOnlyEverywhere
+              : appLocalizations.appPureOnlyDesc,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
+        trailing: Switch(
+          value: guarded || guardAll,
+          onChanged: guardAll ? null : setGuarded,
+        ),
+        onPressed: guardAll ? null : () => setGuarded(!guarded),
+      ),
+    ];
   }
 
   List<Widget> _section({
@@ -617,9 +874,16 @@ class _TargetsPageState extends ConsumerState<_TargetsPage> {
   @override
   Widget build(BuildContext context) {
     final appLocalizations = context.appLocalizations;
-    final current = ref.watch(
+    final packageName = widget.packageName;
+    final (:current, :picks, :auto, :guarded, :guardAll) = ref.watch(
       patchClashConfigProvider.select(
-        (state) => state.slothAppRoutes[widget.packageName],
+        (state) => (
+          current: state.slothAppRoutes[packageName],
+          picks: state.slothAppPicks[packageName] ?? const <String>[],
+          auto: state.slothAppAuto.contains(packageName),
+          guarded: state.slothAppPureOnly.contains(packageName),
+          guardAll: state.slothPureOnly,
+        ),
       ),
     );
     final groups = ref.watch(groupsProvider);
@@ -640,6 +904,14 @@ class _TargetsPageState extends ConsumerState<_TargetsPage> {
         title: appLocalizations.appRouteFollow,
         subtitle: appLocalizations.appRouteFollowDesc,
         glyph: AppGlyphs.rules,
+      ),
+      (
+        target: _ownPicks,
+        title: appLocalizations.fastestNodes,
+        subtitle: picks.isEmpty
+            ? appLocalizations.appRoutePicksDesc
+            : appLocalizations.appRoutePicksCount(picks.length),
+        glyph: AppGlyphs.bolt,
       ),
       (
         target: appRouteDirect,
@@ -688,12 +960,24 @@ class _TargetsPageState extends ConsumerState<_TargetsPage> {
                       ),
                     ),
                   ],
-                  if (query.isEmpty)
+                  if (query.isEmpty) ...[
                     ..._section(
                       title: appLocalizations.appRouteTo,
                       choices: fixed,
                       current: current,
                     ),
+                    SliverToBoxAdapter(
+                      child: ListHeader(title: appLocalizations.settings),
+                    ),
+                    _SwitchList(
+                      items: _switches(
+                        ownPicks: current == _ownPicks,
+                        auto: auto,
+                        guarded: guarded,
+                        guardAll: guardAll,
+                      ),
+                    ),
+                  ],
                   if (query.isEmpty && groups.isEmpty)
                     SliverToBoxAdapter(
                       child: Padding(
@@ -742,6 +1026,23 @@ class _TargetsPageState extends ConsumerState<_TargetsPage> {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _SwitchList extends StatelessWidget {
+  const _SwitchList({required this.items});
+
+  final List<Widget> items;
+
+  @override
+  Widget build(BuildContext context) {
+    return SliverPrismList(
+      itemCount: items.length,
+      itemBuilder: (_, index) => ItemPositionProvider(
+        position: ItemPosition.get(index, items.length),
+        child: items[index],
       ),
     );
   }

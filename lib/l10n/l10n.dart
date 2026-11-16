@@ -9573,6 +9573,105 @@ class AppLocalizations {
       args: [],
     );
   }
+
+  /// `Block impure nodes`
+  String get pureOnly {
+    return Intl.message(
+      'Block impure nodes',
+      name: 'pureOnly',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Proxied traffic only goes through Good nodes; the VPN stays on`
+  String get pureOnlyDesc {
+    return Intl.message(
+      'Proxied traffic only goes through Good nodes; the VPN stays on',
+      name: 'pureOnlyDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `{count, plural, =1{1 connection stopped just now} other{{count} connections stopped just now}}`
+  String pureOnlyStopped(num count) {
+    return Intl.plural(
+      count,
+      one: '1 connection stopped just now',
+      other: '$count connections stopped just now',
+      name: 'pureOnlyStopped',
+      desc: '',
+      args: [count],
+    );
+  }
+
+  /// `When the node isn't Good, this app can't go online`
+  String get appPureOnlyDesc {
+    return Intl.message(
+      'When the node isn\'t Good, this app can\'t go online',
+      name: 'appPureOnlyDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Already on for every app in Privacy hardening`
+  String get pureOnlyEverywhere {
+    return Intl.message(
+      'Already on for every app in Privacy hardening',
+      name: 'pureOnlyEverywhere',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Switch automatically`
+  String get autoSwitch {
+    return Intl.message(
+      'Switch automatically',
+      name: 'autoSwitch',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Good nodes first, then the fastest`
+  String get autoSwitchDesc {
+    return Intl.message(
+      'Good nodes first, then the fastest',
+      name: 'autoSwitchDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Pick a few nodes, then switch with a tap on the card`
+  String get appRoutePicksDesc {
+    return Intl.message(
+      'Pick a few nodes, then switch with a tap on the card',
+      name: 'appRoutePicksDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `{count, plural, =1{1 node} other{{count} nodes}}`
+  String appRoutePicksCount(num count) {
+    return Intl.plural(
+      count,
+      one: '1 node',
+      other: '$count nodes',
+      name: 'appRoutePicksCount',
+      desc: '',
+      args: [count],
+    );
+  }
+
+  /// `Blocked`
+  String get guardStopped {
+    return Intl.message('Blocked', name: 'guardStopped', desc: '', args: []);
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<AppLocalizations> {

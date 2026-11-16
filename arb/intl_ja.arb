@@ -1137,5 +1137,15 @@
   "appRouteMissing": "プロファイルにもうありません",
   "appExits": "使った IP",
   "appRouteTo": "経由先",
-  "appRoutesTest": "速度を測る"
+  "appRoutesTest": "速度を測る",
+  "pureOnly": "クリーンでなければ遮断",
+  "pureOnlyDesc": "プロキシ経由の通信は「良好」なノードだけを通します。VPN は切れません",
+  "pureOnlyStopped": "{count} 件の接続を遮断しました",
+  "appPureOnlyDesc": "ノードが「良好」でないとき、このアプリは通信できません",
+  "pureOnlyEverywhere": "「プライバシー強化」ですべてのアプリに適用中",
+  "autoSwitch": "自動で切り替え",
+  "autoSwitchDesc": "「良好」なノードを優先し、その中で最速を選びます",
+  "appRoutePicksDesc": "いくつかノードを選び、カードをタップして切り替え",
+  "appRoutePicksCount": "{count} 個のノード",
+  "guardStopped": "遮断中"
 }

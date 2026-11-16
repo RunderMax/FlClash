@@ -1137,5 +1137,15 @@
   "appRouteMissing": "No longer in the profile",
   "appExits": "IPs used",
   "appRouteTo": "Send through",
-  "appRoutesTest": "Test speed"
+  "appRoutesTest": "Test speed",
+  "pureOnly": "Block impure nodes",
+  "pureOnlyDesc": "Proxied traffic only goes through Good nodes; the VPN stays on",
+  "pureOnlyStopped": "{count, plural, =1{1 connection stopped just now} other{{count} connections stopped just now}}",
+  "appPureOnlyDesc": "When the node isn't Good, this app can't go online",
+  "pureOnlyEverywhere": "Already on for every app in Privacy hardening",
+  "autoSwitch": "Switch automatically",
+  "autoSwitchDesc": "Good nodes first, then the fastest",
+  "appRoutePicksDesc": "Pick a few nodes, then switch with a tap on the card",
+  "appRoutePicksCount": "{count, plural, =1{1 node} other{{count} nodes}}",
+  "guardStopped": "Blocked"
 }

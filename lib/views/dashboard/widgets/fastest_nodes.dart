@@ -160,7 +160,11 @@ class _FastestNodesCardState extends ConsumerState<FastestNodesCard> {
     _probe.refresh(picks);
   }
 
+  /// A node picked by hand takes over from the automatic choice.
   Future<void> _select(String name) async {
+    if (ref.read(patchClashConfigProvider).slothPickAuto) {
+      _setAuto(false);
+    }
     final actions = ref.read(proxiesActionProvider.notifier);
     await actions.changeProxy(groupName: slothPicksGroup, proxyName: name);
     final host = _hostGroup(ref.read(groupsProvider));
@@ -170,6 +174,12 @@ class _FastestNodesCardState extends ConsumerState<FastestNodesCard> {
         proxyName: slothPicksGroup,
       );
     }
+  }
+
+  void _setAuto(bool auto) {
+    ref
+        .read(patchClashConfigProvider.notifier)
+        .update((state) => state.copyWith(slothPickAuto: auto));
   }
 
   void _setSort(PickSort sort) {
@@ -188,7 +198,7 @@ class _FastestNodesCardState extends ConsumerState<FastestNodesCard> {
   void _choose() {
     showSheet<void>(
       context: context,
-      builder: (_) => _PicksSheet(
+      builder: (_) => PicksSheet(
         candidates: nodeNamesOf(ref.read(groupsProvider)),
         picks: ref.read(patchClashConfigProvider).slothPicks,
         onConfirm: (picks) => ref
@@ -220,6 +230,9 @@ class _FastestNodesCardState extends ConsumerState<FastestNodesCard> {
     );
     final sort = ref.watch(
       appSettingProvider.select((state) => state.pickSort),
+    );
+    final auto = ref.watch(
+      patchClashConfigProvider.select((state) => state.slothPickAuto),
     );
     final groups = ref.watch(groupsProvider);
     final inUse = _inUse(
@@ -266,6 +279,18 @@ class _FastestNodesCardState extends ConsumerState<FastestNodesCard> {
                   .copyWith(color: colorScheme.onSurfaceVariant),
             )
           else ...[
+            DashboardSwitchRow(
+              glyph: AppGlyphs.swap,
+              title: appLocalizations.autoSwitch,
+              subtitle: appLocalizations.autoSwitchDesc,
+              value: auto,
+              iconSize: 38,
+              padding: const EdgeInsets.fromLTRB(10, 10, 12, 10),
+              radius: AppCorner.md,
+              onTap: () => _setAuto(!auto),
+              onChanged: _setAuto,
+            ),
+            const SizedBox(height: 8),
             DashboardConnectedGroup(
               children: [
                 for (final (index, item) in PickSort.values.indexed)
@@ -434,8 +459,9 @@ class _PickTile extends StatelessWidget {
   }
 }
 
-class _PicksSheet extends StatefulWidget {
-  const _PicksSheet({
+class PicksSheet extends StatefulWidget {
+  const PicksSheet({
+    super.key,
     required this.candidates,
     required this.picks,
     required this.onConfirm,
@@ -446,10 +472,10 @@ class _PicksSheet extends StatefulWidget {
   final ValueChanged<List<String>> onConfirm;
 
   @override
-  State<_PicksSheet> createState() => _PicksSheetState();
+  State<PicksSheet> createState() => _PicksSheetState();
 }
 
-class _PicksSheetState extends State<_PicksSheet> {
+class _PicksSheetState extends State<PicksSheet> {
   late final _checked = {...widget.picks};
 
   /// Picks first, in their order, so dragging sets the custom order.

@@ -1137,5 +1137,15 @@
   "appRouteMissing": "프로필에 더 이상 없어요",
   "appExits": "사용한 IP",
   "appRouteTo": "보낼 곳",
-  "appRoutesTest": "속도 측정"
+  "appRoutesTest": "속도 측정",
+  "pureOnly": "청정하지 않으면 차단",
+  "pureOnlyDesc": "프록시를 거치는 연결은 「양호」 노드만 통과해요. VPN은 꺼지지 않아요",
+  "pureOnlyStopped": "{count, plural, other{방금 연결 {count}개를 차단했어요}}",
+  "appPureOnlyDesc": "노드가 「양호」가 아니면 이 앱은 인터넷을 쓸 수 없어요",
+  "pureOnlyEverywhere": "「개인정보 강화」에서 모든 앱에 켜져 있어요",
+  "autoSwitch": "자동 전환",
+  "autoSwitchDesc": "「양호」 노드를 먼저, 그다음 가장 빠른 것",
+  "appRoutePicksDesc": "노드 몇 개를 골라 카드에서 탭으로 바꿔요",
+  "appRoutePicksCount": "{count, plural, other{노드 {count}개}}",
+  "guardStopped": "차단됨"
 }

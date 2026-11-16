@@ -1,5 +1,6 @@
 import 'package:fl_clash/common/app_exits.dart';
 import 'package:fl_clash/common/app_routes.dart';
+import 'package:fl_clash/common/common.dart';
 import 'package:fl_clash/core/controller.dart';
 import 'package:fl_clash/core/interface.dart';
 import 'package:fl_clash/enum/enum.dart';
@@ -69,11 +70,14 @@ void main() {
   late _MockCore core;
   var exits = <String, List<AppExit>>{};
 
-  setUpAll(
-    () => registerFallbackValue(
+  setUpAll(() {
+    registerFallbackValue(
       const TestDelayParams(proxyName: '', testUrl: '', timeout: 0),
-    ),
-  );
+    );
+    registerFallbackValue(
+      const ChangeProxyParams(groupName: '', proxyName: ''),
+    );
+  });
 
   setUp(() {
     exits = {};
@@ -82,6 +86,9 @@ void main() {
       final params = invocation.positionalArguments.single as TestDelayParams;
       return Delay(name: params.proxyName, url: params.testUrl, value: 88);
     });
+    when(
+      () => core.changeProxy(any()),
+    ).thenAnswer((_) async => const ChangeProxyResult());
     container = ProviderContainer(
       overrides: [
         appExitsProvider.overrideWith(() => _Exits(exits)),
@@ -100,9 +107,14 @@ void main() {
   Map<String, String> routes() =>
       container.read(patchClashConfigProvider).slothAppRoutes;
 
+  PatchClashConfig config() => container.read(patchClashConfigProvider);
+
   void route(Map<String, String> routes) => container
       .read(patchClashConfigProvider.notifier)
       .update((state) => state.copyWith(slothAppRoutes: routes));
+
+  void change(PatchClashConfig Function(PatchClashConfig state) update) =>
+      container.read(patchClashConfigProvider.notifier).update(update);
 
   Future<void> pumpCard(WidgetTester tester) async {
     const size = Size(400, 1400);
@@ -298,5 +310,122 @@ void main() {
     await tester.pumpWidget(const SizedBox.shrink());
     container.dispose();
     await tester.pump(const Duration(seconds: 1));
+  });
+
+  testWidgets('an app of its own picks switches between them on the card', (
+    tester,
+  ) async {
+    const video = 'com.example.video';
+    container.read(packagesProvider.notifier).value = _packages;
+    container.read(groupsProvider.notifier).value = [
+      ..._groups,
+      Group(
+        type: GroupType.Selector,
+        name: appPicksGroupOf(video),
+        hidden: true,
+        now: 'US-01',
+        all: const [
+          Proxy(name: 'JP-01', type: 'ss'),
+          Proxy(name: 'US-01', type: 'ss'),
+        ],
+      ),
+    ];
+    change((state) => state.withAppPicks(video, ['JP-01', 'US-01']));
+    await pumpCard(tester);
+
+    expect(find.bySemanticsLabel(RegExp('^Video US-01')), findsOneWidget);
+    expect(find.text('JP-01'), findsOneWidget);
+
+    await tester.tap(find.text('Auto'));
+    await tester.pump();
+    expect(config().slothAppAuto, [video]);
+    expect(find.bySemanticsLabel(RegExp('^Video US-01 Auto')), findsOneWidget);
+
+    await tester.tap(find.text('JP-01'));
+    await tester.pump();
+    expect(config().slothAppAuto, isEmpty);
+    final params = verify(() => core.changeProxy(captureAny())).captured.single;
+    expect(
+      params,
+      ChangeProxyParams(groupName: appPicksGroupOf(video), proxyName: 'JP-01'),
+    );
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('an app the guard stopped says so in place of its speed', (
+    tester,
+  ) async {
+    container.read(packagesProvider.notifier).value = _packages;
+    container.read(groupsProvider.notifier).value = _groups;
+    route({'com.example.video': 'JP-01'});
+    container
+        .read(requestsProvider.notifier)
+        .addRequest(
+          TrackerInfo(
+            id: '1',
+            start: DateTime.now(),
+            metadata: const Metadata(),
+            chains: const [slothGuardOutbound],
+            rule: processNameRule,
+            rulePayload: 'com.example.video',
+          ),
+        );
+    await pumpCard(tester);
+    await tester.pumpAndSettle();
+
+    expect(find.text('Blocked'), findsOneWidget);
+    expect(find.text('88 ms'), findsNothing);
+    expect(
+      find.bySemanticsLabel(RegExp('Video JP-01 Blocked')),
+      findsOneWidget,
+    );
+    expect(find.byType(SelectionBadge), findsNothing);
+    expect(tester.takeException(), isNull);
+
+    await tester.pumpWidget(const SizedBox.shrink());
+    container.dispose();
+    await tester.pump(const Duration(seconds: 1));
+  });
+
+  testWidgets('an app page gives the app its own picks and their switches', (
+    tester,
+  ) async {
+    const video = 'com.example.video';
+    container.read(packagesProvider.notifier).value = _packages;
+    container.read(groupsProvider.notifier).value = _groups;
+    route({video: 'Media'});
+    await pumpCard(tester);
+
+    await tester.tap(find.text('Video'));
+    await tester.pumpAndSettle();
+    expect(find.text('Switch automatically'), findsNothing);
+    await tester.tap(find.text('Picks'));
+    await tester.pumpAndSettle();
+    // The page underneath lists the nodes too.
+    await tester.tap(find.text('US-01').last);
+    await tester.tap(find.text('JP-01').last);
+    await tester.pump();
+    await tester.tap(find.byTooltip('Confirm'));
+    await tester.pumpAndSettle();
+
+    expect(routes(), {video: appPicksGroupOf(video)});
+    expect(config().slothAppPicks, {
+      video: ['JP-01', 'US-01'],
+    });
+    expect(find.text('2 nodes'), findsOneWidget);
+
+    await tester.tap(find.text('Switch automatically'));
+    await tester.tap(find.text('Block impure nodes'));
+    await tester.pump();
+    expect(config().slothAppAuto, [video]);
+    expect(config().slothAppPureOnly, [video]);
+
+    change((state) => state.copyWith(slothPureOnly: true));
+    await tester.pump();
+    expect(
+      find.text('Already on for every app in Privacy hardening'),
+      findsOneWidget,
+    );
+    expect(tester.takeException(), isNull);
   });
 }

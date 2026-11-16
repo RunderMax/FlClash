@@ -1137,5 +1137,15 @@
   "appRouteMissing": "N'est plus dans le profil",
   "appExits": "IP utilisées",
   "appRouteTo": "Faire passer par",
-  "appRoutesTest": "Tester la vitesse"
+  "appRoutesTest": "Tester la vitesse",
+  "pureOnly": "Bloquer les nœuds impurs",
+  "pureOnlyDesc": "Le trafic proxy ne passe que par des nœuds « Bonne » ; le VPN reste actif",
+  "pureOnlyStopped": "{count, plural, =1{1 connexion bloquée à l'instant} other{{count} connexions bloquées à l'instant}}",
+  "appPureOnlyDesc": "Si le nœud n'est pas « Bonne », l'app ne peut pas se connecter",
+  "pureOnlyEverywhere": "Déjà actif pour toutes les apps dans Renforcement",
+  "autoSwitch": "Changer automatiquement",
+  "autoSwitchDesc": "D'abord les nœuds « Bonne », puis le plus rapide",
+  "appRoutePicksDesc": "Choisissez quelques nœuds, puis changez d'un toucher sur la carte",
+  "appRoutePicksCount": "{count, plural, =1{1 nœud} other{{count} nœuds}}",
+  "guardStopped": "Bloqué"
 }
