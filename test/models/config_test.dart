@@ -1146,6 +1146,19 @@ void main() {
       );
     });
 
+    test('a desktop list saved before Windows app routes takes them on', () {
+      final saved = [
+        for (final card in defaultDashboardWidgets)
+          if (card != DashboardWidget.appRoutes) card.name,
+      ];
+
+      expect(dashboardWidgetsFromJson(saved), platformDefaultDashboardWidgets);
+      expect(
+        dashboardWidgetsFromJson([...saved.take(saved.length - 1)]),
+        isNot(contains(DashboardWidget.appRoutes)),
+      );
+    });
+
     test('fromJson keeps everything but the values it cannot read', () {
       final json = <String, Object?>{
         'currentProfileId': 'one',

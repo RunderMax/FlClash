@@ -33,7 +33,7 @@ void main() {
 
     test('looks processes up only for the rules once an app is routed', () {
       expect(
-        routed.appRoutesFor(android: true).findProcessMode,
+        routed.appRoutesFor(listsApps: true).findProcessMode,
         FindProcessMode.strict,
       );
     });
@@ -42,22 +42,22 @@ void main() {
       final always = routed.copyWith(findProcessMode: FindProcessMode.always);
 
       expect(
-        always.appRoutesFor(android: true).findProcessMode,
+        always.appRoutesFor(listsApps: true).findProcessMode,
         FindProcessMode.always,
       );
     });
 
     test('leaves lookups off with no app routed', () {
       expect(
-        const PatchClashConfig().appRoutesFor(android: true).findProcessMode,
+        const PatchClashConfig().appRoutesFor(listsApps: true).findProcessMode,
         FindProcessMode.off,
       );
     });
 
-    test('hands no Android package to a desktop Core', () {
+    test('hands no app to a Core the app cannot name apps for', () {
       final desktop = routed
           .copyWith(slothAppPureOnly: ['com.example.chat'])
-          .appRoutesFor(android: false);
+          .appRoutesFor(listsApps: false);
 
       expect(desktop.slothAppRoutes, isEmpty);
       expect(desktop.slothAppPureOnly, isEmpty);
@@ -68,7 +68,7 @@ void main() {
       const guarded = PatchClashConfig(slothAppPureOnly: ['com.example.chat']);
 
       expect(
-        guarded.appRoutesFor(android: true).findProcessMode,
+        guarded.appRoutesFor(listsApps: true).findProcessMode,
         FindProcessMode.strict,
       );
     });

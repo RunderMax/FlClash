@@ -640,7 +640,7 @@ class SetupAction extends _$SetupAction {
   PatchClashConfig _effectivePatchConfig(PatchClashConfig patchConfig) {
     if (ref.read(safeModeProvider)) {
       return patchConfig
-          .appRoutesFor(android: system.isAndroid)
+          .appRoutesFor(listsApps: system.listsApps)
           .copyWith(
             tun: patchConfig.tun.copyWith(enable: false),
             externalController: ExternalControllerStatus.close,
@@ -650,7 +650,7 @@ class SetupAction extends _$SetupAction {
         ref.read(authorizedTunEnableProvider) ==
         TunAuthorizationState.authorized;
     return patchConfig
-        .appRoutesFor(android: system.isAndroid)
+        .appRoutesFor(listsApps: system.listsApps)
         .copyWith(
           tun: patchConfig.tun.copyWith(
             enable: patchConfig.tun.enable && authorized,

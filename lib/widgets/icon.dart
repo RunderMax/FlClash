@@ -415,13 +415,46 @@ class _PackageIconState extends State<PackageIcon> {
   Widget build(BuildContext context) {
     final icon = _icon;
     if (icon == null) {
-      return SizedBox(width: widget.size, height: widget.size);
+      return app == null
+          ? _ProgramMonogram(name: widget.packageName, size: widget.size)
+          : SizedBox(width: widget.size, height: widget.size);
     }
     return Image(
       image: icon,
       gaplessPlayback: true,
       width: widget.size,
       height: widget.size,
+    );
+  }
+}
+
+/// The app reads no desktop program's icon, so its first letter stands in.
+class _ProgramMonogram extends StatelessWidget {
+  const _ProgramMonogram({required this.name, required this.size});
+
+  final String name;
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = context.colorScheme;
+    return SizedBox.square(
+      dimension: size,
+      child: DecoratedBox(
+        decoration: ShapeDecoration(
+          color: colorScheme.secondaryContainer,
+          shape: AppShape.all(AppCorner.fit(size)),
+        ),
+        child: Center(
+          child: IconTheme(
+            data: IconThemeData(
+              size: size * 0.8,
+              color: colorScheme.onSecondaryContainer,
+            ),
+            child: GroupMonogram(name),
+          ),
+        ),
+      ),
     );
   }
 }

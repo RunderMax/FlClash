@@ -397,7 +397,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "appRoutes": MessageLookupByLibrary.simpleMessage("App routes"),
     "appRoutesChoose": MessageLookupByLibrary.simpleMessage("Choose apps"),
     "appRoutesIdle": MessageLookupByLibrary.simpleMessage(
-      "Send an app through a node of its own, like YouTube through Japan",
+      "Send an app through a node of its own, like Telegram through Japan",
+    ),
+    "appRoutesRunningHint": MessageLookupByLibrary.simpleMessage(
+      "Only running programs are listed; open one first to route it",
     ),
     "appRoutesTest": MessageLookupByLibrary.simpleMessage("Test speed"),
     "appendSystemDns": MessageLookupByLibrary.simpleMessage(

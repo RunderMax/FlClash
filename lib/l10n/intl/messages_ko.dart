@@ -346,7 +346,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "appRoutes": MessageLookupByLibrary.simpleMessage("앱별 경로"),
     "appRoutesChoose": MessageLookupByLibrary.simpleMessage("앱 선택"),
     "appRoutesIdle": MessageLookupByLibrary.simpleMessage(
-      "앱마다 지나갈 노드를 정할 수 있어요. 예: YouTube는 일본으로",
+      "앱마다 지나갈 노드를 정할 수 있어요. 예: Telegram는 일본으로",
+    ),
+    "appRoutesRunningHint": MessageLookupByLibrary.simpleMessage(
+      "실행 중인 프로그램만 보여요. 설정할 프로그램을 먼저 켜 주세요",
     ),
     "appRoutesTest": MessageLookupByLibrary.simpleMessage("속도 측정"),
     "appendSystemDns": MessageLookupByLibrary.simpleMessage("시스템 DNS 추가"),

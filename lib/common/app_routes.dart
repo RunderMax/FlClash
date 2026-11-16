@@ -38,11 +38,12 @@ extension AppRoutesExt on PatchClashConfig {
   };
 
   /// Off never looks up which app a connection is from, as the rules need.
-  PatchClashConfig appRoutesFor({required bool android}) {
+  /// [listsApps] is false where the app cannot name apps as the Core does.
+  PatchClashConfig appRoutesFor({required bool listsApps}) {
     if (slothAppRoutes.isEmpty && slothAppPureOnly.isEmpty) {
       return this;
     }
-    if (!android) {
+    if (!listsApps) {
       return copyWith(slothAppRoutes: const {}, slothAppPureOnly: const []);
     }
     return findProcessMode == FindProcessMode.off

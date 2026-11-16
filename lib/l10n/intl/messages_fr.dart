@@ -420,7 +420,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "appRoutes": MessageLookupByLibrary.simpleMessage("Routes par app"),
     "appRoutesChoose": MessageLookupByLibrary.simpleMessage("Choisir des apps"),
     "appRoutesIdle": MessageLookupByLibrary.simpleMessage(
-      "Faites passer une app par son propre nœud, comme YouTube par le Japon",
+      "Faites passer une app par son propre nœud, comme Telegram par le Japon",
+    ),
+    "appRoutesRunningHint": MessageLookupByLibrary.simpleMessage(
+      "Seuls les programmes ouverts sont listés : ouvrez d\'abord celui à régler",
     ),
     "appRoutesTest": MessageLookupByLibrary.simpleMessage("Tester la vitesse"),
     "appendSystemDns": MessageLookupByLibrary.simpleMessage(

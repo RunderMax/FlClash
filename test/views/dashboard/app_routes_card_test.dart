@@ -146,7 +146,7 @@ void main() {
   testWidgets('a card with no app routed says what it is for', (tester) async {
     await pumpCard(tester);
 
-    expect(find.textContaining('YouTube through Japan'), findsOneWidget);
+    expect(find.textContaining('Telegram through Japan'), findsOneWidget);
     expect(find.text('Choose apps'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
@@ -211,7 +211,7 @@ void main() {
     await tester.tap(find.text('Follow the rules'));
     await tester.pumpAndSettle();
     expect(routes(), isEmpty);
-    expect(find.textContaining('YouTube through Japan'), findsOneWidget);
+    expect(find.textContaining('Telegram through Japan'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 

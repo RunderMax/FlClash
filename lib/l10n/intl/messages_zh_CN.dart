@@ -333,7 +333,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "appRoutes": MessageLookupByLibrary.simpleMessage("按软件分配"),
     "appRoutesChoose": MessageLookupByLibrary.simpleMessage("选择软件"),
     "appRoutesIdle": MessageLookupByLibrary.simpleMessage(
-      "让一个软件走你指定的节点，比如 YouTube 走日本",
+      "让一个软件走你指定的节点，比如 Telegram 走日本",
+    ),
+    "appRoutesRunningHint": MessageLookupByLibrary.simpleMessage(
+      "这里只列出正在运行的程序，先把要设置的程序打开",
     ),
     "appRoutesTest": MessageLookupByLibrary.simpleMessage("测速"),
     "appendSystemDns": MessageLookupByLibrary.simpleMessage("追加系统DNS"),

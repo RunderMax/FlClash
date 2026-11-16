@@ -347,7 +347,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "appRoutes": MessageLookupByLibrary.simpleMessage("アプリ別ルート"),
     "appRoutesChoose": MessageLookupByLibrary.simpleMessage("アプリを選ぶ"),
     "appRoutesIdle": MessageLookupByLibrary.simpleMessage(
-      "アプリごとに通るノードを決められます。例：YouTube は日本経由",
+      "アプリごとに通るノードを決められます。例：Telegram は日本経由",
+    ),
+    "appRoutesRunningHint": MessageLookupByLibrary.simpleMessage(
+      "実行中のプログラムだけが表示されます。設定したいプログラムを先に起動してください",
     ),
     "appRoutesTest": MessageLookupByLibrary.simpleMessage("速度を測る"),
     "appendSystemDns": MessageLookupByLibrary.simpleMessage("システムDNSを追加"),

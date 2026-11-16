@@ -121,10 +121,28 @@ const List<DashboardWidget> defaultDashboardWidgets = [
   DashboardWidget.privacyCheck,
   DashboardWidget.privacyHardening,
   DashboardWidget.fastestNodes,
+  DashboardWidget.appRoutes,
   DashboardWidget.profiles,
   DashboardWidget.proxyGroups,
   DashboardWidget.connectionStats,
 ];
+
+/// A desktop cannot edit its cards, so a list saved like this is the defaults.
+const _defaultsBeforeWindowsAppRoutes = {
+  'currentOutbound',
+  'networkSpeed',
+  'outboundMode',
+  'vpnButton',
+  'networkTakeover',
+  'intranetIp',
+  'serviceStatus',
+  'privacyCheck',
+  'privacyHardening',
+  'fastestNodes',
+  'profiles',
+  'proxyGroups',
+  'connectionStats',
+};
 
 /// A phone starts without the VPN switch and the diagnostic cards, which stay
 /// addable. The field default keeps the shared list because it must be const.
@@ -180,6 +198,10 @@ List<DashboardWidget> dashboardWidgetsFromJson(
     return platformDefaultDashboardWidgets;
   }
   final byName = DashboardWidget.values.asNameMap();
+  if (dashboardWidgets.length == _defaultsBeforeWindowsAppRoutes.length &&
+      dashboardWidgets.toSet().containsAll(_defaultsBeforeWindowsAppRoutes)) {
+    return platformDefaultDashboardWidgets;
+  }
   if (dashboardWidgets.contains(DashboardWidget.currentOutbound.name)) {
     return dashboardWidgets
         .map((e) => _legacyDashboardWidgets[e] ?? byName[e])

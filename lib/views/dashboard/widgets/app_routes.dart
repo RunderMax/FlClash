@@ -644,6 +644,20 @@ class _AppsPageState extends ConsumerState<_AppsPage> {
                     SliverToBoxAdapter(
                       child: SizedBox(height: context.contentTopPadding),
                     ),
+                    if (app == null)
+                      SliverPadding(
+                        padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
+                        sliver: SliverToBoxAdapter(
+                          child: Text(
+                            appLocalizations.appRoutesRunningHint,
+                            style: AppTextStyle.footnote
+                                .of(context)
+                                .copyWith(
+                                  color: context.colorScheme.onSurfaceVariant,
+                                ),
+                          ),
+                        ),
+                      ),
                     SliverPadding(
                       padding: EdgeInsets.fromLTRB(
                         16,

@@ -9489,10 +9489,10 @@ class AppLocalizations {
     return Intl.message('App routes', name: 'appRoutes', desc: '', args: []);
   }
 
-  /// `Send an app through a node of its own, like YouTube through Japan`
+  /// `Send an app through a node of its own, like Telegram through Japan`
   String get appRoutesIdle {
     return Intl.message(
-      'Send an app through a node of its own, like YouTube through Japan',
+      'Send an app through a node of its own, like Telegram through Japan',
       name: 'appRoutesIdle',
       desc: '',
       args: [],
@@ -9504,6 +9504,16 @@ class AppLocalizations {
     return Intl.message(
       'Choose apps',
       name: 'appRoutesChoose',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Only running programs are listed; open one first to route it`
+  String get appRoutesRunningHint {
+    return Intl.message(
+      'Only running programs are listed; open one first to route it',
+      name: 'appRoutesRunningHint',
       desc: '',
       args: [],
     );

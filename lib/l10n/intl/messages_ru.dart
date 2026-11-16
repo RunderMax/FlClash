@@ -411,7 +411,10 @@ class MessageLookup extends MessageLookupByLibrary {
       "Выбрать приложения",
     ),
     "appRoutesIdle": MessageLookupByLibrary.simpleMessage(
-      "Пустите приложение через свой узел, например YouTube через Японию",
+      "Пустите приложение через свой узел, например Telegram через Японию",
+    ),
+    "appRoutesRunningHint": MessageLookupByLibrary.simpleMessage(
+      "Здесь только запущенные программы: сначала откройте нужную",
     ),
     "appRoutesTest": MessageLookupByLibrary.simpleMessage("Проверить скорость"),
     "appendSystemDns": MessageLookupByLibrary.simpleMessage(

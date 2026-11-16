@@ -10,11 +10,31 @@ class SystemAction extends _$SystemAction {
   void build() {}
 
   Future<List<Package>> getPackages() async {
-    final packages = await app?.getPackages() ?? [];
+    final plugin = app;
+    final packages = plugin != null
+        ? await plugin.getPackages()
+        : system.isWindows
+        ? _keepRouted(await runningPrograms())
+        : const <Package>[];
     if (!listEquals(packages, ref.read(packagesProvider))) {
       ref.read(packagesProvider.notifier).value = packages;
     }
     return ref.read(packagesProvider);
+  }
+
+  /// A routed program that has quit keeps the row it had while it ran.
+  List<Package> _keepRouted(List<Package> running) {
+    final names = {
+      for (final package in running) package.packageName.toLowerCase(),
+    };
+    final routed = ref.read(patchClashConfigProvider).appRouteApps.toSet();
+    return [
+      ...running,
+      for (final package in ref.read(packagesProvider))
+        if (routed.contains(package.packageName) &&
+            !names.contains(package.packageName.toLowerCase()))
+          package,
+    ];
   }
 
   Future<List<String>> getChinaPackageNames() async {

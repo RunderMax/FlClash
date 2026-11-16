@@ -14,7 +14,9 @@ import (
 
 const appRoutesKey = "x-sloth-app-routes"
 
-var appPackagePattern = regexp.MustCompile(`^[A-Za-z][A-Za-z0-9_]*(\.[A-Za-z][A-Za-z0-9_]*)+$`)
+// Android package names and Windows executable names, both of which a
+// PROCESS-NAME rule matches; a comma would end the rule's payload early.
+var appPackagePattern = regexp.MustCompile(`^[A-Za-z0-9_][A-Za-z0-9_ \-]*(\.[A-Za-z0-9_\-]+)+$`)
 
 var builtInTargets = map[string]bool{
 	"DIRECT":      true,
