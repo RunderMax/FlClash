@@ -3,74 +3,73 @@ import 'dart:convert';
 import 'package:fl_clash/common/programs.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-const _systemRoot = r'C:\Windows';
 const _own = r'C:\Program Files\Sloth Clash';
 
-Map<String, String?> _process(String path, [String? description]) => {
-  'Path': path,
-  'Description': description,
+Map<String, Object?> _exe(String path, {String? description, String? icon}) => {
+  'path': path,
+  'description': description,
+  'running': false,
+  'icon': icon,
 };
 
+List<String> _names(ProgramGroup group) => [
+  for (final program in group.programs) program.packageName,
+];
+
 void main() {
-  test('names each running program once by its executable', () {
-    final programs = parsePrograms(
+  test('keeps the programs of one app together under its name', () {
+    final groups = parsePrograms(
       jsonEncode([
-        _process(
-          r'C:\Program Files\Google\Chrome\Application\chrome.exe',
-          'Google Chrome',
-        ),
-        _process(
-          r'C:\Program Files\Google\Chrome\Application\CHROME.EXE',
-          'Google Chrome',
-        ),
-        _process(r'D:\Apps\Telegram\Telegram.exe', ''),
+        {
+          'name': 'WeChat',
+          'icon': r'C:\icons\wechat.png',
+          'exes': [
+            _exe(
+              r'C:\Program Files\Tencent\WeChat\WeChat.exe',
+              description: 'WeChat',
+            ),
+            _exe(
+              r'C:\Program Files\Tencent\WeChat\WeChatAppEx.exe',
+              description: 'WeChat App',
+            ),
+            _exe(r'C:\Program Files\Tencent\WeChat\uninst.exe'),
+            _exe(r'C:\Program Files\Tencent\WeChat\bad,name.exe'),
+          ],
+        },
+        {'name': 'Telegram', 'exes': _exe(r'D:\Apps\Telegram\Telegram.exe')},
       ]),
-      systemRoot: _systemRoot,
       own: _own,
     );
 
-    expect([for (final program in programs) program.packageName], [
-      'chrome.exe',
-      'Telegram.exe',
-    ]);
-    expect([for (final program in programs) program.label], [
-      'Google Chrome',
-      'Telegram',
-    ]);
+    expect([for (final group in groups) group.name], ['WeChat', 'Telegram']);
+    expect(_names(groups.first), ['WeChat.exe', 'WeChatAppEx.exe']);
+    expect(groups.last.programs.single.label, 'Telegram');
+    expect(programIconOf('wechatappex.exe'), r'C:\icons\wechat.png');
   });
 
-  test('marks what Windows ships as system and leaves this app out', () {
-    final programs = parsePrograms(
+  test('leaves this app out and lists an executable only once', () {
+    final groups = parsePrograms(
       jsonEncode([
-        _process(r'c:\windows\explorer.exe', 'Windows Explorer'),
-        _process(r'C:\Program Files\Sloth Clash\FlClashCore.exe'),
-        _process(r'C:\Tools\Code - Insiders.exe', 'VS Code Insiders'),
-        _process(r'C:\Tools\bad,name.exe', 'Bad'),
+        {
+          'name': 'Sloth Clash',
+          'exes': [_exe(r'C:\Program Files\Sloth Clash\FlClashCore.exe')],
+        },
+        {
+          'name': 'Chrome',
+          'exes': [_exe(r'C:\Chrome\chrome.exe')],
+        },
+        {
+          'name': 'Chrome Beta',
+          'exes': [_exe(r'C:\Chrome Beta\CHROME.EXE')],
+        },
       ]),
-      systemRoot: _systemRoot,
       own: _own,
     );
 
-    expect([for (final program in programs) program.packageName], [
-      'explorer.exe',
-      'Code - Insiders.exe',
-    ]);
-    expect(programs.first.system, isTrue);
-    expect(programs.first.launchable, isFalse);
-    expect(programs.last.system, isFalse);
-  });
-
-  test('reads the single object PowerShell writes for one process', () {
-    final programs = parsePrograms(
-      jsonEncode(_process(r'C:\Apps\Discord.exe', 'Discord')),
-      systemRoot: _systemRoot,
-      own: _own,
-    );
-
-    expect(programs.single.packageName, 'Discord.exe');
+    expect([for (final group in groups) group.name], ['Chrome']);
   });
 
   test('takes no output as no programs', () {
-    expect(parsePrograms('', systemRoot: _systemRoot, own: _own), isEmpty);
+    expect(parsePrograms('', own: _own), isEmpty);
   });
 }

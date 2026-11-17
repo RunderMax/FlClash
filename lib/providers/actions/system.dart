@@ -14,12 +14,20 @@ class SystemAction extends _$SystemAction {
     final packages = plugin != null
         ? await plugin.getPackages()
         : system.isWindows
-        ? _keepRouted(await runningPrograms())
+        ? _keepRouted(await _windowsPrograms())
         : const <Package>[];
     if (!listEquals(packages, ref.read(packagesProvider))) {
       ref.read(packagesProvider.notifier).value = packages;
     }
     return ref.read(packagesProvider);
+  }
+
+  Future<List<Package>> _windowsPrograms() async {
+    final groups = await listPrograms(
+      join(await appPath.homeDirPath, 'program-icons'),
+    );
+    programGroups.value = groups;
+    return [for (final group in groups) ...group.programs];
   }
 
   /// A routed program that has quit keeps the row it had while it ran.

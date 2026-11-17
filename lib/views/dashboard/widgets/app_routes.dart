@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:fl_clash/common/app_exits.dart';
 import 'package:fl_clash/common/app_routes.dart';
 import 'package:fl_clash/common/common.dart';
+import 'package:fl_clash/common/programs.dart';
 import 'package:fl_clash/enum/enum.dart';
 import 'package:fl_clash/models/models.dart';
 import 'package:fl_clash/plugins/app.dart';
@@ -599,6 +600,29 @@ class _AppsPageState extends ConsumerState<_AppsPage> {
         .toList();
   }
 
+  /// Windows lists apps as groups of programs, a routed one's first.
+  List<ProgramGroup> _visibleGroups(SearchQuery query) {
+    bool routed(ProgramGroup group) =>
+        group.programs.any((program) => _pinned.contains(program.packageName));
+    final groups = [...programGroups.value]
+      ..sort((a, b) {
+        final first = (routed(a) ? 0 : 1) - (routed(b) ? 0 : 1);
+        return first != 0 ? first : a.name.compareTo(b.name);
+      });
+    return groups
+        .whereMatches(
+          query,
+          (group) => [
+            group.name,
+            for (final program in group.programs) ...[
+              program.label,
+              program.packageName,
+            ],
+          ],
+        )
+        .toList();
+  }
+
   @override
   Widget build(BuildContext context) {
     final appLocalizations = context.appLocalizations;
@@ -611,6 +635,7 @@ class _AppsPageState extends ConsumerState<_AppsPage> {
     final reachable = _reachable(ref.watch(groupsProvider));
     final query = SearchQuery(_query);
     final visible = _visible(packages, query);
+    final groups = system.isWindows ? _visibleGroups(query) : null;
     return Scaffold(
       title: appLocalizations.appRoutesChoose,
       searchState: AppBarSearchState(
@@ -631,7 +656,7 @@ class _AppsPageState extends ConsumerState<_AppsPage> {
           : NullStatusSwitcher(
               isLoading: !_loaded,
               holdsArrival: false,
-              isEmpty: visible.isEmpty,
+              isEmpty: groups?.isEmpty ?? visible.isEmpty,
               isSearching: query.isNotEmpty,
               loadingStatus: const Center(child: ActivityIndicator.page()),
               nullStatus: NullStatus(
@@ -665,28 +690,47 @@ class _AppsPageState extends ConsumerState<_AppsPage> {
                         16,
                         16 + context.bottomInset,
                       ),
-                      sliver: SliverPrismList(
-                        itemCount: visible.length,
-                        itemBuilder: (_, index) {
-                          final package = visible[index];
-                          final target = routes[package.packageName];
-                          return ItemPositionProvider(
-                            key: ValueKey(package.packageName),
-                            position: ItemPosition.get(index, visible.length),
-                            child: _AppItem(
-                              package: package,
-                              target: target,
-                              missing:
-                                  target != null &&
-                                  _missing(
-                                    target,
-                                    reachable,
-                                    picks[package.packageName] ?? const [],
+                      sliver: groups != null
+                          ? SliverPrismList(
+                              itemCount: groups.length,
+                              itemBuilder: (_, index) => ItemPositionProvider(
+                                key: ValueKey(groups[index].name),
+                                position: ItemPosition.get(
+                                  index,
+                                  groups.length,
+                                ),
+                                child: _GroupItem(
+                                  group: groups[index],
+                                  routes: routes,
+                                ),
+                              ),
+                            )
+                          : SliverPrismList(
+                              itemCount: visible.length,
+                              itemBuilder: (_, index) {
+                                final package = visible[index];
+                                final target = routes[package.packageName];
+                                return ItemPositionProvider(
+                                  key: ValueKey(package.packageName),
+                                  position: ItemPosition.get(
+                                    index,
+                                    visible.length,
                                   ),
+                                  child: _AppItem(
+                                    package: package,
+                                    target: target,
+                                    missing:
+                                        target != null &&
+                                        _missing(
+                                          target,
+                                          reachable,
+                                          picks[package.packageName] ??
+                                              const [],
+                                        ),
+                                  ),
+                                );
+                              },
                             ),
-                          );
-                        },
-                      ),
                     ),
                   ],
                 ),
@@ -696,27 +740,140 @@ class _AppsPageState extends ConsumerState<_AppsPage> {
   }
 }
 
+class _GroupItem extends StatelessWidget {
+  const _GroupItem({required this.group, required this.routes});
+
+  final ProgramGroup group;
+  final Map<String, String> routes;
+
+  @override
+  Widget build(BuildContext context) {
+    final programs = group.programs;
+    final routed = [
+      for (final program in programs)
+        if (routes[program.packageName] case final target?)
+          '${program.label} · ${_targetLabel(context, target)}',
+    ];
+    final icon = group.icon;
+    return DecorationListItem(
+      leading: icon == null
+          ? PackageIcon(
+              packageName: programs.first.packageName,
+              size: _listIcon,
+            )
+          : ProgramIcon(file: icon, size: _listIcon),
+      title: Text(group.name, maxLines: 1, overflow: TextOverflow.ellipsis),
+      subtitle: Text(
+        routed.isEmpty
+            ? context.appLocalizations.appRoutesProgramCount(programs.length)
+            : routed.join(' / '),
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+      ),
+      trailing: GlyphIcon(
+        AppGlyphs.chevronForward,
+        size: 18,
+        color: context.colorScheme.onSurfaceVariant,
+      ),
+      onPressed: () => programs.length == 1
+          ? _showTargets(
+              context,
+              programs.first.packageName,
+              programs.first.label,
+            )
+          : unawaited(
+              showInSheet<void>(
+                context,
+                builder: (_) => _ProgramsPage(group: group),
+              ),
+            ),
+    );
+  }
+}
+
+class _ProgramsPage extends ConsumerWidget {
+  const _ProgramsPage({required this.group});
+
+  final ProgramGroup group;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final (:routes, :picks) = ref.watch(
+      patchClashConfigProvider.select(
+        (state) => (routes: state.slothAppRoutes, picks: state.slothAppPicks),
+      ),
+    );
+    final reachable = _reachable(ref.watch(groupsProvider));
+    final programs = group.programs;
+    return Scaffold(
+      title: group.name,
+      body: CustomScrollView(
+        slivers: [
+          SliverToBoxAdapter(
+            child: SizedBox(height: context.contentTopPadding),
+          ),
+          SliverPadding(
+            padding: EdgeInsets.fromLTRB(16, 0, 16, 16 + context.bottomInset),
+            sliver: SliverPrismList(
+              itemCount: programs.length,
+              itemBuilder: (_, index) {
+                final program = programs[index];
+                final target = routes[program.packageName];
+                return ItemPositionProvider(
+                  key: ValueKey(program.packageName),
+                  position: ItemPosition.get(index, programs.length),
+                  child: _AppItem(
+                    package: program,
+                    target: target,
+                    detail: program.packageName,
+                    missing:
+                        target != null &&
+                        _missing(
+                          target,
+                          reachable,
+                          picks[program.packageName] ?? const [],
+                        ),
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class _AppItem extends StatelessWidget {
   const _AppItem({
     required this.package,
     required this.target,
     required this.missing,
+    this.detail,
   });
 
   final Package package;
   final String? target;
   final bool missing;
 
+  /// The executable, which tells apart programs of one app with like names.
+  final String? detail;
+
   @override
   Widget build(BuildContext context) {
     final target = this.target;
+    final detail = this.detail;
     return DecorationListItem(
       leading: PackageIcon(packageName: package.packageName, size: _listIcon),
       title: Text(package.label, maxLines: 1, overflow: TextOverflow.ellipsis),
       subtitle: target == null
-          ? null
+          ? (detail == null
+                ? null
+                : Text(detail, maxLines: 1, overflow: TextOverflow.ellipsis))
           : Text(
-              _targetLabel(context, target),
+              detail == null
+                  ? _targetLabel(context, target)
+                  : '$detail · ${_targetLabel(context, target)}',
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(color: _targetColor(context, target, missing)),

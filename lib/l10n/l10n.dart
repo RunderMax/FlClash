@@ -9509,13 +9509,25 @@ class AppLocalizations {
     );
   }
 
-  /// `Only running programs are listed; open one first to route it`
+  /// `Programs are grouped by app; open one to pick a program. One missing from the Start menu shows up once it runs`
   String get appRoutesRunningHint {
     return Intl.message(
-      'Only running programs are listed; open one first to route it',
+      'Programs are grouped by app; open one to pick a program. One missing from the Start menu shows up once it runs',
       name: 'appRoutesRunningHint',
       desc: '',
       args: [],
+    );
+  }
+
+  /// `{count, plural, =1{1 program} other{{count} programs}}`
+  String appRoutesProgramCount(num count) {
+    return Intl.plural(
+      count,
+      one: '1 program',
+      other: '$count programs',
+      name: 'appRoutesProgramCount',
+      desc: '',
+      args: [count],
     );
   }
 

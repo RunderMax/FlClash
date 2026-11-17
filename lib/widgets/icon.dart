@@ -1,7 +1,9 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:fl_clash/common/cache.dart';
 import 'package:fl_clash/common/common.dart';
+import 'package:fl_clash/common/programs.dart';
 import 'package:fl_clash/plugins/app.dart';
 import 'package:fl_clash/ui/icons/icons.dart';
 import 'package:fl_clash/ui/ui.dart';
@@ -415,9 +417,13 @@ class _PackageIconState extends State<PackageIcon> {
   Widget build(BuildContext context) {
     final icon = _icon;
     if (icon == null) {
-      return app == null
+      if (app != null) {
+        return SizedBox(width: widget.size, height: widget.size);
+      }
+      final file = programIconOf(widget.packageName);
+      return file == null
           ? _ProgramMonogram(name: widget.packageName, size: widget.size)
-          : SizedBox(width: widget.size, height: widget.size);
+          : ProgramIcon(file: file, size: widget.size);
     }
     return Image(
       image: icon,
@@ -428,7 +434,23 @@ class _PackageIconState extends State<PackageIcon> {
   }
 }
 
-/// The app reads no desktop program's icon, so its first letter stands in.
+class ProgramIcon extends StatelessWidget {
+  const ProgramIcon({super.key, required this.file, required this.size});
+
+  final String file;
+  final double size;
+
+  @override
+  Widget build(BuildContext context) => Image.file(
+    File(file),
+    width: size,
+    height: size,
+    gaplessPlayback: true,
+    errorBuilder: (_, _, _) => SizedBox.square(dimension: size),
+  );
+}
+
+/// A program Windows gave no icon for shows its first letter instead.
 class _ProgramMonogram extends StatelessWidget {
   const _ProgramMonogram({required this.name, required this.size});
 
