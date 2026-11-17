@@ -46,15 +46,15 @@ func TestCleanestFastestTakesTheFastestCleanLiveMember(t *testing.T) {
 	if got := cleanestFastest(group, "", ""); got != "fast" {
 		t.Errorf("picked %q, want the fastest clean one", got)
 	}
-	if got := cleanestFastest(group, "", "dc"); got != "fast" {
-		t.Errorf("picked %q, want it to leave a hosting node in use", got)
+	if got := cleanestFastest(group, "", "dc"); got != "dc" {
+		t.Errorf("picked %q, want no move to another address", got)
 	}
 }
 
 func TestCleanestFastestKeepsTheOneInUseWithinTolerance(t *testing.T) {
 	test := useTestPurity(t)
 	test.know("a", "1.1.1.1", time.Minute, ipVerdict{Type: "residential"})
-	test.know("b", "2.2.2.2", time.Minute, ipVerdict{Type: "residential"})
+	test.know("b", "1.1.1.1", time.Minute, ipVerdict{Type: "residential"})
 	near := members(stubMember{name: "a", delay: 130}, stubMember{name: "b", delay: 100})
 	far := members(stubMember{name: "a", delay: 200}, stubMember{name: "b", delay: 100})
 
@@ -63,6 +63,25 @@ func TestCleanestFastestKeepsTheOneInUseWithinTolerance(t *testing.T) {
 	}
 	if got := cleanestFastest(far, "", "a"); got != "b" {
 		t.Errorf("picked %q, want the much faster one", got)
+	}
+}
+
+func TestCleanestFastestStaysOnTheAddressInUse(t *testing.T) {
+	test := useTestPurity(t)
+	test.know("a", "1.1.1.1", time.Minute, ipVerdict{Type: "residential"})
+	test.know("same", "1.1.1.1", time.Minute, ipVerdict{Type: "residential"})
+	test.know("other", "2.2.2.2", time.Minute, ipVerdict{Type: "residential"})
+	group := members(
+		stubMember{name: "a", delay: 900},
+		stubMember{name: "same", delay: 300},
+		stubMember{name: "other", delay: 10},
+	)
+
+	if got := cleanestFastest(group, "", "a"); got != "same" {
+		t.Errorf("picked %q, want the faster member on the same address", got)
+	}
+	if got := cleanestFastest(group, "", "unchecked"); got != "unchecked" {
+		t.Errorf("picked %q, want no move while the address in use is unknown", got)
 	}
 }
 

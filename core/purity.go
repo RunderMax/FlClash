@@ -116,6 +116,13 @@ func (b *purityBook) cleared(node string) bool {
 }
 
 // levelOf starts a check when the verdict is missing or due.
+func (b *purityBook) exitOf(node string) string {
+	b.mu.Lock()
+	defer b.mu.Unlock()
+	b.load()
+	return b.record.Nodes[node].Ip
+}
+
 func (b *purityBook) levelOf(node string) purityLevel {
 	b.mu.Lock()
 	defer b.mu.Unlock()

@@ -116,12 +116,23 @@ func (s *steerer) steer() {
 }
 
 // cleanestFastest names no member while none is known clean, which leaves the
-// choice to url-test; the one in use stays while it is within tolerance.
+// choice to url-test; the one in use stays while it is within tolerance. Once
+// one is in use it only gives way to members leaving from the same address,
+// so sites never see the exit move.
 func cleanestFastest(members []constant.Proxy, url, current string) string {
+	exit := ""
+	if current != "" {
+		if exit = purity.exitOf(current); exit == "" {
+			return current
+		}
+	}
 	best, bestDelay := "", 0
 	currentDelay, currentClean := 0, false
 	for _, member := range members {
 		if purity.levelOf(member.Name()) != purityGood || !member.AliveForTestUrl(url) {
+			continue
+		}
+		if exit != "" && purity.exitOf(member.Name()) != exit {
 			continue
 		}
 		delay := int(member.LastDelayForTestUrl(url))
@@ -132,7 +143,7 @@ func cleanestFastest(members []constant.Proxy, url, current string) string {
 			best, bestDelay = member.Name(), delay
 		}
 	}
-	if currentClean && currentDelay <= bestDelay+defaultFastestTolerance {
+	if best == "" || currentClean && currentDelay <= bestDelay+defaultFastestTolerance {
 		return current
 	}
 	return best
