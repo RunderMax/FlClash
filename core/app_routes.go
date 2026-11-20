@@ -16,7 +16,7 @@ const appRoutesKey = "x-sloth-app-routes"
 
 // Android package names and Windows and macOS executable names, all of which
 // a PROCESS-NAME rule matches; a comma would end the rule's payload early.
-var appPackagePattern = regexp.MustCompile(`^[A-Za-z0-9_][A-Za-z0-9_ .\-]*[A-Za-z0-9_]$`)
+var appPackagePattern = regexp.MustCompile(`^[^\s,@][^,\x00-\x1f]*[^\s,]$`)
 
 // A site is a service routed by name rather than by one executable: "@" and
 // the name, with the categories, domains and programs that make it up.

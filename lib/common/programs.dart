@@ -5,7 +5,7 @@ import 'package:fl_clash/models/models.dart';
 import 'package:flutter/foundation.dart';
 import 'package:path/path.dart' as path;
 
-final _appName = RegExp(r'^[A-Za-z0-9_][A-Za-z0-9_ .\-]*[A-Za-z0-9_]$');
+final _appName = RegExp(r'^[^\s,@][^,\x00-\x1f]*[^\s,]$');
 final _noise = RegExp('unins|uninstall|setup|crash', caseSensitive: false);
 
 /// One program as Windows lists it: a Start menu entry's folder, or a running
@@ -49,10 +49,10 @@ function Exe($file, $running) {
   return [pscustomobject]@{ path = $file; description = "$($info.FileDescription)".Trim(); running = $running; icon = $(if ($running) { Icon $file } else { $null }) }
 }
 $running = @{}
-Get-Process | Where-Object { $_.SessionId -ne 0 -and $_.Path } | ForEach-Object { $running[$_.Path.ToLower()] = $_.Path }
+Get-CimInstance Win32_Process -Property SessionId, ExecutablePath | Where-Object { $_.SessionId -ne 0 -and $_.ExecutablePath } | ForEach-Object { $running[$_.ExecutablePath.ToLower()] = $_.ExecutablePath }
 $shell = New-Object -ComObject WScript.Shell
 $apps = [ordered]@{}
-$menus = @("$env:ProgramData\Microsoft\Windows\Start Menu\Programs", "$env:APPDATA\Microsoft\Windows\Start Menu\Programs")
+$menus = @("$env:ProgramData\Microsoft\Windows\Start Menu\Programs", "$env:APPDATA\Microsoft\Windows\Start Menu\Programs", "$env:PUBLIC\Desktop", [Environment]::GetFolderPath('Desktop'))
 foreach ($lnk in Get-ChildItem -Path $menus -Recurse -Filter *.lnk -ErrorAction SilentlyContinue) {
   try { $target = $shell.CreateShortcut($lnk.FullName).TargetPath } catch { continue }
   if (-not $target -or -not $target.ToLower().EndsWith('.exe') -or $target.StartsWith($sys, 'OrdinalIgnoreCase')) { continue }

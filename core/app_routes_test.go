@@ -99,12 +99,12 @@ func TestLoadConfigWithBaseRoutesASiteByItsDomainsAndPrograms(t *testing.T) {
 }
 
 func TestAppPackagePatternTakesWindowsExecutables(t *testing.T) {
-	for _, name := range []string{"com.example.chat", "chrome.exe", "ms-teams.exe", "Code - Insiders.exe", "1Password.exe", "Google Chrome Helper"} {
+	for _, name := range []string{"com.example.chat", "chrome.exe", "ms-teams.exe", "Code - Insiders.exe", "1Password.exe", "Google Chrome Helper", "微信.exe", "notepad++.exe", "App (x86).exe"} {
 		if !appPackagePattern.MatchString(name) {
 			t.Errorf("%q should name an app", name)
 		}
 	}
-	for _, name := range []string{"not,a.package", " lead.exe", "line\nbreak.exe", "trail.exe ", "x"} {
+	for _, name := range []string{"not,a.package", " lead.exe", "line\nbreak.exe", "trail.exe ", "x", "@Site"} {
 		if appPackagePattern.MatchString(name) {
 			t.Errorf("%q should not name an app", name)
 		}
