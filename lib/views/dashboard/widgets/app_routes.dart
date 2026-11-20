@@ -660,7 +660,7 @@ class _AppsPageState extends ConsumerState<_AppsPage> {
               ),
             )
           : NullStatusSwitcher(
-              isLoading: !_loaded,
+              isLoading: !_loaded && _query.trim().isEmpty,
               holdsArrival: false,
               isEmpty:
                   _query.trim().isEmpty && (groups?.isEmpty ?? visible.isEmpty),
@@ -827,13 +827,37 @@ class _GroupItem extends StatelessWidget {
   }
 }
 
-class _ProgramsPage extends ConsumerWidget {
+class _ProgramsPage extends ConsumerStatefulWidget {
   const _ProgramsPage({required this.group});
 
   final ProgramGroup group;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<_ProgramsPage> createState() => _ProgramsPageState();
+}
+
+class _ProgramsPageState extends ConsumerState<_ProgramsPage> {
+  @override
+  void initState() {
+    super.initState();
+    unawaited(_loadIcons());
+  }
+
+  Future<void> _loadIcons() async {
+    try {
+      await loadProgramIcons(
+        widget.group,
+        join(await appPath.homeDirPath, 'program-icons'),
+      );
+    } on Object catch (_) {
+      return;
+    }
+    if (mounted) setState(() {});
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final group = widget.group;
     final (:routes, :picks) = ref.watch(
       patchClashConfigProvider.select(
         (state) => (routes: state.slothAppRoutes, picks: state.slothAppPicks),

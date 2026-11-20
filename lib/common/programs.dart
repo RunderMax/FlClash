@@ -24,6 +24,8 @@ class ProgramGroup {
 
 final programGroups = ValueNotifier<List<ProgramGroup>>(const []);
 final _icons = <String, String>{};
+final _paths = <String, String>{};
+final _ownIcons = <String>{};
 
 String? programIconOf(String executable) => _icons[executable.toLowerCase()];
 
@@ -44,7 +46,7 @@ function Icon($file) {
 }
 function Exe($file, $running) {
   $info = (Get-Item -LiteralPath $file -ErrorAction SilentlyContinue).VersionInfo
-  return [pscustomobject]@{ path = $file; description = "$($info.FileDescription)".Trim(); running = $running; icon = (Icon $file) }
+  return [pscustomobject]@{ path = $file; description = "$($info.FileDescription)".Trim(); running = $running; icon = $(if ($running) { Icon $file } else { $null }) }
 }
 $running = @{}
 Get-Process | Where-Object { $_.SessionId -ne 0 -and $_.Path } | ForEach-Object { $running[$_.Path.ToLower()] = $_.Path }
@@ -165,6 +167,50 @@ Future<List<ProgramGroup>> listPrograms(String iconDir) async {
   );
 }
 
+const _iconScript = r"""
+[Console]::OutputEncoding = [Text.Encoding]::UTF8
+Add-Type -AssemblyName System.Drawing
+$icons = $env:SLOTH_ICONS
+$md5 = [Security.Cryptography.MD5]::Create()
+$out = @{}
+foreach ($file in ($env:SLOTH_FILES -split "`n")) {
+  if (-not $file) { continue }
+  $hash = [BitConverter]::ToString($md5.ComputeHash([Text.Encoding]::UTF8.GetBytes($file.ToLower()))).Replace('-', '')
+  $png = Join-Path $icons "$hash.png"
+  if (-not (Test-Path -LiteralPath $png)) {
+    try { [Drawing.Icon]::ExtractAssociatedIcon($file).ToBitmap().Save($png, [Drawing.Imaging.ImageFormat]::Png) } catch { continue }
+  }
+  $out[$file] = $png
+}
+ConvertTo-Json -InputObject $out -Compress
+""";
+
+/// Listing every program's own icon took Windows minutes, so a group's are
+/// read once it is opened.
+Future<void> loadProgramIcons(ProgramGroup group, String iconDir) async {
+  if (!Platform.isWindows) return;
+  final files = [
+    for (final program in group.programs)
+      if (!_ownIcons.contains(program.packageName.toLowerCase()))
+        ?_paths[program.packageName.toLowerCase()],
+  ];
+  if (files.isEmpty) return;
+  final result = await Process.run(
+    'powershell',
+    ['-NoProfile', '-NonInteractive', '-Command', _iconScript],
+    environment: {'SLOTH_ICONS': iconDir, 'SLOTH_FILES': files.join('\n')},
+    stdoutEncoding: utf8,
+  );
+  final decoded = jsonDecode(result.stdout as String);
+  if (decoded is! Map) return;
+  for (final MapEntry(:key, :value) in decoded.entries) {
+    if (key is! String || value is! String) continue;
+    final name = path.windows.basename(key).toLowerCase();
+    _icons[name] = value;
+    _ownIcons.add(name);
+  }
+}
+
 /// Programs under [own], this app and its core, are left out, as is what only
 /// installs or reports crashes.
 @visibleForTesting
@@ -189,8 +235,10 @@ List<ProgramGroup> parsePrograms(String output, {required String own}) {
       final name = path.windows.basename(file);
       if (!_appName.hasMatch(name) || _noise.hasMatch(name)) continue;
       if (!seen.add(name.toLowerCase())) continue;
-      final ownIcon = _text(exe['icon']) ?? icon;
-      if (ownIcon != null) _icons[name.toLowerCase()] = ownIcon;
+      _paths[name.toLowerCase()] = file;
+      final ownIcon = _text(exe['icon']);
+      if (ownIcon != null) _ownIcons.add(name.toLowerCase());
+      if (ownIcon ?? icon case final shown?) _icons[name.toLowerCase()] = shown;
       programs.add(
         Package(
           packageName: name,
