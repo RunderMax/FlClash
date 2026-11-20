@@ -239,19 +239,23 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static String m99(label) => "${label}只能是一项";
 
-  static String m100(value) => "峰值 ${value}";
+  static String m100(count) => "${count} 个网址";
 
-  static String m101(value) => "累计 ${value}";
+  static String m101(query) => "联网查找「${query}」";
 
-  static String m102(transport) => "${transport} 请求头";
+  static String m102(value) => "峰值 ${value}";
 
-  static String m103(label) => "${label}必须为URL";
+  static String m103(value) => "累计 ${value}";
 
-  static String m104(date) => "有效期至 ${date}";
+  static String m104(transport) => "${transport} 请求头";
 
-  static String m105(count) => "${count} 年前";
+  static String m105(label) => "${label}必须为URL";
 
-  static String m106(count) => "${count} 年前";
+  static String m106(date) => "有效期至 ${date}";
+
+  static String m107(count) => "${count} 年前";
+
+  static String m108(count) => "${count} 年前";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
@@ -1624,6 +1628,16 @@ class MessageLookup extends MessageLookupByLibrary {
       "这里只能填写一条链接，多条请在列表的快速编辑中填写",
     ),
     "singleValueTip": m99,
+    "siteDomainCount": m100,
+    "siteLookup": m101,
+    "siteLookupDomains": MessageLookupByLibrary.simpleMessage("官网用到的网址"),
+    "siteLookupNext": MessageLookupByLibrary.simpleMessage("选节点"),
+    "siteLookupNone": MessageLookupByLibrary.simpleMessage(
+      "没找到。换个名字，或者输入官网地址试试",
+    ),
+    "siteLookupPrograms": MessageLookupByLibrary.simpleMessage("相关的软件"),
+    "siteLookupServices": MessageLookupByLibrary.simpleMessage("清单里找到的服务"),
+    "siteLookupShared": MessageLookupByLibrary.simpleMessage("很多网站都在用，默认不选"),
     "size": MessageLookupByLibrary.simpleMessage("尺寸"),
     "skipCertVerify": MessageLookupByLibrary.simpleMessage("跳过证书验证"),
     "skipDomain": MessageLookupByLibrary.simpleMessage("跳过域名"),
@@ -1710,11 +1724,11 @@ class MessageLookup extends MessageLookupByLibrary {
     "totalUpload": MessageLookupByLibrary.simpleMessage("上传总量"),
     "tproxyPort": MessageLookupByLibrary.simpleMessage("Tproxy端口"),
     "traffic": MessageLookupByLibrary.simpleMessage("流量"),
-    "trafficPeak": m100,
-    "trafficTotal": m101,
+    "trafficPeak": m102,
+    "trafficTotal": m103,
     "trafficUsage": MessageLookupByLibrary.simpleMessage("流量统计"),
     "transport": MessageLookupByLibrary.simpleMessage("传输协议"),
-    "transportHeaders": m102,
+    "transportHeaders": m104,
     "trustCertificate": MessageLookupByLibrary.simpleMessage("信任证书"),
     "tun": MessageLookupByLibrary.simpleMessage("虚拟网卡"),
     "tunAuthorizationFailed": MessageLookupByLibrary.simpleMessage(
@@ -1760,14 +1774,14 @@ class MessageLookup extends MessageLookupByLibrary {
     "uploadBandwidth": MessageLookupByLibrary.simpleMessage("上行带宽"),
     "url": MessageLookupByLibrary.simpleMessage("URL"),
     "urlRewrite": MessageLookupByLibrary.simpleMessage("URL 重写"),
-    "urlTip": m103,
+    "urlTip": m105,
     "useHosts": MessageLookupByLibrary.simpleMessage("使用Hosts"),
     "useSystemHosts": MessageLookupByLibrary.simpleMessage("使用系统Hosts"),
     "usedShort": MessageLookupByLibrary.simpleMessage("已用"),
     "usedTraffic": MessageLookupByLibrary.simpleMessage("已用流量"),
     "userAgent": MessageLookupByLibrary.simpleMessage("用户代理"),
     "username": MessageLookupByLibrary.simpleMessage("用户名"),
-    "validUntil": m104,
+    "validUntil": m106,
     "value": MessageLookupByLibrary.simpleMessage("值"),
     "view": MessageLookupByLibrary.simpleMessage("查看"),
     "viewAll": MessageLookupByLibrary.simpleMessage("查看全部"),
@@ -1783,8 +1797,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "writeToSystemDesc": MessageLookupByLibrary.simpleMessage(
       "写入系统会同时设置系统时钟，Android 上不生效。",
     ),
-    "yearsAgo": m105,
-    "yearsAgoShort": m106,
+    "yearsAgo": m107,
+    "yearsAgoShort": m108,
     "yes": MessageLookupByLibrary.simpleMessage("是"),
     "zhCN": MessageLookupByLibrary.simpleMessage("中文简体"),
   };

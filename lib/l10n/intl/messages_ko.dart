@@ -248,19 +248,23 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static String m99(label) => "${label}은(는) 하나만 입력해야 합니다";
 
-  static String m100(value) => "최고 ${value}";
+  static String m100(count) => "주소 ${count}개";
 
-  static String m101(value) => "합계 ${value}";
+  static String m101(query) => "「${query}」 온라인에서 찾기";
 
-  static String m102(transport) => "${transport} 요청 헤더";
+  static String m102(value) => "최고 ${value}";
 
-  static String m103(label) => "${label}은(는) URL이어야 합니다";
+  static String m103(value) => "합계 ${value}";
 
-  static String m104(date) => "${date}까지 유효";
+  static String m104(transport) => "${transport} 요청 헤더";
 
-  static String m105(count) => "${Intl.plural(count, other: '${count}년 전')}";
+  static String m105(label) => "${label}은(는) URL이어야 합니다";
 
-  static String m106(count) => "${Intl.plural(count, other: '${count}년 전')}";
+  static String m106(date) => "${date}까지 유효";
+
+  static String m107(count) => "${Intl.plural(count, other: '${count}년 전')}";
+
+  static String m108(count) => "${Intl.plural(count, other: '${count}년 전')}";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
@@ -1765,6 +1769,18 @@ class MessageLookup extends MessageLookupByLibrary {
       "여기에는 링크를 하나만 입력하세요. 여러 개는 목록의 빠른 편집에서 편집하세요",
     ),
     "singleValueTip": m99,
+    "siteDomainCount": m100,
+    "siteLookup": m101,
+    "siteLookupDomains": MessageLookupByLibrary.simpleMessage("공식 사이트가 쓰는 주소"),
+    "siteLookupNext": MessageLookupByLibrary.simpleMessage("노드 고르기"),
+    "siteLookupNone": MessageLookupByLibrary.simpleMessage(
+      "찾지 못했어요. 다른 이름이나 공식 사이트 주소로 해 보세요",
+    ),
+    "siteLookupPrograms": MessageLookupByLibrary.simpleMessage("관련 프로그램"),
+    "siteLookupServices": MessageLookupByLibrary.simpleMessage("목록에서 찾은 서비스"),
+    "siteLookupShared": MessageLookupByLibrary.simpleMessage(
+      "여러 사이트가 쓰는 주소라 기본으로 빼 둬요",
+    ),
     "size": MessageLookupByLibrary.simpleMessage("크기"),
     "skipCertVerify": MessageLookupByLibrary.simpleMessage("인증서 검증 건너뛰기"),
     "skipDomain": MessageLookupByLibrary.simpleMessage("건너뛸 도메인"),
@@ -1863,11 +1879,11 @@ class MessageLookup extends MessageLookupByLibrary {
     "totalUpload": MessageLookupByLibrary.simpleMessage("업로드량"),
     "tproxyPort": MessageLookupByLibrary.simpleMessage("TProxy 포트"),
     "traffic": MessageLookupByLibrary.simpleMessage("트래픽"),
-    "trafficPeak": m100,
-    "trafficTotal": m101,
+    "trafficPeak": m102,
+    "trafficTotal": m103,
     "trafficUsage": MessageLookupByLibrary.simpleMessage("트래픽 사용량"),
     "transport": MessageLookupByLibrary.simpleMessage("전송"),
-    "transportHeaders": m102,
+    "transportHeaders": m104,
     "trustCertificate": MessageLookupByLibrary.simpleMessage("인증서 신뢰"),
     "tun": MessageLookupByLibrary.simpleMessage("TUN"),
     "tunAuthorizationFailed": MessageLookupByLibrary.simpleMessage(
@@ -1921,14 +1937,14 @@ class MessageLookup extends MessageLookupByLibrary {
     "uploadBandwidth": MessageLookupByLibrary.simpleMessage("업로드 대역폭"),
     "url": MessageLookupByLibrary.simpleMessage("URL"),
     "urlRewrite": MessageLookupByLibrary.simpleMessage("URL 재작성"),
-    "urlTip": m103,
+    "urlTip": m105,
     "useHosts": MessageLookupByLibrary.simpleMessage("hosts 사용"),
     "useSystemHosts": MessageLookupByLibrary.simpleMessage("시스템 hosts 사용"),
     "usedShort": MessageLookupByLibrary.simpleMessage("사용"),
     "usedTraffic": MessageLookupByLibrary.simpleMessage("사용한 트래픽"),
     "userAgent": MessageLookupByLibrary.simpleMessage("User-Agent"),
     "username": MessageLookupByLibrary.simpleMessage("사용자 이름"),
-    "validUntil": m104,
+    "validUntil": m106,
     "value": MessageLookupByLibrary.simpleMessage("값"),
     "view": MessageLookupByLibrary.simpleMessage("보기"),
     "viewAll": MessageLookupByLibrary.simpleMessage("모두 보기"),
@@ -1944,8 +1960,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "writeToSystemDesc": MessageLookupByLibrary.simpleMessage(
       "시스템에 기록하면 시스템 시계도 설정합니다. Android에서는 무시됩니다.",
     ),
-    "yearsAgo": m105,
-    "yearsAgoShort": m106,
+    "yearsAgo": m107,
+    "yearsAgoShort": m108,
     "yes": MessageLookupByLibrary.simpleMessage("예"),
     "zhCN": MessageLookupByLibrary.simpleMessage("중국어 간체"),
   };

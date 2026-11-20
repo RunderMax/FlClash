@@ -416,6 +416,12 @@ class _PackageIconState extends State<PackageIcon> {
   @override
   Widget build(BuildContext context) {
     final icon = _icon;
+    if (widget.packageName.startsWith('@')) {
+      return _ProgramMonogram(
+        name: widget.packageName.substring(1),
+        size: widget.size,
+      );
+    }
     if (icon == null) {
       if (app != null) {
         return SizedBox(width: widget.size, height: widget.size);

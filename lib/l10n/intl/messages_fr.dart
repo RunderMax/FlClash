@@ -287,20 +287,25 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static String m99(label) => "${label} doit être un seul élément";
 
-  static String m100(value) => "Pic ${value}";
+  static String m100(count) =>
+      "${Intl.plural(count, one: '1 adresse', other: '${count} adresses')}";
 
-  static String m101(value) => "Total ${value}";
+  static String m101(query) => "Chercher « ${query} » en ligne";
 
-  static String m102(transport) => "En-têtes ${transport}";
+  static String m102(value) => "Pic ${value}";
 
-  static String m103(label) => "${label} doit être une URL";
+  static String m103(value) => "Total ${value}";
 
-  static String m104(date) => "Valide jusqu’au ${date}";
+  static String m104(transport) => "En-têtes ${transport}";
 
-  static String m105(count) =>
+  static String m105(label) => "${label} doit être une URL";
+
+  static String m106(date) => "Valide jusqu’au ${date}";
+
+  static String m107(count) =>
       "${Intl.plural(count, one: 'il y a 1 an', other: 'il y a ${count} ans')}";
 
-  static String m106(count) =>
+  static String m108(count) =>
       "${Intl.plural(count, other: 'il y a ${count} a')}";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
@@ -1224,9 +1229,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "installCertificateSuccess": MessageLookupByLibrary.simpleMessage(
       "Certificat installé",
     ),
-    "installedAppsPermissionDeniedMessage": MessageLookupByLibrary.simpleMessage(
-      "L’autorisation de la liste des apps a été refusée ; les apps installées ne peuvent donc pas être listées. Veuillez l’accorder manuellement dans les réglages du système.",
-    ),
+    "installedAppsPermissionDeniedMessage":
+        MessageLookupByLibrary.simpleMessage(
+          "L’autorisation de la liste des apps a été refusée ; les apps installées ne peuvent donc pas être listées. Veuillez l’accorder manuellement dans les réglages du système.",
+        ),
     "installedAppsPermissionDesc": MessageLookupByLibrary.simpleMessage(
       "Ce système masque la liste des apps installées tant que l’autorisation n’est pas accordée. Accordez-la pour configurer le proxy par app.",
     ),
@@ -2271,6 +2277,24 @@ class MessageLookup extends MessageLookupByLibrary {
       "Saisissez un seul lien ici ; pour en modifier plusieurs, utilisez la modification rapide de la liste",
     ),
     "singleValueTip": m99,
+    "siteDomainCount": m100,
+    "siteLookup": m101,
+    "siteLookupDomains": MessageLookupByLibrary.simpleMessage(
+      "Adresses utilisées par le site",
+    ),
+    "siteLookupNext": MessageLookupByLibrary.simpleMessage("Choisir un nœud"),
+    "siteLookupNone": MessageLookupByLibrary.simpleMessage(
+      "Rien trouvé. Essayez un autre nom ou l\'adresse du site officiel",
+    ),
+    "siteLookupPrograms": MessageLookupByLibrary.simpleMessage(
+      "Programmes liés",
+    ),
+    "siteLookupServices": MessageLookupByLibrary.simpleMessage(
+      "Services de la liste",
+    ),
+    "siteLookupShared": MessageLookupByLibrary.simpleMessage(
+      "Utilisé par de nombreux sites, donc décoché",
+    ),
     "size": MessageLookupByLibrary.simpleMessage("Taille"),
     "skipCertVerify": MessageLookupByLibrary.simpleMessage(
       "Ignorer la vérification du certificat",
@@ -2393,11 +2417,11 @@ class MessageLookup extends MessageLookupByLibrary {
     "totalUpload": MessageLookupByLibrary.simpleMessage("Envoyé"),
     "tproxyPort": MessageLookupByLibrary.simpleMessage("Port TProxy"),
     "traffic": MessageLookupByLibrary.simpleMessage("Trafic"),
-    "trafficPeak": m100,
-    "trafficTotal": m101,
+    "trafficPeak": m102,
+    "trafficTotal": m103,
     "trafficUsage": MessageLookupByLibrary.simpleMessage("Trafic utilisé"),
     "transport": MessageLookupByLibrary.simpleMessage("Transport"),
-    "transportHeaders": m102,
+    "transportHeaders": m104,
     "trustCertificate": MessageLookupByLibrary.simpleMessage(
       "Approuver le certificat",
     ),
@@ -2463,7 +2487,7 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "url": MessageLookupByLibrary.simpleMessage("URL"),
     "urlRewrite": MessageLookupByLibrary.simpleMessage("Réécriture d’URL"),
-    "urlTip": m103,
+    "urlTip": m105,
     "useHosts": MessageLookupByLibrary.simpleMessage("Utiliser hosts"),
     "useSystemHosts": MessageLookupByLibrary.simpleMessage(
       "Utiliser les hosts du système",
@@ -2472,7 +2496,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "usedTraffic": MessageLookupByLibrary.simpleMessage("Trafic utilisé"),
     "userAgent": MessageLookupByLibrary.simpleMessage("User-Agent"),
     "username": MessageLookupByLibrary.simpleMessage("Nom d’utilisateur"),
-    "validUntil": m104,
+    "validUntil": m106,
     "value": MessageLookupByLibrary.simpleMessage("Valeur"),
     "view": MessageLookupByLibrary.simpleMessage("Afficher"),
     "viewAll": MessageLookupByLibrary.simpleMessage("Tout afficher"),
@@ -2492,8 +2516,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "writeToSystemDesc": MessageLookupByLibrary.simpleMessage(
       "Écrire dans le système règle aussi l’horloge système ; Android l’ignore.",
     ),
-    "yearsAgo": m105,
-    "yearsAgoShort": m106,
+    "yearsAgo": m107,
+    "yearsAgoShort": m108,
     "yes": MessageLookupByLibrary.simpleMessage("Oui"),
     "zhCN": MessageLookupByLibrary.simpleMessage("Chinois simplifié"),
   };

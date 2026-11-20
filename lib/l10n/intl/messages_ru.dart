@@ -274,20 +274,25 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static String m99(label) => "«${label}» — только одно значение";
 
-  static String m100(value) => "Пик ${value}";
+  static String m100(count) =>
+      "${Intl.plural(count, one: '${count} адрес', few: '${count} адреса', other: '${count} адресов')}";
 
-  static String m101(value) => "Всего ${value}";
+  static String m101(query) => "Найти «${query}» в сети";
 
-  static String m102(transport) => "Заголовки ${transport}";
+  static String m102(value) => "Пик ${value}";
 
-  static String m103(label) => "Значение «${label}» должно быть URL";
+  static String m103(value) => "Всего ${value}";
 
-  static String m104(date) => "Действителен до ${date}";
+  static String m104(transport) => "Заголовки ${transport}";
 
-  static String m105(count) =>
+  static String m105(label) => "Значение «${label}» должно быть URL";
+
+  static String m106(date) => "Действителен до ${date}";
+
+  static String m107(count) =>
       "${Intl.plural(count, one: '${count} год назад', few: '${count} года назад', many: '${count} лет назад', other: '${count} года назад')}";
 
-  static String m106(count) =>
+  static String m108(count) =>
       "${Intl.plural(count, one: '${count} г. назад', few: '${count} г. назад', many: '${count} л. назад', other: '${count} г. назад')}";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
@@ -1191,9 +1196,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "installCertificateSuccess": MessageLookupByLibrary.simpleMessage(
       "Сертификат установлен",
     ),
-    "installedAppsPermissionDeniedMessage": MessageLookupByLibrary.simpleMessage(
-      "Разрешение на список приложений отклонено, поэтому установленные приложения недоступны. Предоставьте его вручную в системных настройках.",
-    ),
+    "installedAppsPermissionDeniedMessage":
+        MessageLookupByLibrary.simpleMessage(
+          "Разрешение на список приложений отклонено, поэтому установленные приложения недоступны. Предоставьте его вручную в системных настройках.",
+        ),
     "installedAppsPermissionDesc": MessageLookupByLibrary.simpleMessage(
       "Эта система не выдаёт список установленных приложений без разрешения. Предоставьте его, чтобы настроить прокси для отдельных приложений.",
     ),
@@ -2206,6 +2212,24 @@ class MessageLookup extends MessageLookupByLibrary {
       "Здесь укажите одну ссылку, несколько можно задать в быстром редактировании списка",
     ),
     "singleValueTip": m99,
+    "siteDomainCount": m100,
+    "siteLookup": m101,
+    "siteLookupDomains": MessageLookupByLibrary.simpleMessage(
+      "Адреса, которые использует сайт",
+    ),
+    "siteLookupNext": MessageLookupByLibrary.simpleMessage("Выбрать узел"),
+    "siteLookupNone": MessageLookupByLibrary.simpleMessage(
+      "Ничего не найдено. Попробуйте другое название или адрес сайта",
+    ),
+    "siteLookupPrograms": MessageLookupByLibrary.simpleMessage(
+      "Связанные программы",
+    ),
+    "siteLookupServices": MessageLookupByLibrary.simpleMessage(
+      "Сервисы из списка",
+    ),
+    "siteLookupShared": MessageLookupByLibrary.simpleMessage(
+      "Используется многими сайтами, поэтому не выбран",
+    ),
     "size": MessageLookupByLibrary.simpleMessage("Размер"),
     "skipCertVerify": MessageLookupByLibrary.simpleMessage(
       "Пропускать проверку сертификата",
@@ -2330,11 +2354,11 @@ class MessageLookup extends MessageLookupByLibrary {
     "totalUpload": MessageLookupByLibrary.simpleMessage("Отдано"),
     "tproxyPort": MessageLookupByLibrary.simpleMessage("Порт TProxy"),
     "traffic": MessageLookupByLibrary.simpleMessage("Трафик"),
-    "trafficPeak": m100,
-    "trafficTotal": m101,
+    "trafficPeak": m102,
+    "trafficTotal": m103,
     "trafficUsage": MessageLookupByLibrary.simpleMessage("Статистика трафика"),
     "transport": MessageLookupByLibrary.simpleMessage("Транспорт"),
-    "transportHeaders": m102,
+    "transportHeaders": m104,
     "trustCertificate": MessageLookupByLibrary.simpleMessage(
       "Доверять сертификату",
     ),
@@ -2396,7 +2420,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "uploadBandwidth": MessageLookupByLibrary.simpleMessage("Скорость отдачи"),
     "url": MessageLookupByLibrary.simpleMessage("URL"),
     "urlRewrite": MessageLookupByLibrary.simpleMessage("Перезапись URL"),
-    "urlTip": m103,
+    "urlTip": m105,
     "useHosts": MessageLookupByLibrary.simpleMessage("Использовать hosts"),
     "useSystemHosts": MessageLookupByLibrary.simpleMessage(
       "Использовать системный hosts",
@@ -2407,7 +2431,7 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "userAgent": MessageLookupByLibrary.simpleMessage("User-Agent"),
     "username": MessageLookupByLibrary.simpleMessage("Имя пользователя"),
-    "validUntil": m104,
+    "validUntil": m106,
     "value": MessageLookupByLibrary.simpleMessage("Значение"),
     "view": MessageLookupByLibrary.simpleMessage("Просмотр"),
     "viewAll": MessageLookupByLibrary.simpleMessage("Показать всё"),
@@ -2429,8 +2453,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "writeToSystemDesc": MessageLookupByLibrary.simpleMessage(
       "«Записывать в систему» также устанавливает системные часы; Android это игнорирует.",
     ),
-    "yearsAgo": m105,
-    "yearsAgoShort": m106,
+    "yearsAgo": m107,
+    "yearsAgoShort": m108,
     "yes": MessageLookupByLibrary.simpleMessage("Да"),
     "zhCN": MessageLookupByLibrary.simpleMessage("Упрощённый китайский"),
   };

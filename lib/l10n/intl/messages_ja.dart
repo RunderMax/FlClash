@@ -243,19 +243,23 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static String m99(label) => "${label}は1項目のみ指定できます";
 
-  static String m100(value) => "ピーク ${value}";
+  static String m100(count) => "${count} 件のアドレス";
 
-  static String m101(value) => "累計 ${value}";
+  static String m101(query) => "「${query}」をオンラインで検索";
 
-  static String m102(transport) => "${transport} リクエストヘッダー";
+  static String m102(value) => "ピーク ${value}";
 
-  static String m103(label) => "${label}はURLである必要があります";
+  static String m103(value) => "累計 ${value}";
 
-  static String m104(date) => "有効期限 ${date}";
+  static String m104(transport) => "${transport} リクエストヘッダー";
 
-  static String m105(count) => "${count} 年前";
+  static String m105(label) => "${label}はURLである必要があります";
 
-  static String m106(count) => "${count} 年前";
+  static String m106(date) => "有効期限 ${date}";
+
+  static String m107(count) => "${count} 年前";
+
+  static String m108(count) => "${count} 年前";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
@@ -1796,6 +1800,18 @@ class MessageLookup extends MessageLookupByLibrary {
       "ここにはリンクを 1 つだけ入力してください。複数の場合は一覧のクイック編集を使ってください",
     ),
     "singleValueTip": m99,
+    "siteDomainCount": m100,
+    "siteLookup": m101,
+    "siteLookupDomains": MessageLookupByLibrary.simpleMessage("公式サイトが使うアドレス"),
+    "siteLookupNext": MessageLookupByLibrary.simpleMessage("ノードを選ぶ"),
+    "siteLookupNone": MessageLookupByLibrary.simpleMessage(
+      "見つかりません。別の名前か公式サイトのアドレスで試してください",
+    ),
+    "siteLookupPrograms": MessageLookupByLibrary.simpleMessage("関連するプログラム"),
+    "siteLookupServices": MessageLookupByLibrary.simpleMessage("リストにあるサービス"),
+    "siteLookupShared": MessageLookupByLibrary.simpleMessage(
+      "多くのサイトが使うため、既定では外します",
+    ),
     "size": MessageLookupByLibrary.simpleMessage("サイズ"),
     "skipCertVerify": MessageLookupByLibrary.simpleMessage("証明書の検証をスキップ"),
     "skipDomain": MessageLookupByLibrary.simpleMessage("スキップするドメイン"),
@@ -1892,11 +1908,11 @@ class MessageLookup extends MessageLookupByLibrary {
     "totalUpload": MessageLookupByLibrary.simpleMessage("アップロード量"),
     "tproxyPort": MessageLookupByLibrary.simpleMessage("TProxyポート"),
     "traffic": MessageLookupByLibrary.simpleMessage("通信量"),
-    "trafficPeak": m100,
-    "trafficTotal": m101,
+    "trafficPeak": m102,
+    "trafficTotal": m103,
     "trafficUsage": MessageLookupByLibrary.simpleMessage("トラフィック統計"),
     "transport": MessageLookupByLibrary.simpleMessage("トランスポート"),
-    "transportHeaders": m102,
+    "transportHeaders": m104,
     "trustCertificate": MessageLookupByLibrary.simpleMessage("証明書を信頼"),
     "tun": MessageLookupByLibrary.simpleMessage("TUN"),
     "tunAuthorizationFailed": MessageLookupByLibrary.simpleMessage(
@@ -1950,14 +1966,14 @@ class MessageLookup extends MessageLookupByLibrary {
     "uploadBandwidth": MessageLookupByLibrary.simpleMessage("アップロード帯域幅"),
     "url": MessageLookupByLibrary.simpleMessage("URL"),
     "urlRewrite": MessageLookupByLibrary.simpleMessage("URL 書き換え"),
-    "urlTip": m103,
+    "urlTip": m105,
     "useHosts": MessageLookupByLibrary.simpleMessage("Hostsを使用"),
     "useSystemHosts": MessageLookupByLibrary.simpleMessage("システムのHostsを使用"),
     "usedShort": MessageLookupByLibrary.simpleMessage("使用済み"),
     "usedTraffic": MessageLookupByLibrary.simpleMessage("使用済みトラフィック"),
     "userAgent": MessageLookupByLibrary.simpleMessage("User-Agent"),
     "username": MessageLookupByLibrary.simpleMessage("ユーザー名"),
-    "validUntil": m104,
+    "validUntil": m106,
     "value": MessageLookupByLibrary.simpleMessage("値"),
     "view": MessageLookupByLibrary.simpleMessage("表示"),
     "viewAll": MessageLookupByLibrary.simpleMessage("すべて表示"),
@@ -1973,8 +1989,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "writeToSystemDesc": MessageLookupByLibrary.simpleMessage(
       "システムに書き込むを有効にするとシステムクロックも設定します。Android では無視されます。",
     ),
-    "yearsAgo": m105,
-    "yearsAgoShort": m106,
+    "yearsAgo": m107,
+    "yearsAgoShort": m108,
     "yes": MessageLookupByLibrary.simpleMessage("はい"),
     "zhCN": MessageLookupByLibrary.simpleMessage("簡体字中国語"),
   };

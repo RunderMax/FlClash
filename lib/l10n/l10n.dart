@@ -7663,8 +7663,7 @@ class AppLocalizations {
   String customImportDroppedSubRules(num count, Object label) {
     return Intl.plural(
       count,
-      one:
-          '1 SUB-RULE rule was dropped, since custom profiles do not support sub-rules',
+      one: '1 SUB-RULE rule was dropped, since custom profiles do not support sub-rules',
       other:
           '$label SUB-RULE rules were dropped, since custom profiles do not support sub-rules',
       name: 'customImportDroppedSubRules',
@@ -9529,6 +9528,88 @@ class AppLocalizations {
       name: 'appRoutesProgramCount',
       desc: '',
       args: [count],
+    );
+  }
+
+  /// `Look up “{query}” online`
+  String siteLookup(Object query) {
+    return Intl.message(
+      'Look up “$query” online',
+      name: 'siteLookup',
+      desc: '',
+      args: [query],
+    );
+  }
+
+  /// `Services in the list`
+  String get siteLookupServices {
+    return Intl.message(
+      'Services in the list',
+      name: 'siteLookupServices',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Addresses the site uses`
+  String get siteLookupDomains {
+    return Intl.message(
+      'Addresses the site uses',
+      name: 'siteLookupDomains',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Related programs`
+  String get siteLookupPrograms {
+    return Intl.message(
+      'Related programs',
+      name: 'siteLookupPrograms',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Many sites use this, so it is left off`
+  String get siteLookupShared {
+    return Intl.message(
+      'Many sites use this, so it is left off',
+      name: 'siteLookupShared',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Nothing found. Try another name or the official site’s address`
+  String get siteLookupNone {
+    return Intl.message(
+      'Nothing found. Try another name or the official site’s address',
+      name: 'siteLookupNone',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `{count, plural, =1{1 address} other{{count} addresses}}`
+  String siteDomainCount(num count) {
+    return Intl.plural(
+      count,
+      one: '1 address',
+      other: '$count addresses',
+      name: 'siteDomainCount',
+      desc: '',
+      args: [count],
+    );
+  }
+
+  /// `Choose a node`
+  String get siteLookupNext {
+    return Intl.message(
+      'Choose a node',
+      name: 'siteLookupNext',
+      desc: '',
+      args: [],
     );
   }
 

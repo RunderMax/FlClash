@@ -1,9 +1,12 @@
 import 'dart:async';
+import 'dart:io';
 
+import 'package:dio/dio.dart';
 import 'package:fl_clash/common/app_exits.dart';
 import 'package:fl_clash/common/app_routes.dart';
 import 'package:fl_clash/common/common.dart';
 import 'package:fl_clash/common/programs.dart';
+import 'package:fl_clash/common/site_lookup.dart';
 import 'package:fl_clash/enum/enum.dart';
 import 'package:fl_clash/models/models.dart';
 import 'package:fl_clash/plugins/app.dart';
@@ -16,6 +19,7 @@ import 'package:fl_clash/views/dashboard/style.dart';
 import 'package:fl_clash/widgets/widgets.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:path/path.dart' show join;
 
 import 'card.dart';
 import 'fastest_nodes.dart';
@@ -215,7 +219,7 @@ class _AppRoutesCardState extends ConsumerState<AppRoutesCard> {
             for (final packageName in shown) ...[
               _RouteRow(
                 packageName: packageName,
-                label: labels[packageName] ?? packageName,
+                label: labels[packageName] ?? packageName.replaceFirst('@', ''),
                 target: config.slothAppRoutes[packageName],
                 picks: config.usesOwnPicks(packageName)
                     ? config.slothAppPicks[packageName] ?? const []
@@ -658,7 +662,8 @@ class _AppsPageState extends ConsumerState<_AppsPage> {
           : NullStatusSwitcher(
               isLoading: !_loaded,
               holdsArrival: false,
-              isEmpty: groups?.isEmpty ?? visible.isEmpty,
+              isEmpty:
+                  _query.trim().isEmpty && (groups?.isEmpty ?? visible.isEmpty),
               isSearching: query.isNotEmpty,
               loadingStatus: const Center(child: ActivityIndicator.page()),
               nullStatus: NullStatus(
@@ -682,6 +687,35 @@ class _AppsPageState extends ConsumerState<_AppsPage> {
                                 .copyWith(
                                   color: context.colorScheme.onSurfaceVariant,
                                 ),
+                          ),
+                        ),
+                      ),
+                    if (_query.trim() case final lookup when lookup.isNotEmpty)
+                      SliverPadding(
+                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+                        sliver: SliverToBoxAdapter(
+                          child: ItemPositionProvider(
+                            position: ItemPosition.startAndEnd,
+                            child: DecorationListItem(
+                              leading: const GlyphIcon(AppGlyphs.language),
+                              title: Text(
+                                appLocalizations.siteLookup(lookup),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              trailing: GlyphIcon(
+                                AppGlyphs.chevronForward,
+                                size: 18,
+                                color: context.colorScheme.onSurfaceVariant,
+                              ),
+                              onPressed: () => unawaited(
+                                showInSheet<void>(
+                                  context,
+                                  builder: (_) =>
+                                      _SiteLookupPage(query: lookup),
+                                ),
+                              ),
+                            ),
                           ),
                         ),
                       ),
@@ -973,26 +1007,27 @@ class _TargetsPageState extends ConsumerState<_TargetsPage> {
           trailing: Switch(value: auto, onChanged: setAuto),
           onPressed: () => setAuto(!auto),
         ),
-      DecorationListItem(
-        leading: const GlyphIcon(AppGlyphs.filter),
-        title: Text(
-          appLocalizations.pureOnly,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
+      if (!packageName.startsWith('@'))
+        DecorationListItem(
+          leading: const GlyphIcon(AppGlyphs.filter),
+          title: Text(
+            appLocalizations.pureOnly,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+          subtitle: Text(
+            guardAll
+                ? appLocalizations.pureOnlyEverywhere
+                : appLocalizations.appPureOnlyDesc,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+          trailing: Switch(
+            value: guarded || guardAll,
+            onChanged: guardAll ? null : setGuarded,
+          ),
+          onPressed: guardAll ? null : () => setGuarded(!guarded),
         ),
-        subtitle: Text(
-          guardAll
-              ? appLocalizations.pureOnlyEverywhere
-              : appLocalizations.appPureOnlyDesc,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-        ),
-        trailing: Switch(
-          value: guarded || guardAll,
-          onChanged: guardAll ? null : setGuarded,
-        ),
-        onPressed: guardAll ? null : () => setGuarded(!guarded),
-      ),
     ];
   }
 
@@ -1357,6 +1392,232 @@ class _ExitsPage extends ConsumerWidget {
                 itemBuilder: (_, index) => ItemPositionProvider(
                   position: ItemPosition.get(index, exits.length),
                   child: _ExitItem(exit: exits[index]),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// A service named or addressed by [query], made of a category from the
+/// bundled list, the sites its official page loads and matching programs.
+class _SiteLookupPage extends ConsumerStatefulWidget {
+  const _SiteLookupPage({required this.query});
+
+  final String query;
+
+  @override
+  ConsumerState<_SiteLookupPage> createState() => _SiteLookupPageState();
+}
+
+class _SiteLookupPageState extends ConsumerState<_SiteLookupPage> {
+  bool _loading = true;
+  List<String> _categories = const [];
+  Map<String, int> _sizes = const {};
+  String? _category;
+  List<String> _domains = const [];
+  final _chosenDomains = <String>{};
+  List<Package> _programs = const [];
+  final _chosenPrograms = <String>{};
+
+  @override
+  void initState() {
+    super.initState();
+    unawaited(_lookup());
+  }
+
+  Future<void> _lookup() async {
+    final host = hostOf(widget.query);
+    final file = join(await appPath.homeDirPath, GEOSITE);
+    final results = await Future.wait([
+      _categoriesOf(file),
+      if (host != null)
+        pageDomains(Dio(), host).catchError((_) => [registrableDomain(host)]),
+    ]);
+    if (!mounted) return;
+    final (categories, sizes) =
+        results.first as (List<String>, Map<String, int>);
+    final domains = results.length > 1
+        ? results[1] as List<String>
+        : <String>[];
+    final words = {
+      widget.query.trim().toLowerCase(),
+      ...categories.take(1),
+    }.where((word) => word.length >= 3);
+    final programs = [
+      for (final package in ref.read(packagesProvider))
+        if (words.any(
+          (word) =>
+              package.label.toLowerCase().contains(word) ||
+              package.packageName.toLowerCase().contains(word),
+        ))
+          package,
+    ];
+    setState(() {
+      _loading = false;
+      _categories = categories.take(5).toList();
+      _sizes = sizes;
+      _category = categories.firstOrNull;
+      _domains = domains;
+      _chosenDomains.addAll(domains.where((d) => !sharedDomains.contains(d)));
+      _programs = programs;
+      _chosenPrograms.addAll(programs.map((program) => program.packageName));
+    });
+  }
+
+  Future<(List<String>, Map<String, int>)> _categoriesOf(String file) async {
+    try {
+      final modified = await File(file).lastModified();
+      if (DateTime.now().difference(modified) > const Duration(days: 7)) {
+        unawaited(
+          ref
+              .read(geoResourceActionProvider.notifier)
+              .updateGeoResource(GeoResource.GEOSITE, announceSuccess: false)
+              .catchError((_) {}),
+        );
+      }
+      final book = await readGeosite(file);
+      final found = findCategories(book, widget.query);
+      return (found, {for (final code in found) code: book[code]!.length});
+    } on Object {
+      return (const <String>[], const <String, int>{});
+    }
+  }
+
+  String? get _name {
+    final source = _category ?? hostOf(widget.query);
+    if (source == null) return null;
+    final name = source[0].toUpperCase() + source.substring(1);
+    return RegExp(r'^[A-Za-z0-9_][A-Za-z0-9_ .\-]*$').hasMatch(name)
+        ? name
+        : null;
+  }
+
+  void _next() {
+    final name = _name;
+    if (name == null) return;
+    final key = '@$name';
+    final matchers = [
+      if (_category case final category?) 'GEOSITE,$category',
+      for (final domain in _chosenDomains) 'DOMAIN-SUFFIX,$domain',
+      for (final program in _chosenPrograms) 'PROCESS-NAME,$program',
+    ];
+    if (matchers.isEmpty) return;
+    ref
+        .read(patchClashConfigProvider.notifier)
+        .update((state) => state.withSite(key, matchers));
+    _showTargets(context, key, name);
+  }
+
+  Widget _check(bool on) =>
+      on ? const SelectionCheck() : const SizedBox.square(dimension: 24);
+
+  @override
+  Widget build(BuildContext context) {
+    final appLocalizations = context.appLocalizations;
+    final empty = _categories.isEmpty && _domains.isEmpty && _programs.isEmpty;
+    final ready = !empty && _name != null;
+    return Scaffold(
+      title: widget.query,
+      body: NullStatusSwitcher(
+        isLoading: _loading,
+        holdsArrival: false,
+        isEmpty: empty,
+        isSearching: false,
+        loadingStatus: const Center(child: ActivityIndicator.page()),
+        nullStatus: NullStatus(
+          label: appLocalizations.siteLookupNone,
+          illustration: NullStatusIllustration.apps,
+        ),
+        child: CustomScrollView(
+          slivers: [
+            SliverToBoxAdapter(
+              child: SizedBox(height: context.contentTopPadding),
+            ),
+            if (_categories.isNotEmpty) ...[
+              SliverToBoxAdapter(
+                child: ListHeader(title: appLocalizations.siteLookupServices),
+              ),
+              _SwitchList(
+                items: [
+                  for (final code in _categories)
+                    DecorationListItem(
+                      title: Text(code),
+                      subtitle: Text(
+                        appLocalizations.siteDomainCount(_sizes[code] ?? 0),
+                      ),
+                      trailing: _check(code == _category),
+                      onPressed: () => setState(
+                        () => _category = code == _category ? null : code,
+                      ),
+                    ),
+                ],
+              ),
+            ],
+            if (_domains.isNotEmpty) ...[
+              SliverToBoxAdapter(
+                child: ListHeader(title: appLocalizations.siteLookupDomains),
+              ),
+              _SwitchList(
+                items: [
+                  for (final domain in _domains)
+                    DecorationListItem(
+                      title: Text(domain),
+                      subtitle: sharedDomains.contains(domain)
+                          ? Text(appLocalizations.siteLookupShared)
+                          : null,
+                      trailing: _check(_chosenDomains.contains(domain)),
+                      onPressed: () => setState(
+                        () => _chosenDomains.contains(domain)
+                            ? _chosenDomains.remove(domain)
+                            : _chosenDomains.add(domain),
+                      ),
+                    ),
+                ],
+              ),
+            ],
+            if (_programs.isNotEmpty) ...[
+              SliverToBoxAdapter(
+                child: ListHeader(title: appLocalizations.siteLookupPrograms),
+              ),
+              _SwitchList(
+                items: [
+                  for (final program in _programs)
+                    DecorationListItem(
+                      leading: PackageIcon(
+                        packageName: program.packageName,
+                        size: _listIcon,
+                      ),
+                      title: Text(program.label),
+                      subtitle: Text(program.packageName),
+                      trailing: _check(
+                        _chosenPrograms.contains(program.packageName),
+                      ),
+                      onPressed: () => setState(
+                        () => _chosenPrograms.contains(program.packageName)
+                            ? _chosenPrograms.remove(program.packageName)
+                            : _chosenPrograms.add(program.packageName),
+                      ),
+                    ),
+                ],
+              ),
+            ],
+            SliverPadding(
+              padding: EdgeInsets.fromLTRB(
+                16,
+                20,
+                16,
+                16 + context.bottomInset,
+              ),
+              sliver: SliverToBoxAdapter(
+                child: TonalButton(
+                  size: TonalButtonSize.bar,
+                  glyph: AppGlyphs.chevronForward,
+                  label: appLocalizations.siteLookupNext,
+                  onPressed: ready ? _next : null,
                 ),
               ),
             ),
