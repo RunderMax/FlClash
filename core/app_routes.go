@@ -18,6 +18,37 @@ const appRoutesKey = "x-sloth-app-routes"
 // a PROCESS-NAME rule matches; a comma would end the rule's payload early.
 var appPackagePattern = regexp.MustCompile(`^[A-Za-z0-9_][A-Za-z0-9_ .\-]*[A-Za-z0-9_]$`)
 
+// A site is a service routed by name rather than by one executable: "@" and
+// the name, with the categories, domains and programs that make it up.
+var siteKeyPattern = regexp.MustCompile(`^@[A-Za-z0-9_][A-Za-z0-9_ .\-]*$`)
+
+var (
+	geositePattern = regexp.MustCompile(`^[a-z0-9!@_\-]+$`)
+	domainPattern  = regexp.MustCompile(`^[a-z0-9]([a-z0-9\-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9\-]*[a-z0-9])?)+$`)
+)
+
+func routeKey(key string) bool {
+	return appPackagePattern.MatchString(key) || siteKeyPattern.MatchString(key)
+}
+
+func siteRule(matcher string) (string, bool) {
+	kind, payload, ok := strings.Cut(matcher, ",")
+	if !ok {
+		return "", false
+	}
+	switch kind {
+	case "GEOSITE":
+		ok = geositePattern.MatchString(payload)
+	case "DOMAIN-SUFFIX":
+		ok = domainPattern.MatchString(payload)
+	case "PROCESS-NAME":
+		ok = appPackagePattern.MatchString(payload)
+	default:
+		ok = false
+	}
+	return matcher, ok
+}
+
 var builtInTargets = map[string]bool{
 	"DIRECT":      true,
 	"REJECT":      true,
@@ -44,17 +75,31 @@ func applyAppRoutes(root *yaml.Node) {
 		known[name] = true
 	}
 	addAppPickGroups(root, resolveAlias(mappingValue(request, "picks")), routes, nodes, known)
+	var sites map[string][]string
+	if node := resolveAlias(mappingValue(request, "sites")); node != nil && node.Decode(&sites) != nil {
+		sites = nil
+	}
 	var added []*yaml.Node
+	rule := func(value string) {
+		added = append(added, &yaml.Node{Kind: yaml.ScalarNode, Tag: "!!str", Value: value})
+	}
 	for i := 0; i+1 < len(routes.Content); i += 2 {
 		app, target := scalarOf(routes.Content[i]), scalarOf(routes.Content[i+1])
-		if !appPackagePattern.MatchString(app) || !routable(target, known) {
+		if !routable(target, known) {
 			continue
 		}
-		added = append(added, &yaml.Node{
-			Kind:  yaml.ScalarNode,
-			Tag:   "!!str",
-			Value: "PROCESS-NAME," + app + "," + target,
-		})
+		if appPackagePattern.MatchString(app) {
+			rule("PROCESS-NAME," + app + "," + target)
+			continue
+		}
+		if !siteKeyPattern.MatchString(app) {
+			continue
+		}
+		for _, matcher := range sites[app] {
+			if value, ok := siteRule(matcher); ok {
+				rule(value + "," + target)
+			}
+		}
 	}
 	if len(added) == 0 {
 		return
@@ -103,7 +148,7 @@ func addAppPickGroups(root, picks, routes *yaml.Node, nodes, known map[string]bo
 		app := scalarOf(picks.Content[i])
 		name := appPickGroupPrefix + app
 		var spec appPickSpec
-		if !appPackagePattern.MatchString(app) || targets[app] != name || known[name] ||
+		if !routeKey(app) || targets[app] != name || known[name] ||
 			resolveAlias(picks.Content[i+1]).Decode(&spec) != nil {
 			continue
 		}

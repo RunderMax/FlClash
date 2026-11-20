@@ -67,6 +67,37 @@ func TestLoadConfigWithBaseRoutesAppsAfterTheLeadingRules(t *testing.T) {
 	}
 }
 
+func TestLoadConfigWithBaseRoutesASiteByItsDomainsAndPrograms(t *testing.T) {
+	path := writeBaseProfile(t, baseProfile)
+	base, err := handleGetProfileBase(PathParams{Path: path})
+	if err != nil {
+		t.Fatalf("handleGetProfileBase = %v", err)
+	}
+	overlay := overlayOf(t, base, nil, map[string]any{
+		appRoutesKey: map[string]any{
+			"routes": map[string]any{"@Chat": "b", "@Unlisted": "a"},
+			"sites": map[string]any{
+				"@Chat": []string{
+					"DOMAIN-SUFFIX,chat.example",
+					"PROCESS-NAME,Chat.exe",
+					"DOMAIN-SUFFIX,bad domain",
+					"IP-CIDR,1.2.3.4/32",
+				},
+			},
+		},
+	})
+
+	cfg, err := loadConfigWithBase(&SetupBase{Path: path, Overlay: overlay}, filepath.Join(t.TempDir(), "config.yaml"))
+
+	if err != nil {
+		t.Fatalf("loadConfigWithBase = %v", err)
+	}
+	want := []string{"DomainSuffix,chat.example,b", "ProcessName,Chat.exe,b"}
+	if got := ruleLines(cfg); !reflect.DeepEqual(got[:len(want)], want) {
+		t.Errorf("rules = %v, want %v first", got, want)
+	}
+}
+
 func TestAppPackagePatternTakesWindowsExecutables(t *testing.T) {
 	for _, name := range []string{"com.example.chat", "chrome.exe", "ms-teams.exe", "Code - Insiders.exe", "1Password.exe", "Google Chrome Helper"} {
 		if !appPackagePattern.MatchString(name) {
