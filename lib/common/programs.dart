@@ -5,7 +5,7 @@ import 'package:fl_clash/models/models.dart';
 import 'package:flutter/foundation.dart';
 import 'package:path/path.dart' as path;
 
-final _appName = RegExp(r'^[A-Za-z0-9_][A-Za-z0-9_ \-]*(\.[A-Za-z0-9_\-]+)+$');
+final _appName = RegExp(r'^[A-Za-z0-9_][A-Za-z0-9_ .\-]*[A-Za-z0-9_]$');
 final _noise = RegExp('unins|uninstall|setup|crash', caseSensitive: false);
 
 /// One program as Windows lists it: a Start menu entry's folder, or a running
@@ -44,7 +44,7 @@ function Icon($file) {
 }
 function Exe($file, $running) {
   $info = (Get-Item -LiteralPath $file -ErrorAction SilentlyContinue).VersionInfo
-  return [pscustomobject]@{ path = $file; description = "$($info.FileDescription)".Trim(); running = $running; icon = $(if ($running) { Icon $file } else { $null }) }
+  return [pscustomobject]@{ path = $file; description = "$($info.FileDescription)".Trim(); running = $running; icon = (Icon $file) }
 }
 $running = @{}
 Get-Process | Where-Object { $_.SessionId -ne 0 -and $_.Path } | ForEach-Object { $running[$_.Path.ToLower()] = $_.Path }
@@ -54,6 +54,7 @@ $menus = @("$env:ProgramData\Microsoft\Windows\Start Menu\Programs", "$env:APPDA
 foreach ($lnk in Get-ChildItem -Path $menus -Recurse -Filter *.lnk -ErrorAction SilentlyContinue) {
   try { $target = $shell.CreateShortcut($lnk.FullName).TargetPath } catch { continue }
   if (-not $target -or -not $target.ToLower().EndsWith('.exe') -or $target.StartsWith($sys, 'OrdinalIgnoreCase')) { continue }
+  if ($lnk.BaseName -match '卸载|删除|uninstall|remove' -or [IO.Path]::GetFileName($target) -match 'unins|uninstall|setup|update') { continue }
   if (-not (Test-Path -LiteralPath $target)) { continue }
   $dir = Split-Path -Parent $target
   if (-not $apps.Contains($dir.ToLower())) { $apps[$dir.ToLower()] = @{ name = $lnk.BaseName; main = $target; dir = $dir } }
@@ -77,26 +78,90 @@ foreach ($file in $running.Values) {
 ConvertTo-Json -InputObject $out -Depth 4 -Compress
 ''';
 
+const _macScript = r"""
+ObjC.import('Foundation');
+var sh = Application.currentApplication();
+sh.includeStandardAdditions = true;
+var fm = $.NSFileManager.defaultManager;
+var iconDir = ObjC.unwrap($.NSProcessInfo.processInfo.environment.objectForKey('SLOTH_ICONS'));
+fm.createDirectoryAtPathWithIntermediateDirectoriesAttributesError($(iconDir), true, $(), $());
+function q(s) { return "'" + s.replace(/'/g, "'\\''") + "'"; }
+function lines(cmd) { try { return sh.doShellScript(cmd).split(/[\r\n]+/).filter(String); } catch (e) { return []; } }
+function plist(bundle) { var d = $.NSDictionary.dictionaryWithContentsOfFile($(bundle + '/Contents/Info.plist')); return d.isNil() ? null : d; }
+function key(d, k) { var v = d.objectForKey(k); return v.isNil() ? null : ObjC.unwrap(v); }
+function hash(s) { var h = 5381; for (var i = 0; i < s.length; i++) h = ((h * 33) ^ s.charCodeAt(i)) >>> 0; return h.toString(16); }
+function icon(bundle, d) {
+  var name = key(d, 'CFBundleIconFile');
+  if (!name) return null;
+  if (!/\.icns$/.test(name)) name += '.icns';
+  var src = bundle + '/Contents/Resources/' + name;
+  if (!fm.fileExistsAtPath($(src))) return null;
+  var png = iconDir + '/' + hash(bundle) + '.png';
+  if (!fm.fileExistsAtPath($(png))) {
+    try { sh.doShellScript('sips -s format png -Z 64 ' + q(src) + ' --out ' + q(png)); } catch (e) { return null; }
+  }
+  return png;
+}
+function exe(bundle, d) { var e = key(d, 'CFBundleExecutable'); return e ? bundle + '/Contents/MacOS/' + e : null; }
+function label(bundle, d) { return key(d, 'CFBundleDisplayName') || key(d, 'CFBundleName') || bundle.split('/').pop().replace(/\.app$/, ''); }
+var running = {};
+lines('ps -axo comm=').forEach(function (p) { running[p] = true; });
+var bundles = [];
+['/Applications', ObjC.unwrap($.NSHomeDirectory()) + '/Applications'].forEach(function (dir) {
+  lines('find ' + q(dir) + ' -maxdepth 2 -name "*.app" -prune').forEach(function (b) { bundles.push(b); });
+});
+var claimed = {};
+var out = [];
+function group(bundle) {
+  var d = plist(bundle);
+  if (!d) return;
+  var exes = [];
+  var main = exe(bundle, d);
+  if (main) exes.push({ path: main, description: label(bundle, d), running: !!running[main], icon: null });
+  lines('find ' + q(bundle + '/Contents') + ' -maxdepth 6 -name "*.app" -prune').forEach(function (h) {
+    var hd = plist(h);
+    var he = hd && exe(h, hd);
+    if (he) exes.push({ path: he, description: label(h, hd), running: !!running[he], icon: null });
+  });
+  exes.forEach(function (e) { claimed[e.path] = true; });
+  if (exes.length) out.push({ name: label(bundle, d), icon: icon(bundle, d), exes: exes });
+}
+bundles.forEach(group);
+Object.keys(running).forEach(function (p) {
+  var m = p.match(/^(.*?\.app)\/Contents\/MacOS\//);
+  if (!m || claimed[p] || /^\/System\//.test(p)) return;
+  group(m[1]);
+});
+JSON.stringify(out);
+""";
+
 /// Windows keeps no list of programs by the executable name a PROCESS-NAME
-/// rule matches, so the Start menu's entries and what runs stand for one.
+/// rule matches, so the Start menu's entries and what runs stand for one; a
+/// Mac lists its apps' bundles and the helper apps inside them.
 Future<List<ProgramGroup>> listPrograms(String iconDir) async {
+  final mac = Platform.isMacOS;
   final result = await Process.run(
-    'powershell',
-    ['-NoProfile', '-NonInteractive', '-Command', _script],
+    mac ? 'osascript' : 'powershell',
+    mac
+        ? ['-l', 'JavaScript', '-e', _macScript]
+        : ['-NoProfile', '-NonInteractive', '-Command', _script],
     environment: {'SLOTH_ICONS': iconDir},
     stdoutEncoding: utf8,
   );
   if (result.exitCode != 0) {
     throw ProcessException(
-      'powershell',
+      mac ? 'osascript' : 'powershell',
       const ['programs'],
       '${result.stderr}',
       result.exitCode,
     );
   }
+  final executable = Platform.resolvedExecutable;
   return parsePrograms(
     result.stdout as String,
-    own: path.windows.dirname(Platform.resolvedExecutable),
+    own: mac
+        ? path.posix.dirname(path.posix.dirname(path.posix.dirname(executable)))
+        : path.windows.dirname(executable),
   );
 }
 

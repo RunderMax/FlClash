@@ -68,12 +68,12 @@ func TestLoadConfigWithBaseRoutesAppsAfterTheLeadingRules(t *testing.T) {
 }
 
 func TestAppPackagePatternTakesWindowsExecutables(t *testing.T) {
-	for _, name := range []string{"com.example.chat", "chrome.exe", "ms-teams.exe", "Code - Insiders.exe", "1Password.exe"} {
+	for _, name := range []string{"com.example.chat", "chrome.exe", "ms-teams.exe", "Code - Insiders.exe", "1Password.exe", "Google Chrome Helper"} {
 		if !appPackagePattern.MatchString(name) {
 			t.Errorf("%q should name an app", name)
 		}
 	}
-	for _, name := range []string{"not,a.package", "chrome", " lead.exe", "line\nbreak.exe", "trail.exe "} {
+	for _, name := range []string{"not,a.package", " lead.exe", "line\nbreak.exe", "trail.exe ", "x"} {
 		if appPackagePattern.MatchString(name) {
 			t.Errorf("%q should not name an app", name)
 		}

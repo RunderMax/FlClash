@@ -11,6 +11,10 @@ import 'package:flutter/widgets.dart';
 
 // Stays FlClash: subscription servers pick the config format from this user agent name.
 const appName = 'FlClash';
+
+/// The name people see; [appName] still names files, the WebDAV folder and
+/// release assets, which existing installs look for.
+const displayName = 'Sloth Clash';
 const appDisplayName = 'Sloth Clash';
 const appHelperService = 'FlClashHelperService';
 const coreManifestName = 'manifest.json';

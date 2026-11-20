@@ -635,7 +635,9 @@ class _AppsPageState extends ConsumerState<_AppsPage> {
     final reachable = _reachable(ref.watch(groupsProvider));
     final query = SearchQuery(_query);
     final visible = _visible(packages, query);
-    final groups = system.isWindows ? _visibleGroups(query) : null;
+    final groups = app == null && system.listsApps
+        ? _visibleGroups(query)
+        : null;
     return Scaffold(
       title: appLocalizations.appRoutesChoose,
       searchState: AppBarSearchState(

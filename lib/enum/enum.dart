@@ -457,7 +457,13 @@ enum DashboardWidget {
   privacyCheck,
   privacyHardening,
   fastestNodes,
-  appRoutes(platforms: [SupportPlatform.Android, SupportPlatform.Windows]),
+  appRoutes(
+    platforms: [
+      SupportPlatform.Android,
+      SupportPlatform.Windows,
+      SupportPlatform.MacOS,
+    ],
+  ),
   profiles,
   proxyGroups,
   connectionStats,

@@ -13,8 +13,8 @@ class SystemAction extends _$SystemAction {
     final plugin = app;
     final packages = plugin != null
         ? await plugin.getPackages()
-        : system.isWindows
-        ? _keepRouted(await _windowsPrograms())
+        : system.listsApps
+        ? _keepRouted(await _desktopPrograms())
         : const <Package>[];
     if (!listEquals(packages, ref.read(packagesProvider))) {
       ref.read(packagesProvider.notifier).value = packages;
@@ -22,7 +22,7 @@ class SystemAction extends _$SystemAction {
     return ref.read(packagesProvider);
   }
 
-  Future<List<Package>> _windowsPrograms() async {
+  Future<List<Package>> _desktopPrograms() async {
     final groups = await listPrograms(
       join(await appPath.homeDirPath, 'program-icons'),
     );

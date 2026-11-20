@@ -39,7 +39,7 @@ class System {
   bool get isAndroid => Platform.isAndroid;
 
   /// Where the app lists apps by the name a PROCESS-NAME rule matches.
-  bool get listsApps => isAndroid || isWindows;
+  bool get listsApps => isAndroid || isWindows || isMacOS;
 
   bool get isLinux => Platform.isLinux;
 
