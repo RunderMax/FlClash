@@ -37,6 +37,15 @@ extension AppRoutesExt on PatchClashConfig {
         app: {'proxies': picks, 'auto': slothAppAuto.contains(app)},
   };
 
+  Map<String, List<String>> get siteRequest => {
+    for (final MapEntry(key: site, value: matchers) in slothSites.entries)
+      if (slothAppRoutes.containsKey(site)) site: matchers,
+  };
+
+  /// Routes [site] by [matchers], replacing what it was made of before.
+  PatchClashConfig withSite(String site, List<String> matchers) =>
+      copyWith(slothSites: {...slothSites, site: matchers});
+
   /// Off never looks up which app a connection is from, as the rules need.
   /// [listsApps] is false where the app cannot name apps as the Core does.
   PatchClashConfig appRoutesFor({required bool listsApps}) {
@@ -55,9 +64,12 @@ extension AppRoutesExt on PatchClashConfig {
     final routes = {...slothAppRoutes};
     if (target == null) {
       routes.remove(packageName);
-    } else {
-      routes[packageName] = target;
+      return copyWith(
+        slothAppRoutes: routes,
+        slothSites: {...slothSites}..remove(packageName),
+      );
     }
+    routes[packageName] = target;
     return copyWith(slothAppRoutes: routes);
   }
 

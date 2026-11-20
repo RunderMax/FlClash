@@ -2210,6 +2210,9 @@ abstract class PatchClashConfig with _$PatchClashConfig {
     @Default([])
     @JsonKey(name: 'sloth-app-pure-only')
     List<String> slothAppPureOnly,
+    @Default({})
+    @JsonKey(name: 'sloth-sites')
+    Map<String, List<String>> slothSites,
   }) = _PatchClashConfig;
 
   factory PatchClashConfig.fromJson(Map<String, Object?> json) =>

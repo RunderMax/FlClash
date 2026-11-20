@@ -398,6 +398,7 @@ Future<RealProfile> _makeRealProfileTask(MakeRealProfileState data) async {
       'at': leadingRules.length,
       'routes': realPatchConfig.slothAppRoutes,
       'picks': realPatchConfig.appPicksRequest,
+      'sites': realPatchConfig.siteRequest,
     };
   }
   if (realPatchConfig.slothPureOnly ||
