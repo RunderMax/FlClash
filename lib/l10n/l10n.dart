@@ -9571,6 +9571,76 @@ class AppLocalizations {
     );
   }
 
+  /// `Desk entrance`
+  String get slothiveEntrance {
+    return Intl.message(
+      'Desk entrance',
+      name: 'slothiveEntrance',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Other AI`
+  String get slothiveOtherAi {
+    return Intl.message(
+      'Other AI',
+      name: 'slothiveOtherAi',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Search`
+  String get slothiveSearch {
+    return Intl.message('Search', name: 'slothiveSearch', desc: '', args: []);
+  }
+
+  /// `Web pages`
+  String get slothiveWeb {
+    return Intl.message('Web pages', name: 'slothiveWeb', desc: '', args: []);
+  }
+
+  /// `Sending mail`
+  String get slothiveMailSend {
+    return Intl.message(
+      'Sending mail',
+      name: 'slothiveMailSend',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Receiving mail`
+  String get slothiveMailFetch {
+    return Intl.message(
+      'Receiving mail',
+      name: 'slothiveMailFetch',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Market data`
+  String get slothiveMarket {
+    return Intl.message(
+      'Market data',
+      name: 'slothiveMarket',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Each service of the desk`
+  String get slothiveDesc {
+    return Intl.message(
+      'Each service of the desk',
+      name: 'slothiveDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Many sites use this, so it is left off`
   String get siteLookupShared {
     return Intl.message(

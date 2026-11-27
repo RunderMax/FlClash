@@ -2311,6 +2311,22 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "slide": MessageLookupByLibrary.simpleMessage("Glissement"),
     "sliders": MessageLookupByLibrary.simpleMessage("Curseurs"),
+    "slothiveDesc": MessageLookupByLibrary.simpleMessage(
+      "Chaque service du bureau",
+    ),
+    "slothiveEntrance": MessageLookupByLibrary.simpleMessage(
+      "Entrée du bureau",
+    ),
+    "slothiveMailFetch": MessageLookupByLibrary.simpleMessage(
+      "Réception de courriel",
+    ),
+    "slothiveMailSend": MessageLookupByLibrary.simpleMessage(
+      "Envoi de courriel",
+    ),
+    "slothiveMarket": MessageLookupByLibrary.simpleMessage("Cours du marché"),
+    "slothiveOtherAi": MessageLookupByLibrary.simpleMessage("Autres IA"),
+    "slothiveSearch": MessageLookupByLibrary.simpleMessage("Recherche"),
+    "slothiveWeb": MessageLookupByLibrary.simpleMessage("Pages web"),
     "sniffProtocols": MessageLookupByLibrary.simpleMessage("Protocoles"),
     "sniffer": MessageLookupByLibrary.simpleMessage("Sniffer"),
     "socksPort": MessageLookupByLibrary.simpleMessage("Port SOCKS"),

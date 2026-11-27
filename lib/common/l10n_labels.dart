@@ -3,6 +3,7 @@ import 'package:flutter/widgets.dart';
 import 'package:prism_ui/color.dart';
 
 import 'app_localizations.dart';
+import 'slothive.dart';
 
 extension PageLabelL10n on PageLabel {
   String get label {
@@ -163,6 +164,27 @@ extension RecordGroupingL10n on RecordGrouping {
       RecordGrouping.host => appLocalizations.host,
       RecordGrouping.rule => appLocalizations.rule,
       RecordGrouping.exit => appLocalizations.outboundExit,
+    };
+  }
+}
+
+extension SlothiveServiceL10n on SlothiveService {
+  String get label => '$slothiveName · $name';
+
+  String get name {
+    final appLocalizations = currentAppLocalizations;
+    return switch (this) {
+      SlothiveService.entrance => appLocalizations.slothiveEntrance,
+      SlothiveService.chatGpt => 'ChatGPT',
+      SlothiveService.deepSeek => 'DeepSeek',
+      SlothiveService.openRouter => 'OpenRouter',
+      SlothiveService.otherAi => appLocalizations.slothiveOtherAi,
+      SlothiveService.search => appLocalizations.slothiveSearch,
+      SlothiveService.web => appLocalizations.slothiveWeb,
+      SlothiveService.mailSend => appLocalizations.slothiveMailSend,
+      SlothiveService.mailFetch => appLocalizations.slothiveMailFetch,
+      SlothiveService.whatsApp => 'WhatsApp',
+      SlothiveService.market => appLocalizations.slothiveMarket,
     };
   }
 }

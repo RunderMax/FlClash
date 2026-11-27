@@ -1,3 +1,4 @@
+import 'package:fl_clash/common/slothive.dart';
 import 'package:fl_clash/enum/enum.dart';
 import 'package:fl_clash/models/models.dart';
 
@@ -40,6 +41,9 @@ extension AppRoutesExt on PatchClashConfig {
   Map<String, List<String>> get siteRequest => {
     for (final MapEntry(key: site, value: matchers) in slothSites.entries)
       if (slothAppRoutes.containsKey(site)) site: matchers,
+    for (final service in SlothiveService.values)
+      if (slothAppRoutes.containsKey(service.key))
+        service.key: [service.matcher],
   };
 
   /// Routes [site] by [matchers], replacing what it was made of before.

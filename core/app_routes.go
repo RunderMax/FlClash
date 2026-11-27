@@ -19,12 +19,15 @@ const appRoutesKey = "x-sloth-app-routes"
 var appPackagePattern = regexp.MustCompile(`^[^\s,@][^,\x00-\x1f]*[^\s,]$`)
 
 // A site is a service routed by name rather than by one executable: "@" and
-// the name, with the categories, domains and programs that make it up.
+// the name, with the categories, domains, programs and proxy users that make
+// it up.
 var siteKeyPattern = regexp.MustCompile(`^@[A-Za-z0-9_][A-Za-z0-9_ .\-]*$`)
 
 var (
 	geositePattern = regexp.MustCompile(`^[a-z0-9!@_\-]+$`)
 	domainPattern  = regexp.MustCompile(`^[a-z0-9]([a-z0-9\-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9\-]*[a-z0-9])?)+$`)
+	// IN-USER reads a "/" in its payload as a list of users.
+	inUserPattern = regexp.MustCompile(`^[A-Za-z0-9][A-Za-z0-9_.\-]*$`)
 )
 
 func routeKey(key string) bool {
@@ -43,6 +46,8 @@ func siteRule(matcher string) (string, bool) {
 		ok = domainPattern.MatchString(payload)
 	case "PROCESS-NAME":
 		ok = appPackagePattern.MatchString(payload)
+	case "IN-USER":
+		ok = inUserPattern.MatchString(payload)
 	default:
 		ok = false
 	}

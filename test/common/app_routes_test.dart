@@ -175,6 +175,20 @@ void main() {
       expect((config['rules'] as YamlList).length, 3);
     });
 
+    test('asks for a SLOTHIVE service by its proxy user', () async {
+      final config = await _configOf(
+        const PatchClashConfig().withAppRoute(
+          SlothiveService.chatGpt.key,
+          'US',
+        ),
+      );
+
+      final request = config[slothAppRoutesKey] as YamlMap;
+      expect(request['sites'], {
+        SlothiveService.chatGpt.key: ['IN-USER,slothive-chatgpt'],
+      });
+    });
+
     test('asks for nothing with no app routed', () async {
       final config = await _configOf(const PatchClashConfig());
 

@@ -176,6 +176,7 @@ class _AppRoutesCardState extends ConsumerState<AppRoutesCard> {
     final labels = {
       for (final package in ref.watch(packagesProvider))
         package.packageName: package.label,
+      for (final service in SlothiveService.values) service.key: service.label,
     };
     final reachable = _reachable(ref.watch(groupsProvider));
     final exits = ref.watch(appExitsProvider).value ?? const {};
@@ -642,6 +643,12 @@ class _AppsPageState extends ConsumerState<_AppsPage> {
     final groups = app == null && system.listsApps
         ? _visibleGroups(query)
         : null;
+    final slothive =
+        groups != null &&
+        query.matches([
+          slothiveName,
+          for (final service in SlothiveService.values) service.label,
+        ]);
     return Scaffold(
       title: appLocalizations.appRoutesChoose,
       searchState: AppBarSearchState(
@@ -719,6 +726,16 @@ class _AppsPageState extends ConsumerState<_AppsPage> {
                           ),
                         ),
                       ),
+                    if (slothive)
+                      SliverPadding(
+                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+                        sliver: SliverToBoxAdapter(
+                          child: ItemPositionProvider(
+                            position: ItemPosition.startAndEnd,
+                            child: _SlothiveItem(routes: routes),
+                          ),
+                        ),
+                      ),
                     SliverPadding(
                       padding: EdgeInsets.fromLTRB(
                         16,
@@ -772,6 +789,55 @@ class _AppsPageState extends ConsumerState<_AppsPage> {
                 ),
               ),
             ),
+    );
+  }
+}
+
+class _SlothiveItem extends StatelessWidget {
+  const _SlothiveItem({required this.routes});
+
+  final Map<String, String> routes;
+
+  @override
+  Widget build(BuildContext context) {
+    final routed = [
+      for (final service in SlothiveService.values)
+        if (routes[service.key] case final target?)
+          '${service.name} · ${_targetLabel(context, target)}',
+    ];
+    return DecorationListItem(
+      leading: const PackageIcon(
+        packageName: '@$slothiveName',
+        size: _listIcon,
+      ),
+      title: const Text(slothiveName),
+      subtitle: Text(
+        routed.isEmpty
+            ? context.appLocalizations.slothiveDesc
+            : routed.join(' / '),
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+      ),
+      trailing: GlyphIcon(
+        AppGlyphs.chevronForward,
+        size: 18,
+        color: context.colorScheme.onSurfaceVariant,
+      ),
+      onPressed: () => unawaited(
+        showInSheet<void>(
+          context,
+          builder: (_) => _ProgramsPage(
+            group: ProgramGroup(
+              name: slothiveName,
+              icon: null,
+              programs: [
+                for (final service in SlothiveService.values)
+                  slothivePackage(service, service.name),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
@@ -885,7 +951,9 @@ class _ProgramsPageState extends ConsumerState<_ProgramsPage> {
                   child: _AppItem(
                     package: program,
                     target: target,
-                    detail: program.packageName,
+                    detail: program.packageName.startsWith('@')
+                        ? null
+                        : program.packageName,
                     missing:
                         target != null &&
                         _missing(

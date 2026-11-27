@@ -67,7 +67,7 @@ func TestLoadConfigWithBaseRoutesAppsAfterTheLeadingRules(t *testing.T) {
 	}
 }
 
-func TestLoadConfigWithBaseRoutesASiteByItsDomainsAndPrograms(t *testing.T) {
+func TestLoadConfigWithBaseRoutesASiteByItsDomainsProgramsAndUsers(t *testing.T) {
 	path := writeBaseProfile(t, baseProfile)
 	base, err := handleGetProfileBase(PathParams{Path: path})
 	if err != nil {
@@ -80,7 +80,9 @@ func TestLoadConfigWithBaseRoutesASiteByItsDomainsAndPrograms(t *testing.T) {
 				"@Chat": []string{
 					"DOMAIN-SUFFIX,chat.example",
 					"PROCESS-NAME,Chat.exe",
+					"IN-USER,slothive-chat",
 					"DOMAIN-SUFFIX,bad domain",
+					"IN-USER,a/b",
 					"IP-CIDR,1.2.3.4/32",
 				},
 			},
@@ -92,7 +94,7 @@ func TestLoadConfigWithBaseRoutesASiteByItsDomainsAndPrograms(t *testing.T) {
 	if err != nil {
 		t.Fatalf("loadConfigWithBase = %v", err)
 	}
-	want := []string{"DomainSuffix,chat.example,b", "ProcessName,Chat.exe,b"}
+	want := []string{"DomainSuffix,chat.example,b", "ProcessName,Chat.exe,b", "InUser,slothive-chat,b"}
 	if got := ruleLines(cfg); !reflect.DeepEqual(got[:len(want)], want) {
 		t.Errorf("rules = %v, want %v first", got, want)
 	}
