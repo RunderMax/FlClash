@@ -2367,6 +2367,12 @@ extension PatchClashConfigExt on PatchClashConfig {
   T? _picked<T>(GeneralOverrideKey key, T value) =>
       generalOverrideKeys.contains(key) ? value : null;
 
+  /// mihomo turns IPv6 on for a profile that does not name it, which routes
+  /// it into the TUN and lets a direct dial leave from the device's own
+  /// IPv6 address; left unpicked it stays off instead.
+  bool get coreIpv6 =>
+      generalOverrideKeys.contains(GeneralOverrideKey.ipv6) && ipv6;
+
   Map<String, Object?> get generalOverrideJson => _overrideJson(
     toJson(),
     GeneralOverrideKey.values,
@@ -2384,7 +2390,7 @@ extension PatchClashConfigExt on PatchClashConfig {
       findProcessMode: findProcessMode,
       mode: mode,
       logLevel: logLevel,
-      ipv6: _picked(GeneralOverrideKey.ipv6, ipv6),
+      ipv6: coreIpv6,
       tcpConcurrent: _picked(GeneralOverrideKey.tcpConcurrent, tcpConcurrent),
       externalController: externalController,
       secret: secret,

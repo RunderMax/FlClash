@@ -34,8 +34,23 @@ void main() {
     final config = await _configOf(const PatchClashConfig());
 
     for (final MapEntry(:key, :value) in _profile.entries) {
-      expect(config[key], value, reason: key);
+      if (key != 'ipv6') expect(config[key], value, reason: key);
     }
+  });
+
+  test('keeps IPv6 off until it is picked and turned on', () async {
+    expect((await _configOf(const PatchClashConfig()))['ipv6'], false);
+    expect(
+      (await _configOf(const PatchClashConfig(ipv6: true)))['ipv6'],
+      false,
+    );
+    final picked = await _configOf(
+      const PatchClashConfig(
+        ipv6: true,
+        generalOverrideKeys: {GeneralOverrideKey.ipv6},
+      ),
+    );
+    expect(picked['ipv6'], true);
   });
 
   test('replaces only the picked keys', () async {
@@ -53,7 +68,7 @@ void main() {
     expect(config['tcp-concurrent'], true);
     expect(config['geodata-loader'], 'memconservative');
     expect(config['unified-delay'], false);
-    expect(config['ipv6'], true);
+    expect(config['ipv6'], false);
   });
 
   test('keeps the test URL out of the profile', () async {

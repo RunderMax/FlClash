@@ -190,6 +190,7 @@ Future<RealProfile> _makeRealProfileTask(MakeRealProfileState data) async {
   }
   rawConfig['external-ui-url'] = '';
   rawConfig.addAll(realPatchConfig.generalOverrideJson);
+  rawConfig['ipv6'] = realPatchConfig.coreIpv6;
   rawConfig['log-level'] = realPatchConfig.logLevel.name;
   rawConfig['port'] = 0;
   rawConfig['socks-port'] = 0;
