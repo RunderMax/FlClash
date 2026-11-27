@@ -21,9 +21,9 @@ const (
 var steerEvery = time.Minute
 
 type steerer struct {
-	mu     sync.Mutex
-	groups []string
-	pinned map[string]string
+	mu      sync.Mutex
+	groups  []string
+	pinned  map[string]string
 	applied map[string]bool
 	gen     uint64
 	started bool
