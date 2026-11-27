@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:collection/collection.dart';
+import 'package:fl_clash/common/app_routes.dart';
 import 'package:fl_clash/common/common.dart';
 import 'package:fl_clash/enum/enum.dart';
 import 'package:fl_clash/features/ip_quality/labels.dart';
@@ -41,6 +44,7 @@ List<String> nodeNamesOf(List<Group> groups) {
 
 bool _offersPicks(Group group) =>
     group.type == GroupType.Selector &&
+    !group.name.startsWith(appPicksGroupPrefix) &&
     group.all.any((proxy) => proxy.name == slothPicksGroup);
 
 /// mihomo's own GLOBAL lists every group, the picks among them, yet traffic
@@ -53,14 +57,36 @@ Group? _hostGroup(List<Group> groups) => groups.firstWhereOrNull(
   (group) => !_isBuiltInGlobal(group) && _offersPicks(group),
 );
 
-/// The groups a pick has to be chosen in to carry traffic in [mode].
+/// The groups a pick is chosen in to carry traffic in [mode]: rules send it to
+/// any select group, so each one leading to a proxy now is taken.
 @visibleForTesting
-List<Group> pickEntryGroups(List<Group> groups, Mode mode) {
-  final global = groups.getGroup(GroupName.GLOBAL.name);
-  return {
-    ?_hostGroup(groups),
-    if (mode == Mode.global && global != null && _offersPicks(global)) global,
-  }.toList();
+List<Group> pickEntryGroups(
+  List<Group> groups,
+  Mode mode, [
+  Map<String, String> selectedMap = const {},
+]) {
+  final host = _hostGroup(groups);
+  final types = {
+    for (final group in groups)
+      for (final proxy in group.all) proxy.name: proxy.type,
+  };
+  bool proxied(Group group) {
+    final type =
+        types[computeRealSelectedProxyState(
+          group.name,
+          groups: groups,
+          selectedMap: selectedMap,
+        ).proxyName];
+    return type != null && !_builtInTypes.contains(type);
+  }
+
+  return [
+    for (final group in groups)
+      if (_offersPicks(group) &&
+          (mode == Mode.global || !_isBuiltInGlobal(group)) &&
+          (group == host || _isBuiltInGlobal(group) || proxied(group)))
+        group,
+  ];
 }
 
 /// Where traffic enters the proxies before any request has shown it.
@@ -187,10 +213,16 @@ class _FastestNodesCardState extends ConsumerState<FastestNodesCard> {
     }
     final actions = ref.read(proxiesActionProvider.notifier);
     await actions.changeProxy(groupName: slothPicksGroup, proxyName: name);
+    await _enterPicks();
+  }
+
+  Future<void> _enterPicks() async {
+    final actions = ref.read(proxiesActionProvider.notifier);
     final selectedMap = ref.read(selectedMapProvider);
     final entries = pickEntryGroups(
       ref.read(groupsProvider),
       ref.read(patchClashConfigProvider).mode,
+      selectedMap,
     );
     for (final group in entries) {
       final selected = group.getCurrentSelectedName(
@@ -210,6 +242,7 @@ class _FastestNodesCardState extends ConsumerState<FastestNodesCard> {
     ref
         .read(patchClashConfigProvider.notifier)
         .update((state) => state.copyWith(slothPickAuto: auto));
+    if (auto) unawaited(_enterPicks());
   }
 
   void _setSort(PickSort sort) {

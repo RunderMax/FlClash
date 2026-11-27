@@ -150,3 +150,40 @@ x-sloth-fastest: {name: Fastest, proxies: [a]}
 		t.Error("config.yaml still carries the request")
 	}
 }
+
+func TestLoadSetupConfigOffersTheFastestGroupInEverySelectGroup(t *testing.T) {
+	home := t.TempDir()
+	previous := constant.Path.HomeDir()
+	constant.SetHomeDir(home)
+	t.Cleanup(func() { constant.SetHomeDir(previous) })
+	profile := `proxies:
+  - {name: a, type: socks5, server: 127.0.0.1, port: 1080}
+proxy-groups:
+  - {name: main, type: select, proxies: [a]}
+  - {name: auto, type: url-test, proxies: [a], url: "https://probe.test", interval: 300}
+  - {name: service, type: select, proxies: [auto, a]}
+  - {name: "Sloth Pick · app", type: select, proxies: [a]}
+rules:
+  - MATCH,main
+x-sloth-fastest: {name: Sloth Pick, type: select, proxies: [a]}
+`
+	if err := os.WriteFile(filepath.Join(home, "config.yaml"), []byte(profile), 0o600); err != nil {
+		t.Fatalf("write config: %v", err)
+	}
+
+	cfg, err := loadSetupConfig(&SetupParams{})
+
+	if err != nil {
+		t.Fatalf("loadSetupConfig = %v", err)
+	}
+	for group, want := range map[string][]string{
+		"main":             {"a", "Sloth Pick"},
+		"service":          {"auto", "a", "Sloth Pick"},
+		"auto":             {"a"},
+		"Sloth Pick · app": {"a"},
+	} {
+		if got := groupMembers(t, cfg.Proxies[group]); !reflect.DeepEqual(got, want) {
+			t.Errorf("%s = %v, want %v", group, got, want)
+		}
+	}
+}

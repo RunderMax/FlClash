@@ -12,8 +12,10 @@ import (
 const fastestGroupKey = "x-sloth-fastest"
 
 const (
-	defaultFastestURL       = "https://www.gstatic.com/generate_204"
-	defaultFastestInterval  = 300
+	defaultFastestURL = "https://www.gstatic.com/generate_204"
+	// A member that stopped answering is left only once a check says so, and
+	// the group is checked only while traffic uses it.
+	defaultFastestInterval  = 60
 	defaultFastestTolerance = 50
 )
 
@@ -36,9 +38,10 @@ var (
 )
 
 // applyFastestGroup turns the request into a group of the chosen proxies the
-// profile still has, offered last in its first select group so the profile's
-// own default stays first. A name the profile no longer has is dropped, since
-// mihomo refuses a group that names a proxy it cannot find.
+// profile still has, offered last in every select group so each keeps its own
+// default first; rules send traffic to any of them, not only the first. A
+// name the profile no longer has is dropped, since mihomo refuses a group
+// that names a proxy it cannot find.
 func applyFastestGroup(root *yaml.Node) error {
 	request := deleteMappingValue(root, fastestGroupKey)
 	if request == nil {
@@ -80,11 +83,11 @@ func applyFastestGroup(root *yaml.Node) error {
 	setMappingValue(root, "proxy-groups", &yaml.Node{Kind: yaml.SequenceNode, Tag: "!!seq", Content: content})
 	for _, candidate := range groups.Content {
 		candidate = resolveAlias(candidate)
-		if candidate.Kind != yaml.MappingNode || scalarOf(mappingValue(candidate, "type")) != "select" {
+		if candidate.Kind != yaml.MappingNode || scalarOf(mappingValue(candidate, "type")) != "select" ||
+			isPickGroup(nameOf(candidate)) {
 			continue
 		}
 		offerLast(candidate, spec.Name)
-		break
 	}
 	return nil
 }

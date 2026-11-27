@@ -17,6 +17,10 @@ func init() {
 	mihomoHttp.TLSConfigHook = relaxCertVerify
 	adapter.UrlTestHook = func(url string, name string, delay uint16, timedOut bool) {
 		sendMessage(DelayMessage, &Delay{Url: url, Name: name, Value: delayValue(delay, timedOut)})
+		if timedOut {
+			// The proxy records the failure after this hook returns.
+			time.AfterFunc(time.Second, steering.nudge)
+		}
 	}
 	statistic.DefaultRequestNotify = func(c statistic.Tracker) {
 		blocked := guardJoined(c)

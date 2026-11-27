@@ -21,9 +21,10 @@ const (
 var steerEvery = time.Minute
 
 type steerer struct {
-	mu      sync.Mutex
-	groups  []string
-	pinned  map[string]string
+	mu     sync.Mutex
+	groups []string
+	pinned map[string]string
+	applied map[string]bool
 	gen     uint64
 	started bool
 	poke    chan struct{}
@@ -35,12 +36,16 @@ func isPickGroup(name string) bool {
 	return name == slothPickGroup || strings.HasPrefix(name, appPickGroupPrefix)
 }
 
-// reset forgets every pin, since the applied config may have pinned a group
-// from the host's saved selection since.
 func (s *steerer) reset(proxies map[string]constant.Proxy) {
 	names := autoPickGroups(proxies)
 	s.mu.Lock()
-	s.groups, s.pinned = names, map[string]string{}
+	pinned := map[string]string{}
+	for _, name := range names {
+		if pin, ok := s.pinned[name]; ok {
+			pinned[name] = pin
+		}
+	}
+	s.groups, s.pinned, s.applied = names, pinned, map[string]bool{}
 	s.gen++
 	start := len(names) > 0 && !s.started
 	s.started = s.started || start
@@ -92,10 +97,10 @@ func (s *steerer) steer() {
 			continue
 		}
 		s.mu.Lock()
-		pinned, known := s.pinned[name]
+		pinned, applied := s.pinned[name], s.applied[name]
 		s.mu.Unlock()
 		target := cleanestFastest(group.Proxies(), urlTestURL(group), pinned)
-		if known && target == pinned {
+		if applied && target == pinned {
 			continue
 		}
 		s.mu.Lock()
@@ -107,6 +112,7 @@ func (s *steerer) steer() {
 		group.ForceSet(target)
 		selectMu.Unlock()
 		s.pinned[name] = target
+		s.applied[name] = true
 		s.mu.Unlock()
 		changed = true
 	}
@@ -115,36 +121,33 @@ func (s *steerer) steer() {
 	}
 }
 
-// cleanestFastest names no member while none is known clean, which leaves the
-// choice to url-test; the one in use stays while it is within tolerance. Once
-// one is in use it only gives way to members leaving from the same address,
-// so sites never see the exit move.
+// cleanestFastest leaves the member in use only once it is dead or unclean; an empty name leaves url-test to choose.
 func cleanestFastest(members []constant.Proxy, url, current string) string {
 	exit := ""
 	if current != "" {
-		if exit = purity.exitOf(current); exit == "" {
-			return current
-		}
+		exit = purity.exitOf(current)
 	}
 	best, bestDelay := "", 0
-	currentDelay, currentClean := 0, false
+	same, sameDelay := "", 0
 	for _, member := range members {
-		if purity.levelOf(member.Name()) != purityGood || !member.AliveForTestUrl(url) {
-			continue
+		name := member.Name()
+		level, alive := purity.levelOf(name), member.AliveForTestUrl(url)
+		if name == current && alive && (level == purityGood || level == purityUnknown) {
+			return current
 		}
-		if exit != "" && purity.exitOf(member.Name()) != exit {
+		if level != purityGood || !alive {
 			continue
 		}
 		delay := int(member.LastDelayForTestUrl(url))
-		if member.Name() == current {
-			currentDelay, currentClean = delay, true
-		}
 		if best == "" || delay < bestDelay {
-			best, bestDelay = member.Name(), delay
+			best, bestDelay = name, delay
+		}
+		if exit != "" && purity.exitOf(name) == exit && (same == "" || delay < sameDelay) {
+			same, sameDelay = name, delay
 		}
 	}
-	if best == "" || currentClean && currentDelay <= bestDelay+defaultFastestTolerance {
-		return current
+	if same != "" {
+		return same
 	}
 	return best
 }
