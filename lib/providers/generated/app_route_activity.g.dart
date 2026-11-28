@@ -8,6 +8,64 @@ part of '../app_route_activity.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
+/// Kept for a while after an app's last connection, most recent first.
+
+@ProviderFor(ProxiedApps)
+final proxiedAppsProvider = ProxiedAppsProvider._();
+
+/// Kept for a while after an app's last connection, most recent first.
+final class ProxiedAppsProvider
+    extends $NotifierProvider<ProxiedApps, List<String>> {
+  /// Kept for a while after an app's last connection, most recent first.
+  ProxiedAppsProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'proxiedAppsProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$proxiedAppsHash();
+
+  @$internal
+  @override
+  ProxiedApps create() => ProxiedApps();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(List<String> value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<List<String>>(value),
+    );
+  }
+}
+
+String _$proxiedAppsHash() => r'd3bbc2a777a638f1b5eb08623bbe00da5af0eef0';
+
+/// Kept for a while after an app's last connection, most recent first.
+
+abstract class _$ProxiedApps extends $Notifier<List<String>> {
+  List<String> build();
+  @$mustCallSuper
+  @override
+  WhenComplete runBuild() {
+    final ref = this.ref as $Ref<List<String>, List<String>>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<List<String>, List<String>>,
+              List<String>,
+              Object?,
+              Object?
+            >;
+    return element.handleCreate(ref, build);
+  }
+}
+
 /// An app stays marked for a while after its last routed connection.
 
 @ProviderFor(ActiveRoutedApps)

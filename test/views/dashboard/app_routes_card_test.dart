@@ -428,4 +428,54 @@ void main() {
     );
     expect(tester.takeException(), isNull);
   });
+
+  testWidgets('an app\'s node asks which place it takes while its choice is '
+      'automatic', (tester) async {
+    const video = 'com.example.video';
+    container.read(packagesProvider.notifier).value = _packages;
+    container.read(groupsProvider.notifier).value = _groups;
+    change(
+      (state) => state
+          .withAppPicks(video, ['JP-01', 'US-01'])
+          .withAppAuto(video, true),
+    );
+    await pumpCard(tester);
+
+    await tester.tap(find.text('Video'));
+    await tester.pumpAndSettle();
+    expect(find.text('Main'), findsOneWidget);
+    expect(find.text('Backup 1'), findsOneWidget);
+
+    await tester.ensureVisible(find.text('US-01').last);
+    await tester.tap(find.text('US-01').last);
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
+    expect(find.text('Main'), findsNWidgets(2));
+
+    await tester.tap(find.text('Main').last);
+    await tester.pumpAndSettle();
+    expect(config().slothAppPicks, {
+      video: ['US-01', 'JP-01'],
+    });
+    expect(tester.takeException(), isNull);
+  });
+
+  test('the card lists every app in use, then the idle ones while there is '
+      'room', () {
+    final idle = cardApps(['a', 'b', 'c', 'd', 'e'], const {}, const []);
+    expect(idle.shown, ['a', 'b', 'c', 'd']);
+    expect(idle.hidden, 1);
+
+    final mixed = cardApps(['a', 'b'], const {'b'}, const ['x', 'b', 'y']);
+    expect(mixed.shown, ['b', 'x', 'y', 'a']);
+    expect(mixed.hidden, 0);
+
+    final busy = cardApps(
+      ['a', 'b'],
+      const {},
+      const ['p', 'q', 'r', 's', 't'],
+    );
+    expect(busy.shown, ['p', 'q', 'r', 's', 't']);
+    expect(busy.hidden, 2);
+  });
 }

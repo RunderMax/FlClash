@@ -115,4 +115,60 @@ void main() {
       'Google Chrome',
     });
   });
+
+  test('lists the apps going out through a node, the system\'s aside', () {
+    const folders = {'Google Chrome': '/Applications/Google Chrome.app/'};
+    final requests = FixedList<TrackerInfo>(
+      10,
+      list: [
+        _request(
+          5,
+          'a.com',
+          rule: 'Match',
+          process: 'Google Chrome Helper',
+          processPath: '/Applications/Google Chrome.app/Contents/H/Helper',
+        ),
+        _request(
+          4,
+          'b.com',
+          rule: 'Match',
+          process: 'Muse',
+          processPath: '/Applications/Muse.app/Contents/MacOS/Muse',
+        ),
+        _request(
+          3,
+          'c.com',
+          rule: 'Match',
+          chains: const ['DIRECT'],
+          process: 'WeChat',
+          processPath: '/Applications/WeChat.app/Contents/MacOS/WeChat',
+        ),
+        _request(
+          2,
+          'd.com',
+          rule: 'Match',
+          process: 'apsd',
+          processPath: '/System/Library/PrivateFrameworks/apsd',
+        ),
+        _request(
+          1,
+          'e.com',
+          rule: 'Match',
+          chains: const ['Sloth Guard'],
+          process: 'Stopped',
+          processPath: '/Applications/Stopped.app/Contents/MacOS/Stopped',
+        ),
+        _request(0, 'f.com', rule: 'Match'),
+      ],
+    );
+
+    expect(
+      proxiedAppsSince(
+        requests,
+        _now.subtract(const Duration(minutes: 5)),
+        folders,
+      ).keys,
+      unorderedEquals(['Google Chrome', 'Muse']),
+    );
+  });
 }

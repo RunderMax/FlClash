@@ -27,6 +27,9 @@ class SystemAction extends _$SystemAction {
       join(await appPath.homeDirPath, 'program-icons'),
     );
     programGroups.value = groups;
+    ref
+        .read(patchClashConfigProvider.notifier)
+        .update((state) => state.mergedIntoApps(groups));
     return [for (final group in groups) ...group.programs];
   }
 

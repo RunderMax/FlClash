@@ -1,5 +1,6 @@
 import 'package:fl_clash/common/app_routes.dart';
 import 'package:fl_clash/common/common.dart';
+import 'package:fl_clash/common/programs.dart';
 import 'package:fl_clash/enum/enum.dart';
 import 'package:fl_clash/models/models.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -337,6 +338,80 @@ void main() {
         'normal': true,
         'normal-apps': ['Muse'],
       });
+    });
+  });
+
+  group('programs set one at a time fold into their app', () {
+    Package program(String name) => Package(
+      packageName: name,
+      label: name,
+      system: false,
+      internet: true,
+      lastUpdateTime: 0,
+    );
+    final chrome = ProgramGroup(
+      name: 'Chrome',
+      icon: null,
+      programs: [program('Google Chrome'), program('Helper'), program('GPU')],
+      main: program('Google Chrome'),
+      folder: '/Applications/Google Chrome.app/',
+    );
+
+    test('the app takes the first program\'s settings and they go', () {
+      const config = PatchClashConfig(
+        slothAppRoutes: {'Helper': 'Sloth Pick · Helper', 'GPU': 'DIRECT'},
+        slothAppPicks: {
+          'Helper': ['US-01', 'US-02'],
+        },
+        slothAppAuto: ['Helper'],
+        slothAppPureOnly: ['Helper', 'GPU'],
+        slothAppPureNormal: ['Helper'],
+      );
+
+      final merged = config.mergedIntoApps([chrome]);
+
+      expect(merged.slothAppRoutes, {
+        'Google Chrome': appPicksGroupOf('Google Chrome'),
+      });
+      expect(merged.slothAppPicks, {
+        'Google Chrome': ['US-01', 'US-02'],
+      });
+      expect(merged.slothAppAuto, ['Google Chrome']);
+      expect(merged.slothAppPureOnly, ['Google Chrome']);
+      expect(merged.slothAppPureNormal, ['Google Chrome']);
+      expect(merged.slothAppFolders, {
+        'Google Chrome': '/Applications/Google Chrome.app/',
+      });
+    });
+
+    test('an app already set keeps its own and only loses the programs', () {
+      const config = PatchClashConfig(
+        slothAppRoutes: {'Google Chrome': 'JP', 'Helper': 'DIRECT'},
+        slothAppPureOnly: ['GPU'],
+      );
+
+      final merged = config.mergedIntoApps([chrome]);
+
+      expect(merged.slothAppRoutes, {'Google Chrome': 'JP'});
+      expect(merged.slothAppPureOnly, isEmpty);
+    });
+
+    test('leaves alone what is no program of a foldered app', () {
+      const config = PatchClashConfig(
+        slothAppRoutes: {'curl': 'JP', 'Google Chrome': 'US'},
+      );
+
+      expect(config.mergedIntoApps([chrome]), config);
+      expect(
+        config.mergedIntoApps([
+          ProgramGroup(
+            name: 'Loose',
+            icon: null,
+            programs: [program('a.exe'), program('curl')],
+          ),
+        ]),
+        config,
+      );
     });
   });
 }
