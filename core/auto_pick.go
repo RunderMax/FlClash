@@ -53,7 +53,6 @@ func (s *steerer) reset(proxies map[string]constant.Proxy) {
 	pinned, lead := map[string]string{}, map[string]string{}
 	for _, name := range names {
 		lead[name] = leadOf(proxies[name])
-		// A new main line is taken at once.
 		if pin, ok := s.pinned[name]; ok && lead[name] == s.lead[name] {
 			pinned[name] = pin
 		}
