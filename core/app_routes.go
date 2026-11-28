@@ -66,6 +66,11 @@ var builtInTargets = map[string]bool{
 // A route to a name the profile lost is dropped: mihomo refuses the whole
 // config over one rule it cannot resolve.
 func applyAppRoutes(root *yaml.Node) {
+	loadedFolders = readAppFolders(root)
+	applyRoutes(root, loadedFolders)
+}
+
+func applyRoutes(root *yaml.Node, folders appFolders) {
 	request := resolveAlias(deleteMappingValue(root, appRoutesKey))
 	if request == nil || request.Kind != yaml.MappingNode {
 		return
@@ -88,6 +93,7 @@ func applyAppRoutes(root *yaml.Node) {
 	rule := func(value string) {
 		added = append(added, &yaml.Node{Kind: yaml.ScalarNode, Tag: "!!str", Value: value})
 	}
+	targets := map[string]string{}
 	for i := 0; i+1 < len(routes.Content); i += 2 {
 		app, target := scalarOf(routes.Content[i]), scalarOf(routes.Content[i+1])
 		if !routable(target, known) {
@@ -95,6 +101,7 @@ func applyAppRoutes(root *yaml.Node) {
 		}
 		if appPackagePattern.MatchString(app) {
 			rule("PROCESS-NAME," + app + "," + target)
+			targets[app] = target
 			continue
 		}
 		if !siteKeyPattern.MatchString(app) {
@@ -104,6 +111,12 @@ func applyAppRoutes(root *yaml.Node) {
 			if value, ok := siteRule(matcher); ok {
 				rule(value + "," + target)
 			}
+		}
+	}
+	// After every name, so a program routed by itself keeps its own route.
+	for _, folder := range folders {
+		if target, ok := targets[folder.app]; ok {
+			rule(folder.rule() + "," + target)
 		}
 	}
 	if len(added) == 0 {
@@ -253,7 +266,7 @@ func appOf(metadata *constant.Metadata) string {
 		return ""
 	}
 	if metadata.Process != "" {
-		return metadata.Process
+		return routedApp(metadata.Process, metadata.ProcessPath)
 	}
 	lookup := *metadata
 	name, _ := process.FindPackageName(&lookup)

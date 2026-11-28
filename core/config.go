@@ -111,8 +111,9 @@ func loadConfig(path string) (*config.Config, error) {
 	if err != nil {
 		return nil, err
 	}
+	loadedFolders = nil
 	if bytes.Contains(buf, []byte(fastestGroupKey)) || bytes.Contains(buf, []byte(appRoutesKey)) ||
-		bytes.Contains(buf, []byte(guardKey)) {
+		bytes.Contains(buf, []byte(guardKey)) || bytes.Contains(buf, []byte(appFoldersKey)) {
 		return loadConfigWithRequests(buf, path)
 	}
 	cfg, err := executor.ParseWithBytes(buf)
@@ -205,6 +206,8 @@ func applyConfig(params *SetupParams) error {
 		armGuard(cfg)
 	}
 	currentGuard.Store(guard)
+	folders := loadedFolders
+	currentFolders.Store(&folders)
 	currentConfig = cfg
 	hub.ApplyConfig(cfg)
 	patchSelectGroup(params.SelectedMap)

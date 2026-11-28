@@ -72,4 +72,30 @@ void main() {
   test('takes no output as no programs', () {
     expect(parsePrograms('', own: _own), isEmpty);
   });
+
+  test('an app keeps its folder and its main program', () {
+    final groups = parsePrograms(
+      jsonEncode([
+        {
+          'name': 'Chrome',
+          'main':
+              '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+          'folder': '/Applications/Google Chrome.app/',
+          'exes': [
+            _exe('/Applications/Google Chrome.app/Contents/H/Chrome Helper'),
+            _exe(
+              '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+            ),
+          ],
+        },
+        {'name': 'Loose', 'exes': _exe(r'D:\Tools\loose.exe')},
+      ]),
+      own: _own,
+    );
+
+    expect(groups.first.lead.packageName, 'Google Chrome');
+    expect(groups.first.folder, '/Applications/Google Chrome.app/');
+    expect(groups.last.lead.packageName, 'loose.exe');
+    expect(groups.last.folder, isNull);
+  });
 }

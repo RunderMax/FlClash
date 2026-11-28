@@ -15,11 +15,21 @@ class ProgramGroup {
     required this.name,
     required this.icon,
     required this.programs,
+    this.main,
+    this.folder,
   });
 
   final String name;
   final String? icon;
   final List<Package> programs;
+
+  final Package? main;
+
+  /// The program the app is routed and shown by.
+  Package get lead => main ?? programs.first;
+
+  /// Where every program of the app lives, when one folder holds them all.
+  final String? folder;
 }
 
 final programGroups = ValueNotifier<List<ProgramGroup>>(const []);
@@ -50,6 +60,24 @@ function Exe($file, $running) {
 }
 $running = @{}
 Get-CimInstance Win32_Process -Property SessionId, ExecutablePath | Where-Object { $_.SessionId -ne 0 -and $_.ExecutablePath } | ForEach-Object { $running[$_.ExecutablePath.ToLower()] = $_.ExecutablePath }
+$broad = @($env:ProgramFiles, ${env:ProgramFiles(x86)}, $env:ProgramW6432, $env:ProgramData, $env:USERPROFILE, $env:LOCALAPPDATA, "$env:LOCALAPPDATA\Programs", $env:APPDATA, $env:PUBLIC, "$env:PUBLIC\Desktop", "$env:USERPROFILE\Downloads", "$env:USERPROFILE\Documents", "$env:USERPROFILE\Desktop", [Environment]::GetFolderPath('Desktop')) | Where-Object { $_ } | ForEach-Object { $_.TrimEnd('\').ToLower() }
+function Wide($dir) { return ($broad -contains $dir.ToLower()) -or (($dir -split '\\').Count -lt 3) }
+function Folder($dir) {
+  $d = $dir.TrimEnd('\')
+  while ((Split-Path -Leaf $d) -match '^(app-[\d.]+|bin|x64|x86|current|\d+(\.\d+)+)$') {
+    $up = Split-Path -Parent $d
+    if (-not $up -or (Wide $up)) { break }
+    $d = $up
+  }
+  if (Wide $d) { return $null }
+  return "$d\"
+}
+function PackageFolder($dir) {
+  $leaf = Split-Path -Leaf $dir
+  $at = $leaf.IndexOf('_')
+  if ($at -lt 1) { return (Folder $dir) }
+  return (Join-Path (Split-Path -Parent $dir) $leaf.Substring(0, $at + 1))
+}
 $shell = New-Object -ComObject WScript.Shell
 $apps = [ordered]@{}
 $menus = @("$env:ProgramData\Microsoft\Windows\Start Menu\Programs", "$env:APPDATA\Microsoft\Windows\Start Menu\Programs", "$env:PUBLIC\Desktop", [Environment]::GetFolderPath('Desktop'))
@@ -70,7 +98,7 @@ foreach ($app in $apps.Values) {
     $claimed[$file.ToLower()] = $true
     $exes += Exe $file $running.ContainsKey($file.ToLower())
   }
-  $out += [pscustomobject]@{ name = $app.name; icon = (Icon $app.main); exes = $exes }
+  $out += [pscustomobject]@{ name = $app.name; icon = (Icon $app.main); exes = $exes; main = $app.main; folder = (Folder $app.dir) }
 }
 try {
   $shown = @{}
@@ -89,7 +117,7 @@ try {
       $claimed[$file.ToLower()] = $true
       $exes += Exe $file $running.ContainsKey($file.ToLower())
     }
-    if ($exes.Count) { $out += [pscustomobject]@{ name = $name; icon = (Icon $exes[0].path); exes = $exes } }
+    if ($exes.Count) { $out += [pscustomobject]@{ name = $name; icon = (Icon $exes[0].path); exes = $exes; main = $exes[0].path; folder = (PackageFolder $pkg.InstallLocation) } }
   }
 } catch {}
 foreach ($file in $running.Values) {
@@ -151,7 +179,7 @@ function group(bundle) {
     if (he) exes.push({ path: he, description: label(h, hd), running: !!running[he], icon: null });
   });
   exes.forEach(function (e) { claimed[e.path] = true; });
-  if (exes.length) out.push(grouped[bundle] = { name: label(bundle, d), icon: icon(bundle, d), exes: exes });
+  if (exes.length) out.push(grouped[bundle] = { name: label(bundle, d), icon: icon(bundle, d), exes: exes, main: exes[0].path, folder: bundle + '/' });
 }
 bundles.forEach(group);
 Object.keys(running).forEach(function (p) {
@@ -160,7 +188,7 @@ Object.keys(running).forEach(function (p) {
   if (!grouped[m[1]]) group(m[1]);
   if (claimed[p]) return;
   claimed[p] = true;
-  if (!grouped[m[1]]) out.push(grouped[m[1]] = { name: m[1].split('/').pop().replace(/\.app$/, ''), icon: null, exes: [] });
+  if (!grouped[m[1]]) out.push(grouped[m[1]] = { name: m[1].split('/').pop().replace(/\.app$/, ''), icon: null, exes: [], main: p, folder: m[1] + '/' });
   grouped[m[1]].exes.push({ path: p, description: p.split('/').pop(), running: true, icon: null });
 });
 JSON.stringify(out);
@@ -170,7 +198,8 @@ JSON.stringify(out);
 /// rule matches, so the Start menu's entries and what runs stand for one; a
 /// Mac lists its apps' bundles and the helper apps inside them. A bundle may
 /// leave CFBundleExecutable out, and macOS then runs the file named after it.
-/// A packaged Windows app has no shortcut file; its manifest names what it runs.
+/// A packaged Windows app has no shortcut file; its manifest names what it runs,
+/// and its folder is cut before the version an update changes.
 Future<List<ProgramGroup>> listPrograms(String iconDir) async {
   final mac = Platform.isMacOS;
   final result = await Process.run(
@@ -285,7 +314,20 @@ List<ProgramGroup> parsePrograms(String output, {required String own}) {
     }
     final name = _text(item['name']);
     if (name == null || programs.isEmpty) continue;
-    groups.add(ProgramGroup(name: name, icon: icon, programs: programs));
+    final mainFile = _text(item['main']);
+    final mainName = mainFile == null ? null : path.windows.basename(mainFile);
+    groups.add(
+      ProgramGroup(
+        name: name,
+        icon: icon,
+        programs: programs,
+        main: programs.firstWhere(
+          (program) => program.packageName == mainName,
+          orElse: () => programs.first,
+        ),
+        folder: _text(item['folder']),
+      ),
+    );
   }
   return groups;
 }

@@ -5,8 +5,25 @@ import 'package:fl_clash/models/models.dart';
 const appRouteDirect = 'DIRECT';
 const appRouteBlock = 'REJECT';
 
-/// How the Core names the rule type an app route makes.
+/// How the Core names the rule types an app route makes.
 const processNameRule = 'ProcessName';
+const processPathRule = 'ProcessPathRegex';
+
+/// The app whose folder holds the program at [processPath]; the longest folder
+/// wins and case is ignored, as in core/app_folders.go.
+String? folderAppOf(Map<String, String> folders, String processPath) {
+  if (processPath.isEmpty || folders.isEmpty) return null;
+  final path = processPath.toLowerCase();
+  String? app;
+  var length = 0;
+  for (final MapEntry(:key, :value) in folders.entries) {
+    if (value.length > length && path.startsWith(value.toLowerCase())) {
+      app = key;
+      length = value.length;
+    }
+  }
+  return app;
+}
 
 /// The Core names the group of an app's own picks so; kept in step with
 /// appPickGroupPrefix in core/auto_pick.go.
@@ -37,6 +54,19 @@ extension AppRoutesExt on PatchClashConfig {
       if (picks.isNotEmpty && usesOwnPicks(app))
         app: {'proxies': picks, 'auto': slothAppAuto.contains(app)},
   };
+
+  /// The folders of the apps routed or guarded, each standing for every
+  /// program under it.
+  Map<String, String> get appFolderRequest => {
+    for (final MapEntry(key: app, value: folder) in slothAppFolders.entries)
+      if (slothAppRoutes.containsKey(app) || slothAppPureOnly.contains(app))
+        app: folder,
+  };
+
+  PatchClashConfig withAppFolder(String packageName, String folder) =>
+      slothAppFolders[packageName] == folder
+      ? this
+      : copyWith(slothAppFolders: {...slothAppFolders, packageName: folder});
 
   Map<String, List<String>> get siteRequest => {
     for (final MapEntry(key: site, value: matchers) in slothSites.entries)

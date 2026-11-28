@@ -7,6 +7,7 @@ import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import 'app.dart';
+import 'config.dart';
 
 part 'generated/app_route_activity.g.dart';
 
@@ -17,20 +18,26 @@ const _blocked = {'REJECT', 'REJECT-DROP', slothGuardOutbound};
 
 Map<String, DateTime> routedAppsSince(
   FixedList<TrackerInfo> requests,
-  DateTime since,
-) {
+  DateTime since, [
+  Map<String, String> folders = const {},
+]) {
   final latest = <String, DateTime>{};
   for (var index = requests.length - 1; index >= 0; index--) {
     final request = requests[index];
     if (request.start.isBefore(since)) {
       break;
     }
-    if (request.rule != processNameRule ||
-        request.chains.isEmpty ||
-        _blocked.contains(request.chains.first)) {
+    if (request.chains.isEmpty || _blocked.contains(request.chains.first)) {
       continue;
     }
-    latest.putIfAbsent(request.rulePayload, () => request.start);
+    final app = switch (request.rule) {
+      processNameRule => request.rulePayload,
+      processPathRule => folderAppOf(folders, request.metadata.processPath),
+      _ => null,
+    };
+    if (app != null) {
+      latest.putIfAbsent(app, () => request.start);
+    }
   }
   return latest;
 }
@@ -53,6 +60,7 @@ class ActiveRoutedApps extends _$ActiveRoutedApps {
     final latest = routedAppsSince(
       ref.read(requestsProvider),
       now.subtract(_activeFor),
+      ref.read(patchClashConfigProvider).slothAppFolders,
     );
     if (latest.isNotEmpty) {
       final oldest = latest.values.reduce((a, b) => a.isBefore(b) ? a : b);
@@ -75,8 +83,9 @@ typedef GuardBlocks = ({Set<String> apps, int count});
 /// all, and when the earliest of those was.
 ({GuardBlocks blocks, DateTime? earliest}) guardBlocksSince(
   FixedList<TrackerInfo> requests,
-  DateTime since,
-) {
+  DateTime since, [
+  Map<String, String> folders = const {},
+]) {
   final latest = <String, bool>{};
   var count = 0;
   DateTime? earliest;
@@ -91,7 +100,8 @@ typedef GuardBlocks = ({Set<String> apps, int count});
       earliest = request.start;
     }
     final app = request.metadata.process.isNotEmpty
-        ? request.metadata.process
+        ? folderAppOf(folders, request.metadata.processPath) ??
+              request.metadata.process
         : request.rule == processNameRule
         ? request.rulePayload
         : '';
@@ -128,6 +138,7 @@ class GuardBlocked extends _$GuardBlocked {
     final (:blocks, :earliest) = guardBlocksSince(
       ref.read(requestsProvider),
       now.subtract(_guardedFor),
+      ref.read(patchClashConfigProvider).slothAppFolders,
     );
     if (earliest != null) {
       _expiry = Timer(earliest.add(_guardedFor).difference(now), _refresh);

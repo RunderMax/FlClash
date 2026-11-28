@@ -402,6 +402,10 @@ Future<RealProfile> _makeRealProfileTask(MakeRealProfileState data) async {
       'sites': realPatchConfig.siteRequest,
     };
   }
+  final appFolders = realPatchConfig.appFolderRequest;
+  if (appFolders.isNotEmpty) {
+    rawConfig[slothAppFoldersKey] = appFolders;
+  }
   if (realPatchConfig.slothPureOnly ||
       realPatchConfig.slothAppPureOnly.isNotEmpty) {
     rawConfig[slothGuardKey] = {
