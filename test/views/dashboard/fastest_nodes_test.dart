@@ -81,9 +81,11 @@ void main() {
     });
   });
 
-  test('a node made the main line leads and the rest keep their order', () {
-    expect(mainFirst(['a', 'b', 'c'], 'c'), ['c', 'a', 'b']);
-    expect(mainFirst(['a', 'b', 'c'], 'a'), ['a', 'b', 'c']);
-    expect(mainFirst(['a', 'b'], 'gone'), ['a', 'b']);
+  test('a node takes the place chosen and the rest keep their order', () {
+    expect(placedAt(['a', 'b', 'c'], 'c', 0), ['c', 'a', 'b']);
+    expect(placedAt(['a', 'b', 'c'], 'a', 2), ['b', 'c', 'a']);
+    expect(placedAt(['a', 'b', 'c'], 'c', 1), ['a', 'c', 'b']);
+    expect(placedAt(['a', 'b', 'c'], 'b', 9), ['a', 'c', 'b']);
+    expect(placedAt(['a', 'b'], 'gone', 0), ['a', 'b']);
   });
 }

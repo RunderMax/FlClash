@@ -121,12 +121,59 @@ Set<String> _inUse(
   };
 }
 
-/// [picks] with [name] moved to the front, the rest standing by in their order.
-List<String> mainFirst(List<String> picks, String name) => [
-  if (picks.contains(name)) name,
-  for (final pick in picks)
-    if (pick != name) pick,
-];
+/// [picks] with [name] moved to [index], the rest keeping their order: the
+/// first is the main line and the others stand by in turn.
+List<String> placedAt(List<String> picks, String name, int index) {
+  if (!picks.contains(name)) return picks;
+  final rest = [
+    for (final pick in picks)
+      if (pick != name) pick,
+  ];
+  return rest..insert(index.clamp(0, rest.length), name);
+}
+
+String _roleLabel(BuildContext context, int index) => index == 0
+    ? context.appLocalizations.pickRoleMain
+    : context.appLocalizations.pickRoleBackup(index);
+
+/// Asks which place [name] takes among [count] picks, [current] being its own.
+class PickRoleSheet extends StatelessWidget {
+  const PickRoleSheet({
+    super.key,
+    required this.name,
+    required this.count,
+    required this.current,
+  });
+
+  final String name;
+  final int count;
+  final int current;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      title: name,
+      body: ListView(
+        padding: const EdgeInsets.symmetric(horizontal: 16).copyWith(
+          top: context.contentTopPadding,
+          bottom: 20 + context.bottomInset,
+        ),
+        children: [
+          for (var index = 0; index < count; index++)
+            ItemPositionProvider(
+              position: ItemPosition.get(index, count),
+              child: DecorationListItem(
+                title: Text(_roleLabel(context, index)),
+                isSelected: index == current,
+                trailing: index == current ? const SelectionCheck() : null,
+                onPressed: () => Navigator.of(context).pop(index),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
 
 typedef _Pick = ({
   String name,
@@ -271,12 +318,24 @@ class _FastestNodesCardState extends ConsumerState<FastestNodesCard>
   Future<void> _select(String name) async {
     final config = ref.read(patchClashConfigProvider);
     if (config.slothPickAuto) {
-      ref
-          .read(patchClashConfigProvider.notifier)
-          .update(
-            (state) =>
-                state.copyWith(slothPicks: mainFirst(state.slothPicks, name)),
-          );
+      final picks = config.slothPicks;
+      final index = await showSheet<int>(
+        context: context,
+        builder: (_) => PickRoleSheet(
+          name: name,
+          count: picks.length,
+          current: picks.indexOf(name),
+        ),
+      );
+      if (index != null) {
+        ref
+            .read(patchClashConfigProvider.notifier)
+            .update(
+              (state) => state.copyWith(
+                slothPicks: placedAt(state.slothPicks, name, index),
+              ),
+            );
+      }
       return;
     }
     final actions = ref.read(proxiesActionProvider.notifier);
@@ -466,8 +525,7 @@ class _FastestNodesCardState extends ConsumerState<FastestNodesCard>
                 pick: pick,
                 role: switch (auto ? names.indexOf(pick.name) : -1) {
                   < 0 => null,
-                  0 => appLocalizations.pickRoleMain,
-                  final index => appLocalizations.pickRoleBackup(index),
+                  final index => _roleLabel(context, index),
                 },
                 selected: inUse.contains(pick.name),
                 onTap: () => _select(pick.name),
@@ -645,7 +703,7 @@ class AppPickNodes extends ConsumerStatefulWidget {
   final List<String> names;
   final String? current;
   final bool auto;
-  final ValueChanged<String> onSelect;
+  final void Function(String name, int index) onSelect;
 
   @override
   ConsumerState<AppPickNodes> createState() => _AppPickNodesState();
@@ -681,13 +739,9 @@ class _AppPickNodesState extends ConsumerState<AppPickNodes> with _PickProbes {
         for (final (index, name) in names.indexed)
           _PickTile(
             pick: _pickOf(name, speeds),
-            role: switch (index) {
-              _ when !widget.auto => null,
-              0 => appLocalizations.pickRoleMain,
-              _ => appLocalizations.pickRoleBackup(index),
-            },
+            role: widget.auto ? _roleLabel(context, index) : null,
             selected: name == widget.current,
-            onTap: () => widget.onSelect(name),
+            onTap: () => widget.onSelect(name, index),
           ),
       ],
     );

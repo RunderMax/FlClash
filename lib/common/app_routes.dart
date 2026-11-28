@@ -29,6 +29,9 @@ String? folderAppOf(Map<String, String> folders, String processPath) {
 /// appPickGroupPrefix in core/auto_pick.go.
 const appPicksGroupPrefix = 'Sloth Pick · ';
 
+/// Kept in step with linePrefix in core/auto_pick.go.
+const slothLinePrefix = 'Sloth Line';
+
 String appPicksGroupOf(String packageName) =>
     '$appPicksGroupPrefix$packageName';
 

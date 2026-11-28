@@ -1,7 +1,13 @@
 package core
 
 import (
+	"context"
+	"github.com/metacubex/mihomo/adapter/outboundgroup"
+	"github.com/metacubex/mihomo/tunnel"
 	"math"
+	"net/http"
+	"os"
+	"path/filepath"
 	"reflect"
 	"testing"
 	"time"
@@ -198,4 +204,83 @@ func TestNextPickTakesNormalNodesWhereTheFloorAllows(t *testing.T) {
 	if got := nextPick(down, "", "dc1", leaveDeadAfter, nil, purityNormal); got != "dc2" {
 		t.Errorf("picked %q, want the normal stand-in", got)
 	}
+}
+
+func TestSteerMovesTheLineAndLeavesTheUrlTestGroupOnIt(t *testing.T) {
+	keepTunnel(t)
+	home := t.TempDir()
+	previous := constant.Path.HomeDir()
+	constant.SetHomeDir(home)
+	t.Cleanup(func() { constant.SetHomeDir(previous) })
+	profile := `proxies:
+  - {name: a, type: socks5, server: 127.0.0.1, port: 1080}
+  - {name: b, type: socks5, server: 127.0.0.1, port: 1081}
+proxy-groups:
+  - {name: g, type: select, proxies: [a]}
+rules:
+  - MATCH,g
+x-sloth-fastest: {name: Sloth Pick, type: url-test, proxies: [a, b]}
+`
+	if err := os.WriteFile(filepath.Join(home, "config.yaml"), []byte(profile), 0o600); err != nil {
+		t.Fatalf("write config: %v", err)
+	}
+	cfg, err := loadSetupConfig(&SetupParams{})
+	if err != nil {
+		t.Fatalf("loadSetupConfig = %v", err)
+	}
+	tunnel.UpdateProxies(cfg.Proxies, cfg.Providers)
+	test := useTestPurity(t)
+	useCountries(t, map[string]string{"1.1.1.1": "MY"})
+	test.know("a", "1.1.1.1", time.Minute, ipVerdict{Type: "residential"})
+	test.know("b", "1.1.1.1", time.Minute, ipVerdict{Type: "residential"})
+	alive := map[string]bool{"a": true, "b": true}
+	previousTest := testMembers
+	testMembers = func(members []constant.Proxy, url string) {
+		for _, member := range members {
+			status := 204
+			if !alive[member.Name()] {
+				status = 500
+			}
+			server := probeServer(t, func(w http.ResponseWriter, _ *http.Request) { w.WriteHeader(status) })
+			_, _ = member.URLTest(context.Background(), server.URL, steerTestStatus("/generate_204"))
+			_ = url
+		}
+	}
+	t.Cleanup(func() { testMembers = previousTest })
+
+	s := &steerer{poke: make(chan struct{}, 1), started: true}
+	s.reset(cfg.Proxies)
+	if !reflect.DeepEqual(s.groups, []string{slothPickGroup}) {
+		t.Fatalf("groups = %v, want the picks group", s.groups)
+	}
+	line, members := lineMembers(slothPickGroup)
+	if line == nil || len(members) != 2 {
+		t.Fatalf("line = %v with %d members, want both nodes", line, len(members))
+	}
+	s.steer()
+	if got := line.Now(); got != "a" {
+		t.Errorf("line on %q, want the main line", got)
+	}
+	if got := finalNode(cfg.Proxies[slothPickGroup], &constant.Metadata{}).Name(); got != "a" {
+		t.Errorf("the picks group leads to %q, want the line's node", got)
+	}
+
+	alive["a"] = false
+	s.tested = map[string]time.Time{}
+	s.steer()
+	if members[0].AliveForTestUrl(urlTestURL(mustURLTest(t, cfg.Proxies[slothPickGroup]))) {
+		t.Fatal("the main line still counts as up after a failed check")
+	}
+	if got := finalNode(cfg.Proxies[slothPickGroup], &constant.Metadata{}).Name(); got != "a" {
+		t.Errorf("one failed check moved traffic to %q, want it kept on the main line", got)
+	}
+}
+
+func mustURLTest(t *testing.T, proxy constant.Proxy) *outboundgroup.URLTest {
+	t.Helper()
+	group, ok := adapterAs[*outboundgroup.URLTest](proxy)
+	if !ok {
+		t.Fatal("not a url-test group")
+	}
+	return group
 }

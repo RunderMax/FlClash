@@ -90,6 +90,14 @@ Color _targetColor(BuildContext context, String target, bool missing) {
       : colorScheme.primary;
 }
 
+/// An automatic group's pick is the line holding its nodes; the line's is the node.
+String? _pickInUse(WidgetRef ref, String group) {
+  final name = ref.watch(selectedProxyNameProvider(group));
+  return name != null && name.startsWith(slothLinePrefix)
+      ? ref.watch(selectedProxyNameProvider(name))
+      : name;
+}
+
 void _showApps(BuildContext context) {
   showSheet<void>(
     context: context,
@@ -317,7 +325,7 @@ class _RouteRow extends ConsumerWidget {
     final picks = this.picks;
     final current = picks == null
         ? null
-        : ref.watch(selectedProxyNameProvider(appPicksGroupOf(packageName)));
+        : _pickInUse(ref, appPicksGroupOf(packageName));
     final color = target == null
         ? colorScheme.onSurfaceVariant
         : _targetColor(context, target, missing);
@@ -1080,17 +1088,24 @@ class _TargetsPageState extends ConsumerState<_TargetsPage> {
     );
   }
 
-  /// While the choice is automatic, a tap makes the node the app's main line.
-  void _selectPick(String node) {
+  Future<void> _selectPick(String node, int index) async {
     final packageName = widget.packageName;
     final config = ref.read(patchClashConfigProvider);
     if (config.slothAppAuto.contains(packageName)) {
-      _update(
-        (state) => state.withAppPicks(
-          packageName,
-          mainFirst(state.slothAppPicks[packageName] ?? const [], node),
-        ),
+      final picks = config.slothAppPicks[packageName] ?? const <String>[];
+      final place = await showInSheet<int>(
+        context,
+        builder: (_) =>
+            PickRoleSheet(name: node, count: picks.length, current: index),
       );
+      if (place != null) {
+        _update(
+          (state) => state.withAppPicks(
+            packageName,
+            placedAt(state.slothAppPicks[packageName] ?? const [], node, place),
+          ),
+        );
+      }
       return;
     }
     unawaited(
@@ -1341,10 +1356,9 @@ class _TargetsPageState extends ConsumerState<_TargetsPage> {
                           padding: const EdgeInsets.symmetric(horizontal: 16),
                           child: AppPickNodes(
                             names: picks,
-                            current: ref.watch(
-                              selectedProxyNameProvider(
-                                appPicksGroupOf(packageName),
-                              ),
+                            current: _pickInUse(
+                              ref,
+                              appPicksGroupOf(packageName),
                             ),
                             auto: auto,
                             onSelect: _selectPick,
