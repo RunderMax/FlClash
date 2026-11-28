@@ -48,8 +48,15 @@ func TestLoadConfigWithBaseAddsTheFastestGroupOfTheProxiesItStillHas(t *testing.
 	if fastest.Type() != constant.URLTest {
 		t.Errorf("type = %v, want url-test", fastest.Type())
 	}
-	if got := groupMembers(t, fastest); !reflect.DeepEqual(got, []string{"a", "b"}) {
-		t.Errorf("members = %v, want only the proxies the profile has", got)
+	if got := groupMembers(t, fastest); !reflect.DeepEqual(got, []string{lineOf("Fastest")}) {
+		t.Errorf("members = %v, want only the line a failed check cannot move", got)
+	}
+	line := cfg.Proxies[lineOf("Fastest")]
+	if line == nil || line.Type() != constant.Selector {
+		t.Fatalf("line = %v, want a select group", line)
+	}
+	if got := groupMembers(t, line); !reflect.DeepEqual(got, []string{"a", "b"}) {
+		t.Errorf("line = %v, want only the proxies the profile has", got)
 	}
 	if got := groupMembers(t, cfg.Proxies["g"]); !reflect.DeepEqual(got, []string{"a", "b", "Fastest"}) {
 		t.Errorf("select group = %v, want the fastest group last", got)

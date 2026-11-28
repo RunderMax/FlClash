@@ -71,7 +71,7 @@ func applyFastestGroup(root *yaml.Node) error {
 	if len(proxies) == 0 {
 		return nil
 	}
-	group, err := fastestGroupNode(spec, proxies)
+	added, err := fastestGroupNodes(spec, proxies)
 	if err != nil {
 		return err
 	}
@@ -79,8 +79,8 @@ func applyFastestGroup(root *yaml.Node) error {
 		recordedPicksGroup = spec.Name
 		recordedPicksEvery = time.Duration(spec.Record) * time.Minute
 	}
-	content := make([]*yaml.Node, 0, len(groups.Content)+1)
-	content = append(append(content, groups.Content...), group)
+	content := make([]*yaml.Node, 0, len(groups.Content)+len(added))
+	content = append(append(content, groups.Content...), added...)
 	setMappingValue(root, "proxy-groups", &yaml.Node{Kind: yaml.SequenceNode, Tag: "!!seq", Content: content})
 	for _, candidate := range groups.Content {
 		candidate = resolveAlias(candidate)
@@ -91,6 +91,28 @@ func applyFastestGroup(root *yaml.Node) error {
 		offerLast(candidate, spec.Name)
 	}
 	return nil
+}
+
+// A url-test group drops a member the moment one check of it fails, so an
+// automatic group holds its members in a select group of its own, the line,
+// which the steerer alone moves; the url-test group keeps only that line.
+func fastestGroupNodes(spec fastestGroupSpec, proxies []string) ([]*yaml.Node, error) {
+	if spec.Type == "select" {
+		group, err := fastestGroupNode(spec, proxies)
+		return []*yaml.Node{group}, err
+	}
+	line, err := lineNode(spec.Name, proxies)
+	if err != nil {
+		return nil, err
+	}
+	group, err := fastestGroupNode(spec, []string{lineOf(spec.Name)})
+	return []*yaml.Node{line, group}, err
+}
+
+func lineNode(group string, proxies []string) (*yaml.Node, error) {
+	var node yaml.Node
+	err := node.Encode(map[string]any{"name": lineOf(group), "type": "select", "proxies": proxies, "hidden": true})
+	return &node, err
 }
 
 func fastestGroupNode(spec fastestGroupSpec, proxies []string) (*yaml.Node, error) {

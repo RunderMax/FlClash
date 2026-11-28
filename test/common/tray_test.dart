@@ -37,11 +37,11 @@ void main() {
       );
     });
 
-    test('macOS keeps the template icon in every state', () {
-      for (final (isStart, tunEnable) in [
-        (false, false),
-        (true, false),
-        (true, true),
+    test('macOS strikes its template icon out while stopped', () {
+      for (final (isStart, tunEnable, status) in [
+        (false, false, 0),
+        (true, false, 1),
+        (true, true, 1),
       ]) {
         expect(
           macOS.getTrayIcon(
@@ -49,7 +49,7 @@ void main() {
             tunEnable: tunEnable,
             safeMode: false,
           ),
-          'assets/images/tray/macos/status_1.png',
+          'assets/images/tray/macos/status_$status.png',
         );
       }
     });

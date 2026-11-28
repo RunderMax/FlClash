@@ -60,6 +60,10 @@ class AppTray implements TrayPort {
     required bool safeMode,
     bool monochrome = true,
   }) {
+    // A template icon has no color to tell on from off, so off is struck out.
+    if (_isTemplate(monochrome) && !safeMode && !isStart) {
+      return '${_trayIconDir(monochrome)}/status_0.$_trayIconSuffix';
+    }
     final status = switch ((
       safeMode,
       _isTemplate(monochrome) || !isStart,

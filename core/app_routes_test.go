@@ -274,6 +274,9 @@ func TestLoadConfigWithBaseGivesAnAppAGroupOfItsOwnPicks(t *testing.T) {
 	if group := cfg.Proxies[chat]; group == nil || group.Type() != constant.URLTest {
 		t.Errorf("chat group = %v, want a url-test group", group)
 	}
+	if members, hidden := groupFields(t, cfg.Proxies[lineOf(chat)]); len(members) == 0 || !hidden {
+		t.Errorf("chat line = %v hidden %v, want its nodes in a hidden line", members, hidden)
+	}
 	for _, name := range []string{gone, appPickGroupPrefix + "com.example.web"} {
 		if cfg.Proxies[name] != nil {
 			t.Errorf("made %s, which no route takes or no member is left in", name)

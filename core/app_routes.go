@@ -176,11 +176,14 @@ func addAppPickGroups(root, picks, routes *yaml.Node, nodes, known map[string]bo
 				members = append(members, member)
 			}
 		}
-		group, err := appPickGroupNode(name, members, spec.Auto)
-		if len(members) == 0 || err != nil {
+		if len(members) == 0 || known[lineOf(name)] {
 			continue
 		}
-		content = append(content, group)
+		nodes, err := appPickGroupNodes(name, members, spec.Auto)
+		if err != nil {
+			continue
+		}
+		content = append(content, nodes...)
 		known[name] = true
 		added++
 	}
@@ -189,17 +192,24 @@ func addAppPickGroups(root, picks, routes *yaml.Node, nodes, known map[string]bo
 	}
 }
 
-func appPickGroupNode(name string, members []string, auto bool) (*yaml.Node, error) {
+func appPickGroupNodes(name string, members []string, auto bool) ([]*yaml.Node, error) {
 	group := map[string]any{"name": name, "type": "select", "proxies": members, "hidden": true}
+	var nodes []*yaml.Node
 	if auto {
+		line, err := lineNode(name, members)
+		if err != nil {
+			return nil, err
+		}
+		nodes = append(nodes, line)
 		group["type"] = "url-test"
+		group["proxies"] = []string{lineOf(name)}
 		group["url"] = defaultFastestURL
 		group["interval"] = defaultFastestInterval
 		group["tolerance"] = defaultFastestTolerance
 	}
 	var node yaml.Node
 	err := node.Encode(group)
-	return &node, err
+	return append(nodes, &node), err
 }
 
 // mihomo trims each rule field, so a padded name would not resolve.

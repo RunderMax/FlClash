@@ -1,6 +1,7 @@
 package core
 
 import (
+	"context"
 	"encoding/json"
 	"net"
 	"slices"
@@ -9,6 +10,7 @@ import (
 	"time"
 
 	"github.com/metacubex/mihomo/adapter/outboundgroup"
+	"github.com/metacubex/mihomo/common/utils"
 	"github.com/metacubex/mihomo/component/mmdb"
 	"github.com/metacubex/mihomo/constant"
 )
@@ -20,7 +22,19 @@ const (
 	appPickGroupPrefix = "Sloth Pick · "
 )
 
+// The select group holding an automatic group's members.
+const linePrefix = "Sloth Line"
+
+func lineOf(group string) string {
+	if rest, ok := strings.CutPrefix(group, slothPickGroup); ok {
+		return linePrefix + rest
+	}
+	return linePrefix + " · " + group
+}
+
 var steerEvery = time.Minute
+
+const steerTestTimeout = 5 * time.Second
 
 // One failed check is often the network, not the node.
 const leaveDeadAfter = 2 * time.Minute
@@ -35,6 +49,7 @@ type steerer struct {
 	applied map[string]bool
 	down    map[string]time.Time
 	up      map[string]time.Time
+	tested  map[string]time.Time
 	lead    map[string]string
 	gen     uint64
 	started bool
@@ -52,14 +67,16 @@ func (s *steerer) reset(proxies map[string]constant.Proxy) {
 	s.mu.Lock()
 	pinned, lead := map[string]string{}, map[string]string{}
 	for _, name := range names {
-		lead[name] = leadOf(proxies[name])
+		if _, members := lineMembers(name); len(members) > 0 {
+			lead[name] = members[0].Name()
+		}
 		if pin, ok := s.pinned[name]; ok && lead[name] == s.lead[name] {
 			pinned[name] = pin
 		}
 	}
 	s.groups, s.pinned, s.lead, s.applied = names, pinned, lead, map[string]bool{}
 	if s.down == nil {
-		s.down, s.up = map[string]time.Time{}, map[string]time.Time{}
+		s.down, s.up, s.tested = map[string]time.Time{}, map[string]time.Time{}, map[string]time.Time{}
 	}
 	s.gen++
 	start := len(names) > 0 && !s.started
@@ -71,12 +88,12 @@ func (s *steerer) reset(proxies map[string]constant.Proxy) {
 	s.nudge()
 }
 
-func leadOf(proxy constant.Proxy) string {
-	group, ok := adapterAs[*outboundgroup.URLTest](proxy)
-	if !ok || len(group.Proxies()) == 0 {
-		return ""
+func lineMembers(group string) (*outboundgroup.Selector, []constant.Proxy) {
+	line, ok := adapterAs[*outboundgroup.Selector](lookupProxy(lineOf(group)))
+	if !ok {
+		return nil, nil
 	}
-	return group.Proxies()[0].Name()
+	return line, line.GetProxies(false)
 }
 
 func autoPickGroups(proxies map[string]constant.Proxy) []string {
@@ -116,12 +133,23 @@ func (s *steerer) steer() {
 	changed := false
 	for _, name := range names {
 		group, ok := adapterAs[*outboundgroup.URLTest](lookupProxy(name))
-		if !ok {
+		line, members := lineMembers(name)
+		if !ok || line == nil {
 			continue
 		}
-		members, url := group.Proxies(), urlTestURL(group)
+		url := urlTestURL(group)
 		s.mu.Lock()
-		pinned, applied := s.pinned[name], s.applied[name]
+		due := time.Since(s.tested[name]) >= steerEvery/2
+		if due {
+			s.tested[name] = time.Now()
+		}
+		s.mu.Unlock()
+		if due {
+			testMembers(members, url)
+		}
+		s.mu.Lock()
+		pinned := s.pinned[name]
+		applied := s.applied[name] && line.Now() == pinned
 		now := time.Now()
 		downFor := s.downForLocked(name, pinned, members, url, now)
 		steady := s.steadyLocked(name, members, url, now)
@@ -135,8 +163,11 @@ func (s *steerer) steer() {
 			s.mu.Unlock()
 			return
 		}
+		if target == "" {
+			target = line.Now()
+		}
 		selectMu.Lock()
-		group.ForceSet(target)
+		_ = line.Set(target)
 		selectMu.Unlock()
 		if target != pinned {
 			delete(s.down, name)
@@ -149,6 +180,29 @@ func (s *steerer) steer() {
 	if changed {
 		refreshRoute()
 	}
+}
+
+// The steerer checks the members itself: nothing else does while the url-test
+// group holds only their line.
+var testMembers = func(members []constant.Proxy, url string) {
+	var wg sync.WaitGroup
+	for _, member := range members {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			ctx, cancel := context.WithTimeout(context.Background(), steerTestTimeout)
+			defer cancel()
+			_, _ = member.URLTest(ctx, url, steerTestStatus(url))
+		}()
+	}
+	wg.Wait()
+}
+
+func steerTestStatus(url string) utils.IntRanges[uint16] {
+	if strings.HasSuffix(url, "/generate_204") {
+		return utils.IntRanges[uint16]{utils.NewRange[uint16](204, 204)}
+	}
+	return anyDelayTestStatus
 }
 
 func (s *steerer) downForLocked(group, current string, members []constant.Proxy, url string, now time.Time) time.Duration {
