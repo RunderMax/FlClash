@@ -72,6 +72,26 @@ foreach ($app in $apps.Values) {
   }
   $out += [pscustomobject]@{ name = $app.name; icon = (Icon $app.main); exes = $exes }
 }
+try {
+  $shown = @{}
+  foreach ($entry in Get-StartApps) { $shown[($entry.AppID -split '!')[0].ToLower()] = $entry.Name }
+  foreach ($pkg in Get-AppxPackage) {
+    $name = $shown["$($pkg.PackageFamilyName)".ToLower()]
+    if (-not $name -or $pkg.IsFramework -or -not $pkg.InstallLocation) { continue }
+    $manifest = Join-Path $pkg.InstallLocation 'AppxManifest.xml'
+    if (-not (Test-Path -LiteralPath $manifest)) { continue }
+    $exes = @()
+    foreach ($entry in @(([xml](Get-Content -LiteralPath $manifest -Raw)).Package.Applications.Application)) {
+      $rel = "$($entry.Executable)" -replace '/', '\'
+      if (-not $rel.ToLower().EndsWith('.exe')) { continue }
+      $file = Join-Path $pkg.InstallLocation $rel
+      if ($claimed.ContainsKey($file.ToLower()) -or $file.StartsWith($sys, 'OrdinalIgnoreCase')) { continue }
+      $claimed[$file.ToLower()] = $true
+      $exes += Exe $file $running.ContainsKey($file.ToLower())
+    }
+    if ($exes.Count) { $out += [pscustomobject]@{ name = $name; icon = (Icon $exes[0].path); exes = $exes } }
+  }
+} catch {}
 foreach ($file in $running.Values) {
   if ($claimed.ContainsKey($file.ToLower()) -or $file.StartsWith($sys, 'OrdinalIgnoreCase')) { continue }
   $exe = Exe $file $true
@@ -150,6 +170,7 @@ JSON.stringify(out);
 /// rule matches, so the Start menu's entries and what runs stand for one; a
 /// Mac lists its apps' bundles and the helper apps inside them. A bundle may
 /// leave CFBundleExecutable out, and macOS then runs the file named after it.
+/// A packaged Windows app has no shortcut file; its manifest names what it runs.
 Future<List<ProgramGroup>> listPrograms(String iconDir) async {
   final mac = Platform.isMacOS;
   final result = await Process.run(
