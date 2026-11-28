@@ -223,6 +223,8 @@ void main() {
       expect(config[slothGuardKey], {
         'all': true,
         'apps': ['com.example.chat'],
+        'normal': false,
+        'normal-apps': <String>[],
       });
     });
 
@@ -289,6 +291,52 @@ void main() {
         }, r'C:\Apps\Suite\Tool\tool.exe'),
         'Tool',
       );
+    });
+  });
+
+  group('the guard\'s floor', () {
+    test('an app follows the floor for all until it sets its own', () {
+      const config = PatchClashConfig(
+        slothPureOnly: true,
+        slothPureNormal: true,
+      );
+
+      expect(config.appTakesNormal('Muse'), isTrue);
+      final strict = config.withAppPureNormal('Muse', false);
+      expect(strict.appTakesNormal('Muse'), isFalse);
+      expect(strict.slothAppPureOnly, ['Muse']);
+      expect(
+        strict.withAppPureNormal('Muse', true).appTakesNormal('Muse'),
+        isTrue,
+      );
+    });
+
+    test('an app with no guard takes none, and loses its floor with it', () {
+      const config = PatchClashConfig();
+
+      expect(config.appTakesNormal('Muse'), isFalse);
+      final off = config
+          .withAppPureNormal('Muse', true)
+          .withAppPureOnly('Muse', false);
+      expect(off.slothAppPureOnly, isEmpty);
+      expect(off.slothAppPureNormal, isEmpty);
+    });
+
+    test('sends the floors to the Core', () async {
+      final config = await _configOf(
+        const PatchClashConfig(
+          slothPureNormal: true,
+          slothAppPureOnly: ['Muse', 'Chrome'],
+          slothAppPureNormal: ['Muse'],
+        ),
+      );
+
+      expect(config[slothGuardKey], {
+        'all': false,
+        'apps': ['Muse', 'Chrome'],
+        'normal': true,
+        'normal-apps': ['Muse'],
+      });
     });
   });
 }

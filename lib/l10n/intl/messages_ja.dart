@@ -331,6 +331,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "appAccessControl": MessageLookupByLibrary.simpleMessage("アプリアクセス制御"),
     "appExits": MessageLookupByLibrary.simpleMessage("使った IP"),
     "appIconDesign": MessageLookupByLibrary.simpleMessage("アプリアイコンのデザイン"),
+    "appPickNodes": MessageLookupByLibrary.simpleMessage("このアプリのノード"),
     "appProxiesEmpty": MessageLookupByLibrary.simpleMessage("ローカルプロキシがありません"),
     "appPureOnlyDesc": MessageLookupByLibrary.simpleMessage(
       "ノードが「良好」でないとき、このアプリは通信できません",
@@ -1498,6 +1499,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "proxyType": MessageLookupByLibrary.simpleMessage("プロキシタイプ"),
     "pruneCache": MessageLookupByLibrary.simpleMessage("キャッシュを整理"),
     "publicKey": MessageLookupByLibrary.simpleMessage("公開鍵"),
+    "pureAllowNormal": MessageLookupByLibrary.simpleMessage("「普通」のノードも通す"),
+    "pureAllowNormalDesc": MessageLookupByLibrary.simpleMessage(
+      "データセンター回線も使えます。リスクありと未確認は引き続き遮断",
+    ),
     "pureBlack": MessageLookupByLibrary.simpleMessage("ピュアブラック"),
     "pureBlackMode": MessageLookupByLibrary.simpleMessage("ピュアブラックモード"),
     "pureOnly": MessageLookupByLibrary.simpleMessage("クリーンでなければ遮断"),

@@ -50,10 +50,10 @@ func TestNextPickStartsOnTheFirstCleanLiveMember(t *testing.T) {
 		stubMember{name: "dead", delay: 10, dead: true},
 	)
 
-	if got := nextPick(group, "", "", 0, nil); got != "slow" {
+	if got := nextPick(group, "", "", 0, nil, purityGood); got != "slow" {
 		t.Errorf("picked %q, want the first clean one, the main line", got)
 	}
-	if got := nextPick(members(stubMember{name: "dc"}), "", "", 0, nil); got != "" {
+	if got := nextPick(members(stubMember{name: "dc"}), "", "", 0, nil, purityGood); got != "" {
 		t.Errorf("picked %q, want the choice left to url-test", got)
 	}
 }
@@ -65,14 +65,14 @@ func TestNextPickKeepsTheOneInUseThroughABriefOutage(t *testing.T) {
 	test.know("b", "2.2.2.2", time.Minute, ipVerdict{Type: "residential"})
 
 	slow := members(stubMember{name: "a", delay: 900}, stubMember{name: "b", delay: 10})
-	if got := nextPick(slow, "", "a", 0, nil); got != "a" {
+	if got := nextPick(slow, "", "a", 0, nil, purityGood); got != "a" {
 		t.Errorf("picked %q, want the one in use kept however slow", got)
 	}
 	dead := members(stubMember{name: "a", dead: true}, stubMember{name: "b", delay: 10})
-	if got := nextPick(dead, "", "a", leaveDeadAfter-time.Second, nil); got != "a" {
+	if got := nextPick(dead, "", "a", leaveDeadAfter-time.Second, nil, purityGood); got != "a" {
 		t.Errorf("picked %q, want no move on a brief outage", got)
 	}
-	if got := nextPick(dead, "", "a", leaveDeadAfter, nil); got != "b" {
+	if got := nextPick(dead, "", "a", leaveDeadAfter, nil, purityGood); got != "b" {
 		t.Errorf("picked %q, want the move once it stayed dead", got)
 	}
 }
@@ -88,18 +88,18 @@ func TestNextPickMovesOnlyWithinTheCountry(t *testing.T) {
 	down := stubMember{name: "a", dead: true}
 
 	all := members(down, stubMember{name: "same", delay: 500}, stubMember{name: "us", delay: 50}, stubMember{name: "jp", delay: 5})
-	if got := nextPick(all, "", "a", leaveDeadAfter, nil); got != "same" {
+	if got := nextPick(all, "", "a", leaveDeadAfter, nil, purityGood); got != "same" {
 		t.Errorf("picked %q, want the member on the same address first", got)
 	}
 	abroad := members(down, stubMember{name: "us", delay: 50}, stubMember{name: "jp", delay: 5}, stubMember{name: "dc", delay: 1})
-	if got := nextPick(abroad, "", "a", leaveDeadAfter, nil); got != "us" {
+	if got := nextPick(abroad, "", "a", leaveDeadAfter, nil, purityGood); got != "us" {
 		t.Errorf("picked %q, want the clean member in the same country", got)
 	}
-	if got := nextPick(members(down, stubMember{name: "jp", delay: 5}), "", "a", leaveDeadAfter, nil); got != "a" {
+	if got := nextPick(members(down, stubMember{name: "jp", delay: 5}), "", "a", leaveDeadAfter, nil, purityGood); got != "a" {
 		t.Errorf("picked %q, want it to stay with none in the country", got)
 	}
 	unclean := members(stubMember{name: "dc", delay: 1}, stubMember{name: "us", delay: 50})
-	if got := nextPick(unclean, "", "dc", 0, nil); got != "us" {
+	if got := nextPick(unclean, "", "dc", 0, nil, purityGood); got != "us" {
 		t.Errorf("picked %q, want the unclean member left at once", got)
 	}
 }
@@ -117,7 +117,7 @@ func TestNextPickTakesTheStandInsInTheirOrder(t *testing.T) {
 		stubMember{name: "b3", delay: 10},
 	)
 
-	if got := nextPick(group, "", "main", leaveDeadAfter, nil); got != "b2" {
+	if got := nextPick(group, "", "main", leaveDeadAfter, nil, purityGood); got != "b2" {
 		t.Errorf("picked %q, want the first stand-in that is up, however slow", got)
 	}
 }
@@ -132,16 +132,16 @@ func TestNextPickReturnsToAnEarlierLineOnceItHasStayedUp(t *testing.T) {
 	group := members(stubMember{name: "abroad"}, stubMember{name: "main"}, stubMember{name: "b1"}, stubMember{name: "b2"})
 	long := returnAfter
 
-	if got := nextPick(group, "", "b2", 0, map[string]time.Duration{"main": long - time.Second, "b1": time.Minute}); got != "b2" {
+	if got := nextPick(group, "", "b2", 0, map[string]time.Duration{"main": long - time.Second, "b1": time.Minute}, purityGood); got != "b2" {
 		t.Errorf("picked %q, want no return to a line only just back", got)
 	}
-	if got := nextPick(group, "", "b2", 0, map[string]time.Duration{"main": time.Minute, "b1": long}); got != "b1" {
+	if got := nextPick(group, "", "b2", 0, map[string]time.Duration{"main": time.Minute, "b1": long}, purityGood); got != "b1" {
 		t.Errorf("picked %q, want the earliest line that has stayed up", got)
 	}
-	if got := nextPick(group, "", "b2", 0, map[string]time.Duration{"abroad": long, "main": long, "b1": long}); got != "main" {
+	if got := nextPick(group, "", "b2", 0, map[string]time.Duration{"abroad": long, "main": long, "b1": long}, purityGood); got != "main" {
 		t.Errorf("picked %q, want the main line, not one abroad", got)
 	}
-	if got := nextPick(group, "", "main", 0, map[string]time.Duration{"b1": long, "b2": long}); got != "main" {
+	if got := nextPick(group, "", "main", 0, map[string]time.Duration{"b1": long, "b2": long}, purityGood); got != "main" {
 		t.Errorf("picked %q, want the main line kept over the ones after it", got)
 	}
 }
@@ -163,7 +163,7 @@ func TestAutoPickGroupsFindsTheHostsUrlTestGroups(t *testing.T) {
 func TestNextPickChecksAMemberNotYetKnown(t *testing.T) {
 	test := useTestPurity(t)
 
-	got := nextPick(members(stubMember{name: "x", delay: math.MaxUint16}), "", "", 0, nil)
+	got := nextPick(members(stubMember{name: "x", delay: math.MaxUint16}), "", "", 0, nil, purityGood)
 
 	if got != "" {
 		t.Errorf("picked %q, want none", got)
@@ -171,5 +171,31 @@ func TestNextPickChecksAMemberNotYetKnown(t *testing.T) {
 	test.settle(t)
 	if test.askedFor("x") != 1 {
 		t.Error("an unchecked member was not checked")
+	}
+}
+
+func TestNextPickTakesNormalNodesWhereTheFloorAllows(t *testing.T) {
+	test := useTestPurity(t)
+	useCountries(t, map[string]string{"1.1.1.1": "US", "2.2.2.2": "US"})
+	test.know("dc1", "1.1.1.1", time.Minute, ipVerdict{Type: "hosting"})
+	test.know("dc2", "2.2.2.2", time.Minute, ipVerdict{Type: "hosting"})
+	test.know("home", "3.3.3.3", time.Minute, ipVerdict{Type: "residential"})
+	group := members(stubMember{name: "dc1"}, stubMember{name: "dc2"}, stubMember{name: "home"})
+
+	if got := nextPick(group, "", "", 0, nil, purityNormal); got != "home" {
+		t.Errorf("started on %q, want a good node ahead of the normal ones", got)
+	}
+	if got := nextPick(group[:2], "", "", 0, nil, purityNormal); got != "dc1" {
+		t.Errorf("started on %q, want the first normal node with no good one", got)
+	}
+	if got := nextPick(group[:2], "", "", 0, nil, purityGood); got != "" {
+		t.Errorf("started on %q, want none under a good floor", got)
+	}
+	if got := nextPick(group[:2], "", "dc1", 0, nil, purityNormal); got != "dc1" {
+		t.Errorf("picked %q, want the normal node in use kept", got)
+	}
+	down := members(stubMember{name: "dc1", dead: true}, stubMember{name: "dc2"})
+	if got := nextPick(down, "", "dc1", leaveDeadAfter, nil, purityNormal); got != "dc2" {
+		t.Errorf("picked %q, want the normal stand-in", got)
 	}
 }

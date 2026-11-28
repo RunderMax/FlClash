@@ -381,6 +381,7 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "appExits": MessageLookupByLibrary.simpleMessage("IPs used"),
     "appIconDesign": MessageLookupByLibrary.simpleMessage("App icon design"),
+    "appPickNodes": MessageLookupByLibrary.simpleMessage("This app’s nodes"),
     "appProxiesEmpty": MessageLookupByLibrary.simpleMessage("No local proxies"),
     "appPureOnlyDesc": MessageLookupByLibrary.simpleMessage(
       "When the node isn\'t Good, this app can\'t go online",
@@ -1757,6 +1758,12 @@ class MessageLookup extends MessageLookupByLibrary {
     "proxyType": MessageLookupByLibrary.simpleMessage("Proxy type"),
     "pruneCache": MessageLookupByLibrary.simpleMessage("Prune cache"),
     "publicKey": MessageLookupByLibrary.simpleMessage("Public key"),
+    "pureAllowNormal": MessageLookupByLibrary.simpleMessage(
+      "Also let “Normal” nodes through",
+    ),
+    "pureAllowNormalDesc": MessageLookupByLibrary.simpleMessage(
+      "Data-centre lines work too; risky and unchecked ones stay cut",
+    ),
     "pureBlack": MessageLookupByLibrary.simpleMessage("Pure black"),
     "pureBlackMode": MessageLookupByLibrary.simpleMessage("Pure black mode"),
     "pureOnly": MessageLookupByLibrary.simpleMessage("Block impure nodes"),

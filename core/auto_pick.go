@@ -126,7 +126,7 @@ func (s *steerer) steer() {
 		downFor := s.downForLocked(name, pinned, members, url, now)
 		steady := s.steadyLocked(name, members, url, now)
 		s.mu.Unlock()
-		target := nextPick(members, url, pinned, downFor, steady)
+		target := nextPick(members, url, pinned, downFor, steady, pickFloor(name))
 		if applied && target == pinned {
 			continue
 		}
@@ -190,13 +190,13 @@ func (s *steerer) steadyLocked(group string, members []constant.Proxy, url strin
 
 // The user's order ranks the members, the main line first; the exit never
 // moves to another country.
-func nextPick(members []constant.Proxy, url, current string, downFor time.Duration, steady map[string]time.Duration) string {
+func nextPick(members []constant.Proxy, url, current string, downFor time.Duration, steady map[string]time.Duration, floor purityLevel) string {
 	at := slices.IndexFunc(members, func(member constant.Proxy) bool { return member.Name() == current })
 	if at < 0 {
-		return firstClean(members, url)
+		return firstClean(members, url, floor)
 	}
 	level := purity.levelOf(current)
-	clean := level == purityGood || level == purityUnknown
+	clean := level == purityUnknown || passes(level, floor)
 	stays := clean && (members[at].AliveForTestUrl(url) || downFor < leaveDeadAfter)
 	exit := purity.exitOf(current)
 	country := countryOf(exit)
@@ -206,7 +206,7 @@ func nextPick(members []constant.Proxy, url, current string, downFor time.Durati
 		if stays && i >= at {
 			break
 		}
-		if i == at || purity.levelOf(name) != purityGood || !member.AliveForTestUrl(url) {
+		if i == at || !passes(purity.levelOf(name), floor) || !member.AliveForTestUrl(url) {
 			continue
 		}
 		if stays && steady[name] < returnAfter {
@@ -229,9 +229,36 @@ func nextPick(members []constant.Proxy, url, current string, downFor time.Durati
 	return current
 }
 
-func firstClean(members []constant.Proxy, url string) string {
+// A group takes what its app's guard lets through, a good node ahead of the rest.
+func pickFloor(group string) purityLevel {
+	state := currentGuard.Load()
+	if state == nil {
+		return purityGood
+	}
+	if app, ok := strings.CutPrefix(group, appPickGroupPrefix); ok {
+		if floor, guarded := state.floorOf(app); guarded {
+			return floor
+		}
+		return purityGood
+	}
+	if state.all {
+		return state.floor
+	}
+	return purityGood
+}
+
+func firstClean(members []constant.Proxy, url string, floor purityLevel) string {
+	for _, want := range []purityLevel{purityGood, purityNormal} {
+		if name := firstAt(members, url, want); name != "" && passes(want, floor) {
+			return name
+		}
+	}
+	return ""
+}
+
+func firstAt(members []constant.Proxy, url string, level purityLevel) string {
 	for _, member := range members {
-		if purity.levelOf(member.Name()) == purityGood && member.AliveForTestUrl(url) {
+		if purity.levelOf(member.Name()) == level && member.AliveForTestUrl(url) {
 			return member.Name()
 		}
 	}

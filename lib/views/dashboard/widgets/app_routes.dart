@@ -1080,16 +1080,42 @@ class _TargetsPageState extends ConsumerState<_TargetsPage> {
     );
   }
 
+  /// While the choice is automatic, a tap makes the node the app's main line.
+  void _selectPick(String node) {
+    final packageName = widget.packageName;
+    final config = ref.read(patchClashConfigProvider);
+    if (config.slothAppAuto.contains(packageName)) {
+      _update(
+        (state) => state.withAppPicks(
+          packageName,
+          mainFirst(state.slothAppPicks[packageName] ?? const [], node),
+        ),
+      );
+      return;
+    }
+    unawaited(
+      ref
+          .read(proxiesActionProvider.notifier)
+          .changeProxy(
+            groupName: appPicksGroupOf(packageName),
+            proxyName: node,
+          ),
+    );
+  }
+
   List<Widget> _switches({
     required bool ownPicks,
     required bool auto,
     required bool guarded,
     required bool guardAll,
+    required bool takesNormal,
   }) {
     final appLocalizations = context.appLocalizations;
     final packageName = widget.packageName;
     void setGuarded(bool value) =>
         _update((state) => state.withAppPureOnly(packageName, value));
+    void setNormal(bool value) =>
+        _update((state) => state.withAppPureNormal(packageName, value));
     void setAuto(bool value) =>
         _update((state) => state.withAppAuto(packageName, value));
     return [
@@ -1129,6 +1155,22 @@ class _TargetsPageState extends ConsumerState<_TargetsPage> {
             onChanged: guardAll ? null : setGuarded,
           ),
           onPressed: guardAll ? null : () => setGuarded(!guarded),
+        ),
+      if (!packageName.startsWith('@') && (guarded || guardAll))
+        DecorationListItem(
+          leading: const GlyphIcon(AppGlyphs.sliders),
+          title: Text(
+            appLocalizations.pureAllowNormal,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+          subtitle: Text(
+            appLocalizations.pureAllowNormalDesc,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+          trailing: Switch(value: takesNormal, onChanged: setNormal),
+          onPressed: () => setNormal(!takesNormal),
         ),
     ];
   }
@@ -1185,17 +1227,19 @@ class _TargetsPageState extends ConsumerState<_TargetsPage> {
   Widget build(BuildContext context) {
     final appLocalizations = context.appLocalizations;
     final packageName = widget.packageName;
-    final (:current, :picks, :auto, :guarded, :guardAll) = ref.watch(
-      patchClashConfigProvider.select(
-        (state) => (
-          current: state.slothAppRoutes[packageName],
-          picks: state.slothAppPicks[packageName] ?? const <String>[],
-          auto: state.slothAppAuto.contains(packageName),
-          guarded: state.slothAppPureOnly.contains(packageName),
-          guardAll: state.slothPureOnly,
-        ),
-      ),
-    );
+    final (:current, :picks, :auto, :guarded, :guardAll, :takesNormal) = ref
+        .watch(
+          patchClashConfigProvider.select(
+            (state) => (
+              current: state.slothAppRoutes[packageName],
+              picks: state.slothAppPicks[packageName] ?? const <String>[],
+              auto: state.slothAppAuto.contains(packageName),
+              guarded: state.slothAppPureOnly.contains(packageName),
+              guardAll: state.slothPureOnly,
+              takesNormal: state.appTakesNormal(packageName),
+            ),
+          ),
+        );
     final groups = ref.watch(groupsProvider);
     final exits = ref.watch(
       appExitsProvider.select((state) => state.value?[widget.packageName]),
@@ -1285,8 +1329,29 @@ class _TargetsPageState extends ConsumerState<_TargetsPage> {
                         auto: auto,
                         guarded: guarded,
                         guardAll: guardAll,
+                        takesNormal: takesNormal,
                       ),
                     ),
+                    if (current == _ownPicks && picks.isNotEmpty) ...[
+                      SliverToBoxAdapter(
+                        child: ListHeader(title: appLocalizations.appPickNodes),
+                      ),
+                      SliverToBoxAdapter(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          child: AppPickNodes(
+                            names: picks,
+                            current: ref.watch(
+                              selectedProxyNameProvider(
+                                appPicksGroupOf(packageName),
+                              ),
+                            ),
+                            auto: auto,
+                            onSelect: _selectPick,
+                          ),
+                        ),
+                      ),
+                    ],
                   ],
                   if (query.isEmpty && groups.isEmpty)
                     SliverToBoxAdapter(
