@@ -187,3 +187,19 @@ x-sloth-fastest: {name: Sloth Pick, type: select, proxies: [a]}
 		}
 	}
 }
+
+func TestFastestGroupNodeExpectsTheEmptyAnswerOfItsProbe(t *testing.T) {
+	expected := func(url string) string {
+		node, err := fastestGroupNode(fastestGroupSpec{Name: "Sloth Pick", Type: "url-test", URL: url}, []string{"a"})
+		if err != nil {
+			t.Fatalf("fastestGroupNode = %v", err)
+		}
+		return scalarOf(mappingValue(node, "expected-status"))
+	}
+	if got := expected(""); got != "204" {
+		t.Errorf("expected-status = %q, want 204 for the default probe", got)
+	}
+	if got := expected("https://probe.test/"); got != "" {
+		t.Errorf("expected-status = %q, want none for a probe of the user's", got)
+	}
+}

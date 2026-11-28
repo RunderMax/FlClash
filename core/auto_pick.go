@@ -1,13 +1,18 @@
 package core
 
 import (
+	"bufio"
 	"encoding/json"
+	"net"
+	"os"
+	"path/filepath"
 	"slices"
 	"strings"
 	"sync"
 	"time"
 
 	"github.com/metacubex/mihomo/adapter/outboundgroup"
+	"github.com/metacubex/mihomo/component/mmdb"
 	"github.com/metacubex/mihomo/constant"
 )
 
@@ -20,11 +25,15 @@ const (
 
 var steerEvery = time.Minute
 
+// One failed check is often the network, not the node.
+const leaveDeadAfter = 2 * time.Minute
+
 type steerer struct {
 	mu      sync.Mutex
 	groups  []string
 	pinned  map[string]string
 	applied map[string]bool
+	down    map[string]time.Time
 	gen     uint64
 	started bool
 	poke    chan struct{}
@@ -46,6 +55,9 @@ func (s *steerer) reset(proxies map[string]constant.Proxy) {
 		}
 	}
 	s.groups, s.pinned, s.applied = names, pinned, map[string]bool{}
+	if s.down == nil {
+		s.down = map[string]time.Time{}
+	}
 	s.gen++
 	start := len(names) > 0 && !s.started
 	s.started = s.started || start
@@ -96,10 +108,12 @@ func (s *steerer) steer() {
 		if !ok {
 			continue
 		}
+		members, url := group.Proxies(), urlTestURL(group)
 		s.mu.Lock()
 		pinned, applied := s.pinned[name], s.applied[name]
+		downFor := s.downForLocked(name, pinned, members, url, time.Now())
 		s.mu.Unlock()
-		target := cleanestFastest(group.Proxies(), urlTestURL(group), pinned)
+		target := nextPick(members, url, pinned, downFor)
 		if applied && target == pinned {
 			continue
 		}
@@ -111,6 +125,9 @@ func (s *steerer) steer() {
 		selectMu.Lock()
 		group.ForceSet(target)
 		selectMu.Unlock()
+		if target != pinned {
+			delete(s.down, name)
+		}
 		s.pinned[name] = target
 		s.applied[name] = true
 		s.mu.Unlock()
@@ -121,35 +138,116 @@ func (s *steerer) steer() {
 	}
 }
 
-// cleanestFastest leaves the member in use only once it is dead or unclean; an empty name leaves url-test to choose.
-func cleanestFastest(members []constant.Proxy, url, current string) string {
-	exit := ""
-	if current != "" {
-		exit = purity.exitOf(current)
-	}
-	best, bestDelay := "", 0
-	same, sameDelay := "", 0
+func (s *steerer) downForLocked(group, current string, members []constant.Proxy, url string, now time.Time) time.Duration {
 	for _, member := range members {
-		name := member.Name()
-		level, alive := purity.levelOf(name), member.AliveForTestUrl(url)
-		if name == current && alive && (level == purityGood || level == purityUnknown) {
-			return current
-		}
-		if level != purityGood || !alive {
+		if member.Name() != current {
 			continue
 		}
-		delay := int(member.LastDelayForTestUrl(url))
-		if best == "" || delay < bestDelay {
-			best, bestDelay = name, delay
+		if member.AliveForTestUrl(url) {
+			break
 		}
-		if exit != "" && purity.exitOf(name) == exit && (same == "" || delay < sameDelay) {
-			same, sameDelay = name, delay
+		since, ok := s.down[group]
+		if !ok {
+			s.down[group] = now
+			return 0
+		}
+		return now.Sub(since)
+	}
+	delete(s.down, group)
+	return 0
+}
+
+// nextPick never moves the exit to another country: with no clean live member
+// on the same address or in the same country it stays on the one in use.
+func nextPick(members []constant.Proxy, url, current string, downFor time.Duration) string {
+	var inUse constant.Proxy
+	for _, member := range members {
+		if member.Name() == current {
+			inUse = member
 		}
 	}
-	if same != "" {
-		return same
+	if inUse == nil {
+		return fastestClean(members, url)
+	}
+	level := purity.levelOf(current)
+	clean := level == purityGood || level == purityUnknown
+	if clean && (inUse.AliveForTestUrl(url) || downFor < leaveDeadAfter) {
+		return current
+	}
+	exit := purity.exitOf(current)
+	country := countryOf(exit)
+	rates := failureRates()
+	best, bestRank := current, [3]int{}
+	for _, member := range members {
+		name := member.Name()
+		if name == current || purity.levelOf(name) != purityGood || !member.AliveForTestUrl(url) {
+			continue
+		}
+		other := purity.exitOf(name)
+		sameExit := exit != "" && other == exit
+		if !sameExit && (country == "" || countryOf(other) != country) {
+			continue
+		}
+		rank := [3]int{1, int(rates[name] * 10), int(member.LastDelayForTestUrl(url))}
+		if sameExit {
+			rank[0] = 0
+		}
+		if best == current || slices.Compare(rank[:], bestRank[:]) < 0 {
+			best, bestRank = name, rank
+		}
 	}
 	return best
+}
+
+func fastestClean(members []constant.Proxy, url string) string {
+	best, bestDelay := "", 0
+	for _, member := range members {
+		if purity.levelOf(member.Name()) != purityGood || !member.AliveForTestUrl(url) {
+			continue
+		}
+		if delay := int(member.LastDelayForTestUrl(url)); best == "" || delay < bestDelay {
+			best, bestDelay = member.Name(), delay
+		}
+	}
+	return best
+}
+
+// IPInstance ends the process when the database cannot be opened.
+var countryOf = func(ip string) string {
+	addr := net.ParseIP(ip)
+	if addr == nil || !mmdb.Verify(constant.Path.MMDB()) {
+		return ""
+	}
+	codes := mmdb.IPInstance().LookupCode(addr)
+	if len(codes) == 0 {
+		return ""
+	}
+	return strings.ToUpper(codes[0])
+}
+
+var failureRates = func() map[string]float64 {
+	file, err := os.Open(filepath.Join(constant.Path.HomeDir(), pickHistoryFile))
+	if err != nil {
+		return nil
+	}
+	defer file.Close()
+	total, failed := map[string]int{}, map[string]int{}
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		var sample pickSample
+		if json.Unmarshal(scanner.Bytes(), &sample) != nil {
+			continue
+		}
+		total[sample.Name]++
+		if sample.Delay == 0 {
+			failed[sample.Name]++
+		}
+	}
+	rates := make(map[string]float64, len(total))
+	for name, count := range total {
+		rates[name] = float64(failed[name]) / float64(count)
+	}
+	return rates
 }
 
 func urlTestURL(group *outboundgroup.URLTest) string {
