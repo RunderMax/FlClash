@@ -26,6 +26,7 @@ import 'fastest_nodes.dart';
 import 'in_use.dart';
 
 const _cardRows = 4;
+const _rowsMaxHeight = 380.0;
 const _cardIcon = 32.0;
 const _listIcon = 40.0;
 
@@ -128,8 +129,7 @@ class _AppRoutesCardState extends ConsumerState<AppRoutesCard> {
   @override
   void initState() {
     super.initState();
-    final listed = ref.read(patchClashConfigProvider).appRouteApps;
-    if (listed.isNotEmpty && ref.read(packagesProvider).isEmpty) {
+    if (ref.read(packagesProvider).isEmpty) {
       unawaited(
         ref
             .read(systemActionProvider.notifier)
@@ -194,8 +194,8 @@ class _AppRoutesCardState extends ConsumerState<AppRoutesCard> {
     );
     final apps = config.appRouteApps;
     final timed = _timed(config);
-    final shown = apps.take(_cardRows).toList();
-    final hidden = apps.length - shown.length;
+    final proxied = ref.watch(proxiedAppsProvider);
+    final (:shown, :hidden) = cardApps(apps, active, proxied);
     return DashboardCard(
       semanticLabel: appLocalizations.appRoutes,
       child: Column(
@@ -225,29 +225,38 @@ class _AppRoutesCardState extends ConsumerState<AppRoutesCard> {
                   .copyWith(color: colorScheme.onSurfaceVariant),
             )
           else
-            for (final packageName in shown) ...[
-              _RouteRow(
-                packageName: packageName,
-                label: labels[packageName] ?? packageName.replaceFirst('@', ''),
-                target: config.slothAppRoutes[packageName],
-                picks: config.usesOwnPicks(packageName)
-                    ? config.slothAppPicks[packageName] ?? const []
-                    : null,
-                auto: config.slothAppAuto.contains(packageName),
-                missing: switch (config.slothAppRoutes[packageName]) {
-                  final target? => _missing(
-                    target,
-                    reachable,
-                    config.slothAppPicks[packageName] ?? const [],
+            _Rows(
+              mobile: mobile,
+              children: [
+                for (final packageName in shown) ...[
+                  _RouteRow(
+                    packageName: packageName,
+                    label:
+                        labels[packageName] ??
+                        packageName.replaceFirst('@', ''),
+                    target: config.slothAppRoutes[packageName],
+                    picks: config.usesOwnPicks(packageName)
+                        ? config.slothAppPicks[packageName] ?? const []
+                        : null,
+                    auto: config.slothAppAuto.contains(packageName),
+                    missing: switch (config.slothAppRoutes[packageName]) {
+                      final target? => _missing(
+                        target,
+                        reachable,
+                        config.slothAppPicks[packageName] ?? const [],
+                      ),
+                      null => false,
+                    },
+                    latest: exits[packageName]?.firstOrNull,
+                    active:
+                        active.contains(packageName) ||
+                        proxied.contains(packageName),
+                    blocked: blocked.contains(packageName),
                   ),
-                  null => false,
-                },
-                latest: exits[packageName]?.firstOrNull,
-                active: active.contains(packageName),
-                blocked: blocked.contains(packageName),
-              ),
-              const SizedBox(height: 6),
-            ],
+                  const SizedBox(height: 6),
+                ],
+              ],
+            ),
           const SizedBox(height: 6),
           DashboardBlock(
             radius: AppCorner.md,
@@ -287,6 +296,52 @@ class _AppRoutesCardState extends ConsumerState<AppRoutesCard> {
         ],
       ),
     );
+  }
+}
+
+/// What the card lists: every app now going out through a node, set up or
+/// not, then the set-up ones at rest while there is room; the rest are counted.
+@visibleForTesting
+({List<String> shown, int hidden}) cardApps(
+  List<String> routed,
+  Set<String> active,
+  List<String> proxied,
+) {
+  final using = [
+    for (final app in routed)
+      if (active.contains(app) || proxied.contains(app)) app,
+    for (final app in proxied)
+      if (!routed.contains(app)) app,
+  ];
+  final idle = [
+    for (final app in routed)
+      if (!using.contains(app)) app,
+  ];
+  final room = (_cardRows - using.length).clamp(0, idle.length);
+  return (shown: [...using, ...idle.take(room)], hidden: idle.length - room);
+}
+
+/// The rows scroll once there are more than the card has room for.
+class _Rows extends StatelessWidget {
+  const _Rows({required this.mobile, required this.children});
+
+  final bool mobile;
+  final List<Widget> children;
+
+  @override
+  Widget build(BuildContext context) {
+    final rows = SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: children,
+      ),
+    );
+    return mobile
+        ? ConstrainedBox(
+            constraints: const BoxConstraints(maxHeight: _rowsMaxHeight),
+            child: rows,
+          )
+        : Flexible(child: rows);
   }
 }
 
@@ -1054,6 +1109,20 @@ class _TargetsPage extends ConsumerStatefulWidget {
 
 class _TargetsPageState extends ConsumerState<_TargetsPage> {
   String _query = '';
+
+  /// An app opened from its traffic, not the app list, still goes whole.
+  @override
+  void initState() {
+    super.initState();
+    final packageName = widget.packageName;
+    final folder = programGroups.value
+        .where((group) => group.lead.packageName == packageName)
+        .firstOrNull
+        ?.folder;
+    if (folder != null) {
+      runAfterFrame(() => _update((s) => s.withAppFolder(packageName, folder)));
+    }
+  }
 
   String get _ownPicks => appPicksGroupOf(widget.packageName);
 

@@ -1,3 +1,4 @@
+import 'package:fl_clash/common/programs.dart';
 import 'package:fl_clash/common/slothive.dart';
 import 'package:fl_clash/enum/enum.dart';
 import 'package:fl_clash/models/models.dart';
@@ -70,6 +71,70 @@ extension AppRoutesExt on PatchClashConfig {
       slothAppFolders[packageName] == folder
       ? this
       : copyWith(slothAppFolders: {...slothAppFolders, packageName: folder});
+
+  /// Folds what was set on one program of an app at a time, before an app was
+  /// routed whole, into the app: its lead takes the first such program's
+  /// settings unless it has its own, and the programs' entries go.
+  PatchClashConfig mergedIntoApps(Iterable<ProgramGroup> groups) {
+    var config = this;
+    for (final group in groups) {
+      final folder = group.folder;
+      if (folder == null) continue;
+      final lead = group.lead.packageName;
+      final olds = [
+        for (final program in group.programs)
+          if (program.packageName != lead &&
+              config.appRouteApps.contains(program.packageName))
+            program.packageName,
+      ];
+      if (olds.isEmpty) continue;
+      if (!config.appRouteApps.contains(lead)) {
+        config = config._moved(olds.first, lead);
+      }
+      for (final old in olds) {
+        config = config._without(old);
+      }
+      config = config.withAppFolder(lead, folder);
+    }
+    return config;
+  }
+
+  PatchClashConfig _moved(String from, String to) {
+    final picks = slothAppPicks[from] ?? const <String>[];
+    final route = slothAppRoutes[from];
+    var config = this;
+    if (usesOwnPicks(from) && picks.isNotEmpty) {
+      config = config.withAppPicks(to, picks);
+    } else if (route != null) {
+      config = config.withAppRoute(to, route);
+    }
+    return config.copyWith(
+      slothAppAuto: _toggled(
+        config.slothAppAuto,
+        to,
+        slothAppAuto.contains(from),
+      ),
+      slothAppPureOnly: _toggled(
+        config.slothAppPureOnly,
+        to,
+        slothAppPureOnly.contains(from),
+      ),
+      slothAppPureNormal: _toggled(
+        config.slothAppPureNormal,
+        to,
+        slothAppPureNormal.contains(from),
+      ),
+    );
+  }
+
+  PatchClashConfig _without(String app) => copyWith(
+    slothAppRoutes: {...slothAppRoutes}..remove(app),
+    slothAppPicks: {...slothAppPicks}..remove(app),
+    slothAppAuto: _toggled(slothAppAuto, app, false),
+    slothAppPureOnly: _toggled(slothAppPureOnly, app, false),
+    slothAppPureNormal: _toggled(slothAppPureNormal, app, false),
+    slothAppFolders: {...slothAppFolders}..remove(app),
+  );
 
   Map<String, List<String>> get siteRequest => {
     for (final MapEntry(key: site, value: matchers) in slothSites.entries)

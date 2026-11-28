@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:fl_clash/common/app_routes.dart';
 import 'package:fl_clash/common/common.dart';
+import 'package:fl_clash/common/programs.dart';
 import 'package:fl_clash/models/models.dart';
 import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -40,6 +41,83 @@ Map<String, DateTime> routedAppsSince(
     }
   }
   return latest;
+}
+
+const _direct = {'DIRECT', 'COMPATIBLE', 'PASS'};
+
+/// The system's own services are no app the user set going.
+bool _ofTheSystem(String processPath) {
+  final path = processPath.toLowerCase();
+  return path.startsWith('/system/') ||
+      path.startsWith('/usr/') ||
+      path.startsWith('/sbin/') ||
+      path.contains(r':\windows\');
+}
+
+/// The apps whose traffic lately went out through a node, whatever rule sent
+/// it there; [folders] names the app a program's file belongs to.
+Map<String, DateTime> proxiedAppsSince(
+  FixedList<TrackerInfo> requests,
+  DateTime since, [
+  Map<String, String> folders = const {},
+]) {
+  final latest = <String, DateTime>{};
+  for (var index = requests.length - 1; index >= 0; index--) {
+    final request = requests[index];
+    if (request.start.isBefore(since)) {
+      break;
+    }
+    final process = request.metadata.process;
+    if (process.isEmpty ||
+        _ofTheSystem(request.metadata.processPath) ||
+        request.chains.isEmpty ||
+        request.chains.any(_blocked.contains) ||
+        request.chains.any(_direct.contains)) {
+      continue;
+    }
+    final app = folderAppOf(folders, request.metadata.processPath) ?? process;
+    latest.putIfAbsent(app, () => request.start);
+  }
+  return latest;
+}
+
+@riverpod
+class ProxiedApps extends _$ProxiedApps {
+  Timer? _expiry;
+
+  @override
+  List<String> build() {
+    programGroups.addListener(_refresh);
+    ref.onDispose(() {
+      _expiry?.cancel();
+      programGroups.removeListener(_refresh);
+    });
+    ref.listen(requestsProvider, (_, _) => _refresh());
+    return _compute();
+  }
+
+  List<String> _compute() {
+    _expiry?.cancel();
+    final now = DateTime.now();
+    final latest =
+        proxiedAppsSince(ref.read(requestsProvider), now.subtract(_activeFor), {
+          for (final group in programGroups.value)
+            group.lead.packageName: ?group.folder,
+          ...ref.read(patchClashConfigProvider).slothAppFolders,
+        });
+    if (latest.isNotEmpty) {
+      final oldest = latest.values.reduce((a, b) => a.isBefore(b) ? a : b);
+      _expiry = Timer(oldest.add(_activeFor).difference(now), _refresh);
+    }
+    return latest.keys.toList();
+  }
+
+  void _refresh() {
+    final next = _compute();
+    if (!listEquals(next, state)) {
+      state = next;
+    }
+  }
 }
 
 /// An app stays marked for a while after its last routed connection.
