@@ -11,10 +11,11 @@ TrackerInfo _request(
   List<String> chains = const ['JP-01'],
   String rule = 'ProcessName',
   String process = '',
+  String processPath = '',
 }) => TrackerInfo(
   id: '$minutesAgo-$app',
   start: _now.subtract(Duration(minutes: minutesAgo)),
-  metadata: Metadata(process: process),
+  metadata: Metadata(process: process, processPath: processPath),
   chains: chains,
   rule: rule,
   rulePayload: app,
@@ -81,5 +82,37 @@ void main() {
       routedAppsSince(requests, _now.subtract(const Duration(minutes: 5))).keys,
       ['com.example.video'],
     );
+  });
+
+  test('counts a helper under an app\'s folder as the app', () {
+    const folders = {'Google Chrome': '/Applications/Google Chrome.app/'};
+    const helper =
+        '/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Helper';
+    final requests = FixedList<TrackerInfo>(
+      10,
+      list: [
+        _request(
+          2,
+          r'^/applications/google chrome\.app/',
+          rule: 'ProcessPathRegex',
+          process: 'Google Chrome Helper',
+          processPath: helper,
+        ),
+        _request(
+          1,
+          'example.com',
+          rule: 'DomainSuffix',
+          chains: const ['Sloth Guard'],
+          process: 'Google Chrome Helper',
+          processPath: helper,
+        ),
+      ],
+    );
+    final since = _now.subtract(const Duration(minutes: 5));
+
+    expect(routedAppsSince(requests, since, folders).keys, ['Google Chrome']);
+    expect(guardBlocksSince(requests, since, folders).blocks.apps, {
+      'Google Chrome',
+    });
   });
 }

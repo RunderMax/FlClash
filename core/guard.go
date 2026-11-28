@@ -117,7 +117,7 @@ func guardRoute(metadata *constant.Metadata, helper constant.RuleMatchHelper, na
 		if metadata.Process == "" && helper.FindProcess != nil {
 			helper.FindProcess()
 		}
-		if !state.apps[metadata.Process] {
+		if !state.apps[routedApp(metadata.Process, metadata.ProcessPath)] {
 			return name
 		}
 	}

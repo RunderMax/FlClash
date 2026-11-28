@@ -842,19 +842,40 @@ class _SlothiveItem extends StatelessWidget {
   }
 }
 
-class _GroupItem extends StatelessWidget {
+class _GroupItem extends ConsumerWidget {
   const _GroupItem({required this.group, required this.routes});
 
   final ProgramGroup group;
   final Map<String, String> routes;
 
+  /// An app in one folder is routed whole, by its main program.
+  void _open(BuildContext context, WidgetRef ref) {
+    final folder = group.folder;
+    if (folder == null && group.programs.length > 1) {
+      unawaited(
+        showInSheet<void>(context, builder: (_) => _ProgramsPage(group: group)),
+      );
+      return;
+    }
+    if (folder != null) {
+      ref
+          .read(patchClashConfigProvider.notifier)
+          .update(
+            (state) => state.withAppFolder(group.lead.packageName, folder),
+          );
+    }
+    _showTargets(context, group.lead.packageName, group.name);
+  }
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final programs = group.programs;
     final routed = [
       for (final program in programs)
         if (routes[program.packageName] case final target?)
-          '${program.label} · ${_targetLabel(context, target)}',
+          program == group.lead && group.folder != null
+              ? _targetLabel(context, target)
+              : '${program.label} · ${_targetLabel(context, target)}',
     ];
     final icon = group.icon;
     return DecorationListItem(
@@ -877,18 +898,7 @@ class _GroupItem extends StatelessWidget {
         size: 18,
         color: context.colorScheme.onSurfaceVariant,
       ),
-      onPressed: () => programs.length == 1
-          ? _showTargets(
-              context,
-              programs.first.packageName,
-              programs.first.label,
-            )
-          : unawaited(
-              showInSheet<void>(
-                context,
-                builder: (_) => _ProgramsPage(group: group),
-              ),
-            ),
+      onPressed: () => _open(context, ref),
     );
   }
 }

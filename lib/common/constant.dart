@@ -27,6 +27,7 @@ const slothPicksKey = 'x-sloth-fastest';
 const slothPicksGroup = 'Sloth Pick';
 const slothAppRoutesKey = 'x-sloth-app-routes';
 const slothGuardKey = 'x-sloth-guard';
+const slothAppFoldersKey = 'x-sloth-app-folders';
 
 /// What the Core names the way a connection takes once the guard stops it.
 const slothGuardOutbound = 'Sloth Guard';

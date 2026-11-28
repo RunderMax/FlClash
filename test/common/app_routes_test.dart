@@ -234,4 +234,61 @@ void main() {
       expect((config[slothPicksKey] as YamlMap)['type'], 'url-test');
     });
   });
+
+  group('an app routed by its folder', () {
+    const folders = {
+      'Google Chrome': '/Applications/Google Chrome.app/',
+      'Idle': '/Applications/Idle.app/',
+      'Guarded': r'C:\Program Files\Guarded\',
+    };
+
+    test('sends the folders of the apps routed or guarded only', () async {
+      final config = await _configOf(
+        const PatchClashConfig(
+          slothAppRoutes: {'Google Chrome': 'DIRECT'},
+          slothAppPureOnly: ['Guarded'],
+          slothAppFolders: folders,
+        ),
+      );
+
+      expect(config[slothAppFoldersKey], {
+        'Google Chrome': '/Applications/Google Chrome.app/',
+        'Guarded': r'C:\Program Files\Guarded\',
+      });
+    });
+
+    test('sends none when no app with a folder is in use', () async {
+      final config = await _configOf(
+        const PatchClashConfig(slothAppFolders: folders),
+      );
+
+      expect(config.containsKey(slothAppFoldersKey), isFalse);
+    });
+
+    test('names the app whose folder holds a program, case aside', () {
+      expect(
+        folderAppOf(
+          folders,
+          '/applications/google chrome.app/Contents/Frameworks/Helper',
+        ),
+        'Google Chrome',
+      );
+      expect(
+        folderAppOf(folders, r'c:\program files\guarded\bin\worker.exe'),
+        'Guarded',
+      );
+      expect(folderAppOf(folders, '/Applications/Google Chrome.app'), isNull);
+      expect(folderAppOf(folders, ''), isNull);
+    });
+
+    test('an app inside another app\'s folder is itself', () {
+      expect(
+        folderAppOf(const {
+          'Suite': r'C:\Apps\Suite\',
+          'Tool': r'C:\Apps\Suite\Tool\',
+        }, r'C:\Apps\Suite\Tool\tool.exe'),
+        'Tool',
+      );
+    });
+  });
 }

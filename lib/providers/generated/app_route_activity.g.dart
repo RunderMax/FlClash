@@ -44,7 +44,7 @@ final class ActiveRoutedAppsProvider
   }
 }
 
-String _$activeRoutedAppsHash() => r'caf78985ad27ca2ab6d44fd3119d082306294b97';
+String _$activeRoutedAppsHash() => r'0f532dd626b43fd0bad3459bdcef26a53ca8ce77';
 
 /// An app stays marked for a while after its last routed connection.
 
@@ -98,7 +98,7 @@ final class GuardBlockedProvider
   }
 }
 
-String _$guardBlockedHash() => r'5180c7c54f1577849b3f88c174394ceece02a6b9';
+String _$guardBlockedHash() => r'76804a2c86d89721d3dec6ebc1f14e3050e45a1d';
 
 abstract class _$GuardBlocked extends $Notifier<GuardBlocks> {
   GuardBlocks build();
