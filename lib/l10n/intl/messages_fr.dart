@@ -1749,10 +1749,19 @@ class MessageLookup extends MessageLookupByLibrary {
       "Toutes les 3 heures, en Wi-Fi seulement",
     ),
     "pickSortCustom": MessageLookupByLibrary.simpleMessage("Personnalisé"),
+    "pickSortDownload": MessageLookupByLibrary.simpleMessage("Débit"),
     "pickSortPurity": MessageLookupByLibrary.simpleMessage("Pureté"),
     "pickSortSpeed": MessageLookupByLibrary.simpleMessage("Vitesse"),
     "pickStable": MessageLookupByLibrary.simpleMessage("Stable"),
     "pickUnstable": MessageLookupByLibrary.simpleMessage("Instable"),
+    "picksDownloadFailed": MessageLookupByLibrary.simpleMessage("Échec"),
+    "picksDownloadTest": MessageLookupByLibrary.simpleMessage(
+      "Test de débit descendant",
+    ),
+    "picksDownloadTesting": MessageLookupByLibrary.simpleMessage("Test…"),
+    "picksDownloadWifiOnly": MessageLookupByLibrary.simpleMessage(
+      "Le test de débit ne s’exécute qu’en Wi-Fi, pour économiser les données mobiles.",
+    ),
     "picksIdle": MessageLookupByLibrary.simpleMessage(
       "Aucun nœud pour l’instant. Choisissez-en ci-dessous",
     ),

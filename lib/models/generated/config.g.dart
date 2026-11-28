@@ -151,6 +151,7 @@ const _$PickSortEnumMap = {
   PickSort.custom: 'custom',
   PickSort.speed: 'speed',
   PickSort.purity: 'purity',
+  PickSort.download: 'download',
 };
 
 const _$RequestFeedEnumMap = {

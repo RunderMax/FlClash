@@ -357,6 +357,26 @@ abstract class CoreHandlerInterface {
     );
   }
 
+  /// Bytes a second downloaded through [proxyName], or the Core's error.
+  Future<({int? rate, String? error})> downloadSpeed(String proxyName) {
+    return _query(
+      CoreMethod.probeSpeed,
+      _model(
+        (json) => (
+          rate: json['error'] == null
+              ? (json['bytes-per-second'] as num?)?.toInt()
+              : null,
+          error: json['error'] as String?,
+        ),
+      ),
+      arguments: {'proxy-name': proxyName},
+      timeout: coreGuardFor(
+        downloadSpeedBudget.inMilliseconds,
+        budgetFactor: 1,
+      ),
+    );
+  }
+
   Future<List<ServiceCheckItem>> serviceCheck(ServiceCheckParams params) {
     return _query(
       CoreMethod.probeServices,

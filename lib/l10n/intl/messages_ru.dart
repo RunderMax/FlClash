@@ -1704,10 +1704,19 @@ class MessageLookup extends MessageLookupByLibrary {
       "Каждые 3 часа, только по Wi-Fi",
     ),
     "pickSortCustom": MessageLookupByLibrary.simpleMessage("Свой порядок"),
+    "pickSortDownload": MessageLookupByLibrary.simpleMessage("Загрузка"),
     "pickSortPurity": MessageLookupByLibrary.simpleMessage("Чистота"),
     "pickSortSpeed": MessageLookupByLibrary.simpleMessage("Скорость"),
     "pickStable": MessageLookupByLibrary.simpleMessage("Стабильно"),
     "pickUnstable": MessageLookupByLibrary.simpleMessage("Нестабильно"),
+    "picksDownloadFailed": MessageLookupByLibrary.simpleMessage("Ошибка"),
+    "picksDownloadTest": MessageLookupByLibrary.simpleMessage(
+      "Тест скорости загрузки",
+    ),
+    "picksDownloadTesting": MessageLookupByLibrary.simpleMessage("Проверка…"),
+    "picksDownloadWifiOnly": MessageLookupByLibrary.simpleMessage(
+      "Тест скорости загрузки выполняется только по Wi-Fi, чтобы не тратить мобильный трафик.",
+    ),
     "picksIdle": MessageLookupByLibrary.simpleMessage(
       "Узлов пока нет. Выберите их ниже",
     ),

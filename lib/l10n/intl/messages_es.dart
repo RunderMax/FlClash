@@ -1745,10 +1745,19 @@ class MessageLookup extends MessageLookupByLibrary {
       "Cada 3 horas, solo con Wi-Fi",
     ),
     "pickSortCustom": MessageLookupByLibrary.simpleMessage("Personalizado"),
+    "pickSortDownload": MessageLookupByLibrary.simpleMessage("Descarga"),
     "pickSortPurity": MessageLookupByLibrary.simpleMessage("Pureza"),
     "pickSortSpeed": MessageLookupByLibrary.simpleMessage("Velocidad"),
     "pickStable": MessageLookupByLibrary.simpleMessage("Estable"),
     "pickUnstable": MessageLookupByLibrary.simpleMessage("Inestable"),
+    "picksDownloadFailed": MessageLookupByLibrary.simpleMessage("Error"),
+    "picksDownloadTest": MessageLookupByLibrary.simpleMessage(
+      "Prueba de velocidad de descarga",
+    ),
+    "picksDownloadTesting": MessageLookupByLibrary.simpleMessage("Probando…"),
+    "picksDownloadWifiOnly": MessageLookupByLibrary.simpleMessage(
+      "La prueba de descarga solo se ejecuta con Wi-Fi, para ahorrar datos móviles.",
+    ),
     "picksIdle": MessageLookupByLibrary.simpleMessage(
       "Aún no hay nodos. Elige algunos abajo",
     ),

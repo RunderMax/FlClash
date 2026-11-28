@@ -1624,10 +1624,19 @@ class MessageLookup extends MessageLookupByLibrary {
       "Every 3 hours, on Wi-Fi only",
     ),
     "pickSortCustom": MessageLookupByLibrary.simpleMessage("Custom"),
+    "pickSortDownload": MessageLookupByLibrary.simpleMessage("Download"),
     "pickSortPurity": MessageLookupByLibrary.simpleMessage("Purity"),
-    "pickSortSpeed": MessageLookupByLibrary.simpleMessage("Speed"),
+    "pickSortSpeed": MessageLookupByLibrary.simpleMessage("Delay"),
     "pickStable": MessageLookupByLibrary.simpleMessage("Stable"),
     "pickUnstable": MessageLookupByLibrary.simpleMessage("Unstable"),
+    "picksDownloadFailed": MessageLookupByLibrary.simpleMessage("Failed"),
+    "picksDownloadTest": MessageLookupByLibrary.simpleMessage(
+      "Download speed test",
+    ),
+    "picksDownloadTesting": MessageLookupByLibrary.simpleMessage("Testing…"),
+    "picksDownloadWifiOnly": MessageLookupByLibrary.simpleMessage(
+      "Download tests run on Wi-Fi only, to save mobile data.",
+    ),
     "picksIdle": MessageLookupByLibrary.simpleMessage(
       "No nodes yet. Choose a few below",
     ),

@@ -236,6 +236,7 @@ var methodHandlers = map[CoreMethod]methodHandler{
 
 	probeOutboundIPMethod: withArguments(handleOutboundIp),
 	probeServicesMethod:   withArguments(handleServiceCheck),
+	probeSpeedMethod:      withArguments(handleSpeedTest),
 }
 
 func watchRouteHandler(call *MethodCall) (any, error) {

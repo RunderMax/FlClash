@@ -9264,14 +9264,64 @@ class AppLocalizations {
     return Intl.message('Custom', name: 'pickSortCustom', desc: '', args: []);
   }
 
-  /// `Speed`
+  /// `Delay`
   String get pickSortSpeed {
-    return Intl.message('Speed', name: 'pickSortSpeed', desc: '', args: []);
+    return Intl.message('Delay', name: 'pickSortSpeed', desc: '', args: []);
   }
 
   /// `Purity`
   String get pickSortPurity {
     return Intl.message('Purity', name: 'pickSortPurity', desc: '', args: []);
+  }
+
+  /// `Download`
+  String get pickSortDownload {
+    return Intl.message(
+      'Download',
+      name: 'pickSortDownload',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Download speed test`
+  String get picksDownloadTest {
+    return Intl.message(
+      'Download speed test',
+      name: 'picksDownloadTest',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Testing…`
+  String get picksDownloadTesting {
+    return Intl.message(
+      'Testing…',
+      name: 'picksDownloadTesting',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Failed`
+  String get picksDownloadFailed {
+    return Intl.message(
+      'Failed',
+      name: 'picksDownloadFailed',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Download tests run on Wi-Fi only, to save mobile data.`
+  String get picksDownloadWifiOnly {
+    return Intl.message(
+      'Download tests run on Wi-Fi only, to save mobile data.',
+      name: 'picksDownloadWifiOnly',
+      desc: '',
+      args: [],
+    );
   }
 
   /// `Stability`
