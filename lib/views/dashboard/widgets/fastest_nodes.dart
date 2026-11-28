@@ -121,6 +121,14 @@ Set<String> _inUse(
   };
 }
 
+/// [picks] with [name] moved to the front, the rest standing by in their order.
+@visibleForTesting
+List<String> mainFirst(List<String> picks, String name) => [
+  if (picks.contains(name)) name,
+  for (final pick in picks)
+    if (pick != name) pick,
+];
+
 typedef _Pick = ({
   String name,
   int? delay,
@@ -243,10 +251,17 @@ class _FastestNodesCardState extends ConsumerState<FastestNodesCard> {
     );
   }
 
-  /// A node picked by hand takes over from the automatic choice.
+  /// While the choice is automatic, a tap makes the node the main line.
   Future<void> _select(String name) async {
-    if (ref.read(patchClashConfigProvider).slothPickAuto) {
-      _setAuto(false);
+    final config = ref.read(patchClashConfigProvider);
+    if (config.slothPickAuto) {
+      ref
+          .read(patchClashConfigProvider.notifier)
+          .update(
+            (state) =>
+                state.copyWith(slothPicks: mainFirst(state.slothPicks, name)),
+          );
+      return;
     }
     final actions = ref.read(proxiesActionProvider.notifier);
     await actions.changeProxy(groupName: slothPicksGroup, proxyName: name);
@@ -360,26 +375,34 @@ class _FastestNodesCardState extends ConsumerState<FastestNodesCard> {
             glyph: AppGlyphs.bolt,
             title: appLocalizations.fastestNodes,
             trailing: [
-              DashboardIconButton(
-                glyph: AppGlyphs.dataUsage,
-                tooltip: appLocalizations.pickHistory,
-                onPressed: names.isEmpty
-                    ? null
-                    : () => _showHistory([for (final pick in picks) pick.name]),
-              ),
-              DashboardIconButton(
-                glyph: AppGlyphs.cloudDownload,
-                tooltip: appLocalizations.picksDownloadTest,
-                onPressed: names.isEmpty || speeds.busy
-                    ? null
-                    : () => _testDownload(names),
-              ),
               Transform.translate(
                 offset: const Offset(8, 0),
-                child: DashboardIconButton(
-                  glyph: AppGlyphs.speed,
-                  tooltip: appLocalizations.picksTest,
-                  onPressed: names.isEmpty ? null : () => _test(names),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  spacing: 8,
+                  children: [
+                    DashboardIconButton(
+                      glyph: AppGlyphs.dataUsage,
+                      tooltip: appLocalizations.pickHistory,
+                      onPressed: names.isEmpty
+                          ? null
+                          : () => _showHistory([
+                              for (final pick in picks) pick.name,
+                            ]),
+                    ),
+                    DashboardIconButton(
+                      glyph: AppGlyphs.cloudDownload,
+                      tooltip: appLocalizations.picksDownloadTest,
+                      onPressed: names.isEmpty || speeds.busy
+                          ? null
+                          : () => _testDownload(names),
+                    ),
+                    DashboardIconButton(
+                      glyph: AppGlyphs.speed,
+                      tooltip: appLocalizations.picksTest,
+                      onPressed: names.isEmpty ? null : () => _test(names),
+                    ),
+                  ],
                 ),
               ),
             ],
@@ -438,6 +461,11 @@ class _FastestNodesCardState extends ConsumerState<FastestNodesCard> {
             for (final pick in picks) ...[
               _PickTile(
                 pick: pick,
+                role: switch (auto ? names.indexOf(pick.name) : -1) {
+                  < 0 => null,
+                  0 => appLocalizations.pickRoleMain,
+                  final index => appLocalizations.pickRoleBackup(index),
+                },
                 selected: inUse.contains(pick.name),
                 onTap: () => _select(pick.name),
               ),
@@ -483,11 +511,13 @@ String _rateLabel(int bytesPerSecond) {
 class _PickTile extends StatelessWidget {
   const _PickTile({
     required this.pick,
+    required this.role,
     required this.selected,
     required this.onTap,
   });
 
   final _Pick pick;
+  final String? role;
   final bool selected;
   final VoidCallback onTap;
 
@@ -535,6 +565,13 @@ class _PickTile extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
+                  if (role case final role?)
+                    Text(
+                      role,
+                      style: AppTextStyle.caption1
+                          .of(context, emphasized: true)
+                          .copyWith(color: colorScheme.primary),
+                    ),
                   Text(
                     ip == null ? '-' : '${ip.ip} · ${ip.countryCode}',
                     maxLines: 1,

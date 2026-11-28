@@ -1169,7 +1169,9 @@
   "appPureOnlyDesc": "Si el nodo no es «Buena», la app no puede conectarse",
   "pureOnlyEverywhere": "Ya activo para todas las apps en Refuerzo de privacidad",
   "autoSwitch": "Cambiar automáticamente",
-  "autoSwitchDesc": "Primero los nodos «Buena», luego el más rápido",
+  "autoSwitchDesc": "Línea principal; si falla, las reservas por turno y luego vuelve",
+  "pickRoleMain": "Principal",
+  "pickRoleBackup": "Reserva {index}",
   "appRoutePicksDesc": "Elige algunos nodos y cámbialos con un toque en la tarjeta",
   "appRoutePicksCount": "{count, plural, =1{1 nodo} other{{count} nodos}}",
   "guardStopped": "Bloqueado"

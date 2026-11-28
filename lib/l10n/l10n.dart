@@ -9876,13 +9876,28 @@ class AppLocalizations {
     );
   }
 
-  /// `Good nodes first, then the fastest`
+  /// `Use the main line; on failure take the backups in turn, then return`
   String get autoSwitchDesc {
     return Intl.message(
-      'Good nodes first, then the fastest',
+      'Use the main line; on failure take the backups in turn, then return',
       name: 'autoSwitchDesc',
       desc: '',
       args: [],
+    );
+  }
+
+  /// `Main`
+  String get pickRoleMain {
+    return Intl.message('Main', name: 'pickRoleMain', desc: '', args: []);
+  }
+
+  /// `Backup {index}`
+  String pickRoleBackup(Object index) {
+    return Intl.message(
+      'Backup $index',
+      name: 'pickRoleBackup',
+      desc: '',
+      args: [index],
     );
   }
 

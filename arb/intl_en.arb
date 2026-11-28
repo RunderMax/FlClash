@@ -1169,7 +1169,9 @@
   "appPureOnlyDesc": "When the node isn't Good, this app can't go online",
   "pureOnlyEverywhere": "Already on for every app in Privacy hardening",
   "autoSwitch": "Switch automatically",
-  "autoSwitchDesc": "Good nodes first, then the fastest",
+  "autoSwitchDesc": "Use the main line; on failure take the backups in turn, then return",
+  "pickRoleMain": "Main",
+  "pickRoleBackup": "Backup {index}",
   "appRoutePicksDesc": "Pick a few nodes, then switch with a tap on the card",
   "appRoutePicksCount": "{count, plural, =1{1 node} other{{count} nodes}}",
   "guardStopped": "Blocked"

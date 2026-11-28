@@ -1169,7 +1169,9 @@
   "appPureOnlyDesc": "Si le nœud n'est pas « Bonne », l'app ne peut pas se connecter",
   "pureOnlyEverywhere": "Déjà actif pour toutes les apps dans Renforcement",
   "autoSwitch": "Changer automatiquement",
-  "autoSwitchDesc": "D'abord les nœuds « Bonne », puis le plus rapide",
+  "autoSwitchDesc": "Ligne principale ; en cas de panne, les secours à tour de rôle, puis retour",
+  "pickRoleMain": "Principale",
+  "pickRoleBackup": "Secours {index}",
   "appRoutePicksDesc": "Choisissez quelques nœuds, puis changez d'un toucher sur la carte",
   "appRoutePicksCount": "{count, plural, =1{1 nœud} other{{count} nœuds}}",
   "guardStopped": "Bloqué"

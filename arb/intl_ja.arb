@@ -1169,7 +1169,9 @@
   "appPureOnlyDesc": "ノードが「良好」でないとき、このアプリは通信できません",
   "pureOnlyEverywhere": "「プライバシー強化」ですべてのアプリに適用中",
   "autoSwitch": "自動で切り替え",
-  "autoSwitchDesc": "「良好」なノードを優先し、その中で最速を選びます",
+  "autoSwitchDesc": "通常はメイン回線、切れたら予備を順に使い、復旧後に戻ります",
+  "pickRoleMain": "メイン",
+  "pickRoleBackup": "予備 {index}",
   "appRoutePicksDesc": "いくつかノードを選び、カードをタップして切り替え",
   "appRoutePicksCount": "{count} 個のノード",
   "guardStopped": "遮断中"
