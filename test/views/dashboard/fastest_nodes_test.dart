@@ -80,4 +80,10 @@ void main() {
       ]);
     });
   });
+
+  test('a node made the main line leads and the rest keep their order', () {
+    expect(mainFirst(['a', 'b', 'c'], 'c'), ['c', 'a', 'b']);
+    expect(mainFirst(['a', 'b', 'c'], 'a'), ['a', 'b', 'c']);
+    expect(mainFirst(['a', 'b'], 'gone'), ['a', 'b']);
+  });
 }

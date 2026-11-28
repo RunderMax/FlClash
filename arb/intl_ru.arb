@@ -1169,7 +1169,9 @@
   "appPureOnlyDesc": "Если узел не «Хороший», приложение не выйдет в сеть",
   "pureOnlyEverywhere": "Уже включено для всех приложений в «Усилении приватности»",
   "autoSwitch": "Переключать автоматически",
-  "autoSwitchDesc": "Сначала узлы «Хороший», затем самый быстрый",
+  "autoSwitchDesc": "Основная линия; при сбое — резервные по очереди, затем возврат",
+  "pickRoleMain": "Основная",
+  "pickRoleBackup": "Резерв {index}",
   "appRoutePicksDesc": "Выберите несколько узлов и переключайте их касанием на карточке",
   "appRoutePicksCount": "{count, plural, one{{count} узел} few{{count} узла} many{{count} узлов} other{{count} узла}}",
   "guardStopped": "Заблокировано"

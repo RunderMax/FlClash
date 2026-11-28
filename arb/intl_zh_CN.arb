@@ -1169,7 +1169,9 @@
   "appPureOnlyDesc": "节点不是「优」时，这个软件上不了网",
   "pureOnlyEverywhere": "「隐私加固」里已对所有软件打开",
   "autoSwitch": "自动切换",
-  "autoSwitchDesc": "先挑「优」的节点，再看谁最快",
+  "autoSwitchDesc": "平时用主线路，断了依次换备用，恢复后切回",
+  "pickRoleMain": "主线路",
+  "pickRoleBackup": "备用 {index}",
   "appRoutePicksDesc": "选几个节点，在卡片上点一下就能换",
   "appRoutePicksCount": "{count} 个节点",
   "guardStopped": "已阻断"

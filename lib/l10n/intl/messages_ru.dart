@@ -221,78 +221,80 @@ class MessageLookup extends MessageLookupByLibrary {
   static String m78(average, timeouts, jitter) =>
       "Среднее ${average} мс · таймаутов ${timeouts} · разброс ±${jitter} мс";
 
-  static String m79(label) =>
+  static String m79(index) => "Резерв ${index}";
+
+  static String m80(label) =>
       "Значение «${label}» должно быть от 1024 до 49151";
 
-  static String m80(port) => "Порт ${port}";
+  static String m81(port) => "Порт ${port}";
 
-  static String m81(days) => "Осталось дней: ${days}";
+  static String m82(days) => "Осталось дней: ${days}";
 
-  static String m82(date, days) => "Истекает ${date}, осталось дней: ${days}";
+  static String m83(date, days) => "Истекает ${date}, осталось дней: ${days}";
 
-  static String m83(time) => "Обновлено ${time}";
+  static String m84(time) => "Обновлено ${time}";
 
-  static String m84(label, profiles) =>
+  static String m85(label, profiles) =>
       "«${label}» всё ещё используется профилями: ${profiles}. После удаления они будут работать неправильно. Вы уверены, что хотите удалить его?";
 
-  static String m85(count, label) =>
+  static String m86(count, label) =>
       "${Intl.plural(count, other: '${label} прокси')}";
 
-  static String m86(name, count) => "${name} и другие (${count} прокси)";
+  static String m87(name, count) => "${name} и другие (${count} прокси)";
 
-  static String m87(removed) =>
+  static String m88(removed) =>
       "Будут удалены прокси: ${removed}. Строка с изменённым именем считается новым прокси, а пользовательские профили, ссылающиеся на удалённые, пометят их как отсутствующие. Применить?";
 
-  static String m88(removed, added) =>
+  static String m89(removed, added) =>
       "Будут удалены прокси: ${removed}. Будут добавлены: ${added}. Строка с изменённым именем считается новым прокси, а пользовательские профили, ссылающиеся на удалённые, пометят их как отсутствующие. Применить?";
 
-  static String m89(label) =>
+  static String m90(label) =>
       "На «${label}» всё ещё ссылаются правила, группы прокси, прокси для подключения, DNS или NTP этого профиля, и после удаления эти ссылки перестанут работать. Вы уверены, что хотите удалить её?";
 
-  static String m90(count, label) =>
+  static String m91(count, label) =>
       "${Intl.plural(count, one: '${label} группа прокси', few: '${label} группы прокси', many: '${label} групп прокси', other: '${label} группы прокси')}";
 
-  static String m91(count) =>
+  static String m92(count) =>
       "${Intl.plural(count, one: 'Только что заблокировано ${count} соединение', few: 'Только что заблокировано ${count} соединения', many: 'Только что заблокировано ${count} соединений', other: 'Только что заблокировано ${count} соединения')}";
 
-  static String m92(count, label) =>
+  static String m93(count, label) =>
       "${Intl.plural(count, one: '${label} правило', few: '${label} правила', many: '${label} правил', other: '${label} правила')}";
 
-  static String m93(appName) => "${appName} (Безопасный режим)";
+  static String m94(appName) => "${appName} (Безопасный режим)";
 
-  static String m94(count) =>
+  static String m95(count) =>
       "${Intl.plural(count, one: '${count} секунда', few: '${count} секунды', many: '${count} секунд', other: '${count} секунды')}";
 
-  static String m95(count) => "Действуют: ${count}";
+  static String m96(count) => "Действуют: ${count}";
 
-  static String m96(count) => "Проблем: ${count}";
+  static String m97(count) => "Проблем: ${count}";
 
-  static String m97(count) =>
+  static String m98(count) =>
       "${Intl.plural(count, one: '${count} настройка', few: '${count} настройки', many: '${count} настроек', other: '${count} настройки')}";
 
-  static String m98(link) => "Не удалось прочитать прокси из ${link}";
+  static String m99(link) => "Не удалось прочитать прокси из ${link}";
 
-  static String m99(label) => "«${label}» — только одно значение";
+  static String m100(label) => "«${label}» — только одно значение";
 
-  static String m100(count) =>
+  static String m101(count) =>
       "${Intl.plural(count, one: '${count} адрес', few: '${count} адреса', other: '${count} адресов')}";
 
-  static String m101(query) => "Найти «${query}» в сети";
+  static String m102(query) => "Найти «${query}» в сети";
 
-  static String m102(value) => "Пик ${value}";
+  static String m103(value) => "Пик ${value}";
 
-  static String m103(value) => "Всего ${value}";
+  static String m104(value) => "Всего ${value}";
 
-  static String m104(transport) => "Заголовки ${transport}";
+  static String m105(transport) => "Заголовки ${transport}";
 
-  static String m105(label) => "Значение «${label}» должно быть URL";
+  static String m106(label) => "Значение «${label}» должно быть URL";
 
-  static String m106(date) => "Действителен до ${date}";
-
-  static String m107(count) =>
-      "${Intl.plural(count, one: '${count} год назад', few: '${count} года назад', many: '${count} лет назад', other: '${count} года назад')}";
+  static String m107(date) => "Действителен до ${date}";
 
   static String m108(count) =>
+      "${Intl.plural(count, one: '${count} год назад', few: '${count} года назад', many: '${count} лет назад', other: '${count} года назад')}";
+
+  static String m109(count) =>
       "${Intl.plural(count, one: '${count} г. назад', few: '${count} г. назад', many: '${count} л. назад', other: '${count} г. назад')}";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
@@ -460,7 +462,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "Переключать автоматически",
     ),
     "autoSwitchDesc": MessageLookupByLibrary.simpleMessage(
-      "Сначала узлы «Хороший», затем самый быстрый",
+      "Основная линия; при сбое — резервные по очереди, затем возврат",
     ),
     "autoUpdate": MessageLookupByLibrary.simpleMessage("Автообновление"),
     "autoUpdateInterval": MessageLookupByLibrary.simpleMessage(
@@ -1702,6 +1704,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "pickRecordDesc": MessageLookupByLibrary.simpleMessage(
       "Каждые 3 часа, только по Wi-Fi",
     ),
+    "pickRoleBackup": m79,
+    "pickRoleMain": MessageLookupByLibrary.simpleMessage("Основная"),
     "pickSortCustom": MessageLookupByLibrary.simpleMessage("Свой порядок"),
     "pickSortDownload": MessageLookupByLibrary.simpleMessage("Загрузка"),
     "pickSortPurity": MessageLookupByLibrary.simpleMessage("Чистота"),
@@ -1746,8 +1750,8 @@ class MessageLookup extends MessageLookupByLibrary {
       "Введите другой порт",
     ),
     "portHopping": MessageLookupByLibrary.simpleMessage("Перескок портов"),
-    "portTip": m79,
-    "portValue": m80,
+    "portTip": m80,
+    "portValue": m81,
     "ports": MessageLookupByLibrary.simpleMessage("Порты"),
     "preSharedKey": MessageLookupByLibrary.simpleMessage("Общий ключ"),
     "preferred": MessageLookupByLibrary.simpleMessage("Предпочтительный"),
@@ -1786,8 +1790,8 @@ class MessageLookup extends MessageLookupByLibrary {
         MessageLookupByLibrary.simpleMessage("Введите корректный интервал"),
     "profileAutoUpdateIntervalNullValidationDesc":
         MessageLookupByLibrary.simpleMessage("Введите интервал автообновления"),
-    "profileDaysLeft": m81,
-    "profileExpiresIn": m82,
+    "profileDaysLeft": m82,
+    "profileExpiresIn": m83,
     "profileHasUpdate": MessageLookupByLibrary.simpleMessage(
       "Профиль изменён. Отключить автообновление?",
     ),
@@ -1800,7 +1804,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "profileTunSettingsDesc": MessageLookupByLibrary.simpleMessage(
       "Действует только для этого профиля и имеет приоритет над переопределяемыми параметрами TUN в настройках сети.",
     ),
-    "profileUpdatedAt": m83,
+    "profileUpdatedAt": m84,
     "profileUrlInvalidValidationDesc": MessageLookupByLibrary.simpleMessage(
       "Введите корректный URL профиля",
     ),
@@ -1813,26 +1817,26 @@ class MessageLookup extends MessageLookupByLibrary {
     "protocol": MessageLookupByLibrary.simpleMessage("Протокол"),
     "protocolParam": MessageLookupByLibrary.simpleMessage("Параметр протокола"),
     "protocolVersion": MessageLookupByLibrary.simpleMessage("Версия протокола"),
-    "providerInUse": m84,
+    "providerInUse": m85,
     "providerUrlTip": MessageLookupByLibrary.simpleMessage(
       "Поддерживаются только удалённые ресурсы",
     ),
     "providers": MessageLookupByLibrary.simpleMessage("Внешние ресурсы"),
     "proxies": MessageLookupByLibrary.simpleMessage("Прокси"),
-    "proxiesCount": m85,
-    "proxiesProfileLabel": m86,
-    "proxiesRemovedTip": m87,
-    "proxiesReplacedTip": m88,
+    "proxiesCount": m86,
+    "proxiesProfileLabel": m87,
+    "proxiesRemovedTip": m88,
+    "proxiesReplacedTip": m89,
     "proxyChains": MessageLookupByLibrary.simpleMessage("Цепочка прокси"),
     "proxyGroup": MessageLookupByLibrary.simpleMessage("Группа прокси"),
     "proxyGroupEmpty": MessageLookupByLibrary.simpleMessage(
       "Группа прокси пуста",
     ),
-    "proxyGroupInUse": m89,
+    "proxyGroupInUse": m90,
     "proxyGroupsAfterStart": MessageLookupByLibrary.simpleMessage(
       "Группы появятся здесь после запуска ядра",
     ),
-    "proxyGroupsCount": m90,
+    "proxyGroupsCount": m91,
     "proxyProviders": MessageLookupByLibrary.simpleMessage("Провайдеры прокси"),
     "proxyServerNameserverDesc": MessageLookupByLibrary.simpleMessage(
       "Используется только для разрешения имён прокси-серверов.",
@@ -1854,7 +1858,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "pureOnlyEverywhere": MessageLookupByLibrary.simpleMessage(
       "Уже включено для всех приложений в «Усилении приватности»",
     ),
-    "pureOnlyStopped": m91,
+    "pureOnlyStopped": m92,
     "qrcode": MessageLookupByLibrary.simpleMessage("QR-код"),
     "qrcodeDesc": MessageLookupByLibrary.simpleMessage(
       "Сканируйте QR-код, чтобы получить профиль",
@@ -2106,7 +2110,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "Правило должно начинаться с поддерживаемого типа, например DOMAIN,example.com,DIRECT",
     ),
     "rules": MessageLookupByLibrary.simpleMessage("Правила"),
-    "rulesCount": m92,
+    "rulesCount": m93,
     "runCheck": MessageLookupByLibrary.simpleMessage("Проверить"),
     "runTime": MessageLookupByLibrary.simpleMessage("Время работы"),
     "running": MessageLookupByLibrary.simpleMessage("Работает"),
@@ -2114,7 +2118,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "Конфигурация выполнения",
     ),
     "safeMode": MessageLookupByLibrary.simpleMessage("Безопасный режим"),
-    "safeModeAppTitle": m93,
+    "safeModeAppTitle": m94,
     "saturation": MessageLookupByLibrary.simpleMessage("Насыщенность"),
     "save": MessageLookupByLibrary.simpleMessage("Сохранить"),
     "saveChanges": MessageLookupByLibrary.simpleMessage("Сохранить изменения?"),
@@ -2127,9 +2131,9 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "search": MessageLookupByLibrary.simpleMessage("Поиск"),
     "seconds": MessageLookupByLibrary.simpleMessage("секунд"),
-    "secondsCount": m94,
+    "secondsCount": m95,
     "secretKey": MessageLookupByLibrary.simpleMessage("Ключ"),
-    "sectionsInEffect": m95,
+    "sectionsInEffect": m96,
     "secureWindow": MessageLookupByLibrary.simpleMessage("Скрывать в недавних"),
     "secureWindowDesc": MessageLookupByLibrary.simpleMessage(
       "В недавних приложениях экран пустой, снимки экрана запрещены",
@@ -2168,7 +2172,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "Отсканируйте код камерой телефона и вставьте ссылку на открывшейся странице. Оба устройства должны быть в одной сети.",
     ),
     "server": MessageLookupByLibrary.simpleMessage("Сервер"),
-    "serviceAbnormalCount": m96,
+    "serviceAbnormalCount": m97,
     "serviceAllAvailable": MessageLookupByLibrary.simpleMessage("Все доступны"),
     "serviceAvailable": MessageLookupByLibrary.simpleMessage("Доступен"),
     "serviceBlocked": MessageLookupByLibrary.simpleMessage("Заблокировано"),
@@ -2198,8 +2202,8 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "settingEntries": MessageLookupByLibrary.simpleMessage("параметры"),
     "settings": MessageLookupByLibrary.simpleMessage("Настройки"),
-    "settingsCount": m97,
-    "shareLinkUnreadable": m98,
+    "settingsCount": m98,
+    "shareLinkUnreadable": m99,
     "shareLinksInvalid": MessageLookupByLibrary.simpleMessage(
       "Не удалось прочитать прокси из ссылок",
     ),
@@ -2219,9 +2223,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "singleShareLinkOnly": MessageLookupByLibrary.simpleMessage(
       "Здесь укажите одну ссылку, несколько можно задать в быстром редактировании списка",
     ),
-    "singleValueTip": m99,
-    "siteDomainCount": m100,
-    "siteLookup": m101,
+    "singleValueTip": m100,
+    "siteDomainCount": m101,
+    "siteLookup": m102,
     "siteLookupDomains": MessageLookupByLibrary.simpleMessage(
       "Адреса, которые использует сайт",
     ),
@@ -2372,11 +2376,11 @@ class MessageLookup extends MessageLookupByLibrary {
     "totalUpload": MessageLookupByLibrary.simpleMessage("Отдано"),
     "tproxyPort": MessageLookupByLibrary.simpleMessage("Порт TProxy"),
     "traffic": MessageLookupByLibrary.simpleMessage("Трафик"),
-    "trafficPeak": m102,
-    "trafficTotal": m103,
+    "trafficPeak": m103,
+    "trafficTotal": m104,
     "trafficUsage": MessageLookupByLibrary.simpleMessage("Статистика трафика"),
     "transport": MessageLookupByLibrary.simpleMessage("Транспорт"),
-    "transportHeaders": m104,
+    "transportHeaders": m105,
     "trustCertificate": MessageLookupByLibrary.simpleMessage(
       "Доверять сертификату",
     ),
@@ -2438,7 +2442,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "uploadBandwidth": MessageLookupByLibrary.simpleMessage("Скорость отдачи"),
     "url": MessageLookupByLibrary.simpleMessage("URL"),
     "urlRewrite": MessageLookupByLibrary.simpleMessage("Перезапись URL"),
-    "urlTip": m105,
+    "urlTip": m106,
     "useHosts": MessageLookupByLibrary.simpleMessage("Использовать hosts"),
     "useSystemHosts": MessageLookupByLibrary.simpleMessage(
       "Использовать системный hosts",
@@ -2449,7 +2453,7 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "userAgent": MessageLookupByLibrary.simpleMessage("User-Agent"),
     "username": MessageLookupByLibrary.simpleMessage("Имя пользователя"),
-    "validUntil": m106,
+    "validUntil": m107,
     "value": MessageLookupByLibrary.simpleMessage("Значение"),
     "view": MessageLookupByLibrary.simpleMessage("Просмотр"),
     "viewAll": MessageLookupByLibrary.simpleMessage("Показать всё"),
@@ -2471,8 +2475,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "writeToSystemDesc": MessageLookupByLibrary.simpleMessage(
       "«Записывать в систему» также устанавливает системные часы; Android это игнорирует.",
     ),
-    "yearsAgo": m107,
-    "yearsAgoShort": m108,
+    "yearsAgo": m108,
+    "yearsAgoShort": m109,
     "yes": MessageLookupByLibrary.simpleMessage("Да"),
     "zhCN": MessageLookupByLibrary.simpleMessage("Упрощённый китайский"),
   };

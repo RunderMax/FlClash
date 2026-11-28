@@ -1169,7 +1169,9 @@
   "appPureOnlyDesc": "노드가 「양호」가 아니면 이 앱은 인터넷을 쓸 수 없어요",
   "pureOnlyEverywhere": "「개인정보 강화」에서 모든 앱에 켜져 있어요",
   "autoSwitch": "자동 전환",
-  "autoSwitchDesc": "「양호」 노드를 먼저, 그다음 가장 빠른 것",
+  "autoSwitchDesc": "평소엔 주 회선, 끊기면 예비를 차례로 쓰고 복구되면 돌아옵니다",
+  "pickRoleMain": "주 회선",
+  "pickRoleBackup": "예비 {index}",
   "appRoutePicksDesc": "노드 몇 개를 골라 카드에서 탭으로 바꿔요",
   "appRoutePicksCount": "{count, plural, other{노드 {count}개}}",
   "guardStopped": "차단됨"
