@@ -6,6 +6,7 @@ import 'package:fl_clash/common/common.dart';
 import 'package:fl_clash/enum/enum.dart';
 import 'package:fl_clash/features/ip_quality/labels.dart';
 import 'package:fl_clash/models/models.dart';
+import 'package:fl_clash/providers/download_speed.dart';
 import 'package:fl_clash/providers/ip_quality.dart';
 import 'package:fl_clash/providers/outbound_ip.dart';
 import 'package:fl_clash/providers/pick_routes.dart';
@@ -120,7 +121,30 @@ Set<String> _inUse(
   };
 }
 
-typedef _Pick = ({String name, int? delay, IpInfo? ip, IpQuality? quality});
+typedef _Pick = ({
+  String name,
+  int? delay,
+  IpInfo? ip,
+  IpQuality? quality,
+  _Download download,
+});
+
+enum _DownloadState { untested, testing, failed, done }
+
+typedef _Download = ({_DownloadState state, int rate});
+
+_Download _downloadOf(DownloadSpeeds speeds, String name) {
+  if (speeds.pending.contains(name)) {
+    return (state: _DownloadState.testing, rate: speeds.rates[name] ?? 0);
+  }
+  if (!speeds.rates.containsKey(name)) {
+    return (state: _DownloadState.untested, rate: 0);
+  }
+  final rate = speeds.rates[name];
+  return rate == null
+      ? (state: _DownloadState.failed, rate: 0)
+      : (state: _DownloadState.done, rate: rate);
+}
 
 /// Timeouts and untested nodes go last, in that order.
 int _delayRank(int? delay) => switch (delay) {
@@ -147,6 +171,7 @@ List<_Pick> _sorted(List<_Pick> picks, PickSort sort) => switch (sort) {
   PickSort.custom => picks,
   PickSort.speed => picks.sortedBy<num>((pick) => _delayRank(pick.delay)),
   PickSort.purity => picks.sorted(_byPurity),
+  PickSort.download => picks.sortedBy<num>((pick) => -pick.download.rate),
 };
 
 String _sortLabel(BuildContext context, PickSort sort) {
@@ -155,6 +180,7 @@ String _sortLabel(BuildContext context, PickSort sort) {
     PickSort.custom => appLocalizations.pickSortCustom,
     PickSort.speed => appLocalizations.pickSortSpeed,
     PickSort.purity => appLocalizations.pickSortPurity,
+    PickSort.download => appLocalizations.pickSortDownload,
   };
 }
 
@@ -204,6 +230,17 @@ class _FastestNodesCardState extends ConsumerState<FastestNodesCard> {
       ...picks.map((name) => byName[name]).nonNulls,
     ]);
     _probe.refresh(picks);
+  }
+
+  Future<void> _testDownload(List<String> picks) async {
+    final allowed = await ref
+        .read(downloadSpeedTestProvider.notifier)
+        .run(picks);
+    if (allowed || !mounted) return;
+    await dialogs.showAlert(
+      title: context.appLocalizations.picksDownloadTest,
+      message: TextSpan(text: context.appLocalizations.picksDownloadWifiOnly),
+    );
   }
 
   /// A node picked by hand takes over from the automatic choice.
@@ -271,7 +308,7 @@ class _FastestNodesCardState extends ConsumerState<FastestNodesCard> {
     );
   }
 
-  _Pick _pickOf(String name) {
+  _Pick _pickOf(String name, DownloadSpeeds speeds) {
     final ip = ref.watch(
       outboundIpProbeProvider.select((state) => state.valueOf(name)),
     );
@@ -280,6 +317,7 @@ class _FastestNodesCardState extends ConsumerState<FastestNodesCard> {
       delay: ref.watch(delayProvider(proxyName: name)),
       ip: ip,
       quality: ip == null ? null : ref.watch(ipQualityProvider(ip.ip)).value,
+      download: _downloadOf(speeds, name),
     );
   }
 
@@ -308,7 +346,10 @@ class _FastestNodesCardState extends ConsumerState<FastestNodesCard> {
       _entryOf(groups, mode),
     );
     _watchPicks(names);
-    final picks = _sorted([for (final name in names) _pickOf(name)], sort);
+    final speeds = ref.watch(downloadSpeedTestProvider);
+    final picks = _sorted([
+      for (final name in names) _pickOf(name, speeds),
+    ], sort);
     return DashboardCard(
       semanticLabel: appLocalizations.fastestNodes,
       child: Column(
@@ -325,6 +366,13 @@ class _FastestNodesCardState extends ConsumerState<FastestNodesCard> {
                 onPressed: names.isEmpty
                     ? null
                     : () => _showHistory([for (final pick in picks) pick.name]),
+              ),
+              DashboardIconButton(
+                glyph: AppGlyphs.cloudDownload,
+                tooltip: appLocalizations.picksDownloadTest,
+                onPressed: names.isEmpty || speeds.busy
+                    ? null
+                    : () => _testDownload(names),
               ),
               Transform.translate(
                 offset: const Offset(8, 0),
@@ -427,6 +475,11 @@ class _FastestNodesCardState extends ConsumerState<FastestNodesCard> {
   }
 }
 
+String _rateLabel(int bytesPerSecond) {
+  final show = bytesPerSecond.traffic;
+  return '${show.value} ${show.unit}/s';
+}
+
 class _PickTile extends StatelessWidget {
   const _PickTile({
     required this.pick,
@@ -507,16 +560,30 @@ class _PickTile extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 10),
-            Text(
-              switch (delay) {
-                null => '-',
-                < 0 => appLocalizations.timeout,
-                final delay => '$delay ms',
-              },
-              style: AppTextStyle.footnote
-                  .of(context, emphasized: true)
-                  .toTabular
-                  .copyWith(color: colorScheme.delayColor(delay)),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              spacing: 2,
+              children: [
+                Text(
+                  switch (delay) {
+                    null => '-',
+                    < 0 => appLocalizations.timeout,
+                    final delay => '$delay ms',
+                  },
+                  style: AppTextStyle.footnote
+                      .of(context, emphasized: true)
+                      .toTabular
+                      .copyWith(color: colorScheme.delayColor(delay)),
+                ),
+                if (pick.download.state != _DownloadState.untested)
+                  Text(switch (pick.download.state) {
+                    _DownloadState.testing =>
+                      appLocalizations.picksDownloadTesting,
+                    _DownloadState.failed =>
+                      appLocalizations.picksDownloadFailed,
+                    _ => _rateLabel(pick.download.rate),
+                  }, style: secondary.toTabular),
+              ],
             ),
           ],
         ),

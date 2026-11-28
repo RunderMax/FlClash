@@ -81,6 +81,9 @@ const delayTimedOutValue = -1;
 
 const probeTimeoutDuration = Duration(seconds: 10);
 
+/// Kept above speedTestDial plus speedTestDuration in core/speed.go.
+const downloadSpeedBudget = Duration(seconds: 20);
+
 /// Outlasts the Core's one-second pick poll (`routePollInterval` in
 /// core/route.go), so groups re-picking on neighbouring polls cost one route
 /// check.
