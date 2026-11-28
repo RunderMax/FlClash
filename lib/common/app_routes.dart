@@ -126,6 +126,22 @@ extension AppRoutesExt on PatchClashConfig {
   PatchClashConfig withAppAuto(String packageName, bool auto) =>
       copyWith(slothAppAuto: _toggled(slothAppAuto, packageName, auto));
 
-  PatchClashConfig withAppPureOnly(String packageName, bool on) =>
-      copyWith(slothAppPureOnly: _toggled(slothAppPureOnly, packageName, on));
+  PatchClashConfig withAppPureOnly(String packageName, bool on) => copyWith(
+    slothAppPureOnly: _toggled(slothAppPureOnly, packageName, on),
+    slothAppPureNormal: on
+        ? slothAppPureNormal
+        : _toggled(slothAppPureNormal, packageName, false),
+  );
+
+  bool appTakesNormal(String packageName) =>
+      slothAppPureOnly.contains(packageName)
+      ? slothAppPureNormal.contains(packageName)
+      : slothPureOnly && slothPureNormal;
+
+  /// The app keeps a floor of its own under the switch for all.
+  PatchClashConfig withAppPureNormal(String packageName, bool normal) =>
+      copyWith(
+        slothAppPureOnly: _toggled(slothAppPureOnly, packageName, true),
+        slothAppPureNormal: _toggled(slothAppPureNormal, packageName, normal),
+      );
 }

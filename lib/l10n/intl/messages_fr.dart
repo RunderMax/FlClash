@@ -402,6 +402,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "appIconDesign": MessageLookupByLibrary.simpleMessage(
       "Conception de l’icône de l’app",
     ),
+    "appPickNodes": MessageLookupByLibrary.simpleMessage(
+      "Nœuds de cette application",
+    ),
     "appProxiesEmpty": MessageLookupByLibrary.simpleMessage(
       "Aucun proxy local",
     ),
@@ -1898,6 +1901,12 @@ class MessageLookup extends MessageLookupByLibrary {
     "proxyType": MessageLookupByLibrary.simpleMessage("Type de proxy"),
     "pruneCache": MessageLookupByLibrary.simpleMessage("Nettoyer le cache"),
     "publicKey": MessageLookupByLibrary.simpleMessage("Clé publique"),
+    "pureAllowNormal": MessageLookupByLibrary.simpleMessage(
+      "Laisser aussi passer les nœuds « Normale »",
+    ),
+    "pureAllowNormalDesc": MessageLookupByLibrary.simpleMessage(
+      "Les lignes de centre de données passent aussi ; risquées et non vérifiées restent coupées",
+    ),
     "pureBlack": MessageLookupByLibrary.simpleMessage("Noir pur"),
     "pureBlackMode": MessageLookupByLibrary.simpleMessage("Mode noir pur"),
     "pureOnly": MessageLookupByLibrary.simpleMessage(

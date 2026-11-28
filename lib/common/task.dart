@@ -411,6 +411,8 @@ Future<RealProfile> _makeRealProfileTask(MakeRealProfileState data) async {
     rawConfig[slothGuardKey] = {
       'all': realPatchConfig.slothPureOnly,
       'apps': realPatchConfig.slothAppPureOnly,
+      'normal': realPatchConfig.slothPureNormal,
+      'normal-apps': realPatchConfig.slothAppPureNormal,
     };
   }
   rawConfig['rules'] = [...leadingRules, ...rules];

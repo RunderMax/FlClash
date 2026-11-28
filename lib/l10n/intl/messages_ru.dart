@@ -391,6 +391,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "appIconDesign": MessageLookupByLibrary.simpleMessage(
       "Дизайн значка приложения",
     ),
+    "appPickNodes": MessageLookupByLibrary.simpleMessage(
+      "Узлы этого приложения",
+    ),
     "appProxiesEmpty": MessageLookupByLibrary.simpleMessage(
       "Нет локальных прокси",
     ),
@@ -1847,6 +1850,12 @@ class MessageLookup extends MessageLookupByLibrary {
     "proxyType": MessageLookupByLibrary.simpleMessage("Тип прокси"),
     "pruneCache": MessageLookupByLibrary.simpleMessage("Очистить кэш"),
     "publicKey": MessageLookupByLibrary.simpleMessage("Открытый ключ"),
+    "pureAllowNormal": MessageLookupByLibrary.simpleMessage(
+      "Пропускать и «Обычные» узлы",
+    ),
+    "pureAllowNormalDesc": MessageLookupByLibrary.simpleMessage(
+      "Линии дата-центров тоже работают; рискованные и непроверенные блокируются",
+    ),
     "pureBlack": MessageLookupByLibrary.simpleMessage("Чисто чёрный"),
     "pureBlackMode": MessageLookupByLibrary.simpleMessage("Чисто чёрный режим"),
     "pureOnly": MessageLookupByLibrary.simpleMessage(

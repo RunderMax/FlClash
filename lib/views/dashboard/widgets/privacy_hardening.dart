@@ -79,6 +79,12 @@ class PrivacyHardeningCard extends ConsumerWidget {
     void setPureOnly(bool value) => ref
         .read(patchClashConfigProvider.notifier)
         .update((state) => state.copyWith(slothPureOnly: value));
+    final pureNormal = ref.watch(
+      patchClashConfigProvider.select((state) => state.slothPureNormal),
+    );
+    void setPureNormal(bool value) => ref
+        .read(patchClashConfigProvider.notifier)
+        .update((state) => state.copyWith(slothPureNormal: value));
     final stopped = pureOnly
         ? ref.watch(guardBlockedProvider.select((state) => state.count))
         : 0;
@@ -108,6 +114,18 @@ class PrivacyHardeningCard extends ConsumerWidget {
             onTap: () => setPureOnly(!pureOnly),
             onChanged: setPureOnly,
           ),
+          if (pureOnly)
+            DashboardSwitchRow(
+              glyph: AppGlyphs.sliders,
+              title: appLocalizations.pureAllowNormal,
+              subtitle: appLocalizations.pureAllowNormalDesc,
+              value: pureNormal,
+              iconSize: _rowIcon,
+              padding: _rowPadding,
+              radius: AppCorner.md,
+              onTap: () => setPureNormal(!pureNormal),
+              onChanged: setPureNormal,
+            ),
           if (plugin != null)
             DashboardSwitchRow(
               glyph: AppGlyphs.vpn,

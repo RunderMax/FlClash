@@ -122,7 +122,6 @@ Set<String> _inUse(
 }
 
 /// [picks] with [name] moved to the front, the rest standing by in their order.
-@visibleForTesting
 List<String> mainFirst(List<String> picks, String name) => [
   if (picks.contains(name)) name,
   for (final pick in picks)
@@ -199,7 +198,8 @@ class FastestNodesCard extends ConsumerStatefulWidget {
   ConsumerState<FastestNodesCard> createState() => _FastestNodesCardState();
 }
 
-class _FastestNodesCardState extends ConsumerState<FastestNodesCard> {
+/// What a list of picks needs to show and test its nodes.
+mixin _PickProbes<T extends ConsumerStatefulWidget> on ConsumerState<T> {
   late final OutboundIpProbe _probe;
   final Set<String> _watched = {};
 
@@ -251,6 +251,22 @@ class _FastestNodesCardState extends ConsumerState<FastestNodesCard> {
     );
   }
 
+  _Pick _pickOf(String name, DownloadSpeeds speeds) {
+    final ip = ref.watch(
+      outboundIpProbeProvider.select((state) => state.valueOf(name)),
+    );
+    return (
+      name: name,
+      delay: ref.watch(delayProvider(proxyName: name)),
+      ip: ip,
+      quality: ip == null ? null : ref.watch(ipQualityProvider(ip.ip)).value,
+      download: _downloadOf(speeds, name),
+    );
+  }
+}
+
+class _FastestNodesCardState extends ConsumerState<FastestNodesCard>
+    with _PickProbes {
   /// While the choice is automatic, a tap makes the node the main line.
   Future<void> _select(String name) async {
     final config = ref.read(patchClashConfigProvider);
@@ -320,19 +336,6 @@ class _FastestNodesCardState extends ConsumerState<FastestNodesCard> {
             .read(patchClashConfigProvider.notifier)
             .update((state) => state.copyWith(slothPicks: picks)),
       ),
-    );
-  }
-
-  _Pick _pickOf(String name, DownloadSpeeds speeds) {
-    final ip = ref.watch(
-      outboundIpProbeProvider.select((state) => state.valueOf(name)),
-    );
-    return (
-      name: name,
-      delay: ref.watch(delayProvider(proxyName: name)),
-      ip: ip,
-      quality: ip == null ? null : ref.watch(ipQualityProvider(ip.ip)).value,
-      download: _downloadOf(speeds, name),
     );
   }
 
@@ -625,6 +628,68 @@ class _PickTile extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+/// An app's own picks with what each one measures, on the app's sheet.
+class AppPickNodes extends ConsumerStatefulWidget {
+  const AppPickNodes({
+    super.key,
+    required this.names,
+    required this.current,
+    required this.auto,
+    required this.onSelect,
+  });
+
+  final List<String> names;
+  final String? current;
+  final bool auto;
+  final ValueChanged<String> onSelect;
+
+  @override
+  ConsumerState<AppPickNodes> createState() => _AppPickNodesState();
+}
+
+class _AppPickNodesState extends ConsumerState<AppPickNodes> with _PickProbes {
+  @override
+  Widget build(BuildContext context) {
+    final appLocalizations = context.appLocalizations;
+    final names = widget.names;
+    final speeds = ref.watch(downloadSpeedTestProvider);
+    _watchPicks(names);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      spacing: 6,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          spacing: 8,
+          children: [
+            DashboardIconButton(
+              glyph: AppGlyphs.cloudDownload,
+              tooltip: appLocalizations.picksDownloadTest,
+              onPressed: speeds.busy ? null : () => _testDownload(names),
+            ),
+            DashboardIconButton(
+              glyph: AppGlyphs.speed,
+              tooltip: appLocalizations.picksTest,
+              onPressed: () => _test(names),
+            ),
+          ],
+        ),
+        for (final (index, name) in names.indexed)
+          _PickTile(
+            pick: _pickOf(name, speeds),
+            role: switch (index) {
+              _ when !widget.auto => null,
+              0 => appLocalizations.pickRoleMain,
+              _ => appLocalizations.pickRoleBackup(index),
+            },
+            selected: name == widget.current,
+            onTap: () => widget.onSelect(name),
+          ),
+      ],
     );
   }
 }

@@ -1,6 +1,7 @@
 package core
 
 import (
+	"slices"
 	"sync/atomic"
 
 	"github.com/metacubex/mihomo/adapter"
@@ -22,11 +23,28 @@ const guardOutbound = "Sloth Guard"
 type guardRequest struct {
 	All  bool     `yaml:"all"`
 	Apps []string `yaml:"apps"`
+	// Whether a node of normal quality passes too, for all and for each app.
+	Normal     bool     `yaml:"normal"`
+	NormalApps []string `yaml:"normal-apps"`
 }
 
+// A floor is the worst quality let through: good, or normal as well.
 type guardState struct {
-	all  bool
-	apps map[string]bool
+	all   bool
+	floor purityLevel
+	apps  map[string]purityLevel
+}
+
+func passes(level, floor purityLevel) bool {
+	return level == purityGood || (level == purityNormal && floor == purityNormal)
+}
+
+// An app guarded by itself keeps its own floor under the switch for all.
+func (s *guardState) floorOf(app string) (purityLevel, bool) {
+	if floor, ok := s.apps[app]; ok {
+		return floor, true
+	}
+	return s.floor, s.all
 }
 
 var (
@@ -46,16 +64,23 @@ func readGuardRequest(root *yaml.Node) {
 }
 
 func newGuardState(request guardRequest) *guardState {
-	apps := map[string]bool{}
+	apps := map[string]purityLevel{}
 	for _, app := range request.Apps {
 		if appPackagePattern.MatchString(app) {
-			apps[app] = true
+			apps[app] = purityGood
+			if slices.Contains(request.NormalApps, app) {
+				apps[app] = purityNormal
+			}
 		}
 	}
 	if !request.All && len(apps) == 0 {
 		return nil
 	}
-	return &guardState{all: request.All, apps: apps}
+	floor := purityGood
+	if request.Normal {
+		floor = purityNormal
+	}
+	return &guardState{all: request.All, floor: floor, apps: apps}
 }
 
 func armGuard(cfg *config.Config) {
@@ -113,15 +138,11 @@ func guardRoute(metadata *constant.Metadata, helper constant.RuleMatchHelper, na
 	if !isProxied(node) || purity.cleared(node.Name()) {
 		return name
 	}
-	if !state.all {
-		if metadata.Process == "" && helper.FindProcess != nil {
-			helper.FindProcess()
-		}
-		if !state.apps[routedApp(metadata.Process, metadata.ProcessPath)] {
-			return name
-		}
+	if len(state.apps) > 0 && metadata.Process == "" && helper.FindProcess != nil {
+		helper.FindProcess()
 	}
-	if purity.allows(node.Name()) {
+	floor, guarded := state.floorOf(routedApp(metadata.Process, metadata.ProcessPath))
+	if !guarded || passes(purity.levelOf(node.Name()), floor) {
 		return name
 	}
 	return guardOutbound
@@ -169,10 +190,12 @@ func blockedByGuard(state *guardState, info *statistic.TrackerInfo) bool {
 	if proxy == nil || !isProxied(proxy) {
 		return false
 	}
-	if !state.all && !state.apps[appOf(info.Metadata)] {
-		return false
+	app := ""
+	if len(state.apps) > 0 {
+		app = appOf(info.Metadata)
 	}
-	return !purity.allows(node)
+	floor, guarded := state.floorOf(app)
+	return guarded && !passes(purity.levelOf(node), floor)
 }
 
 // An empty [node] sweeps every node.
@@ -219,7 +242,7 @@ func warmGuard(state *guardState, rules []constant.Rule) {
 		}
 	}
 	for app, target := range appliedAppRoutes {
-		if state.all || state.apps[app] {
+		if _, guarded := state.floorOf(app); guarded {
 			warm(target)
 		}
 	}

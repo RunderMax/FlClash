@@ -71,7 +71,7 @@ func TestNewGuardStateGuardsNothingWithoutASwitchOn(t *testing.T) {
 		t.Errorf("state = %+v, want none", state)
 	}
 	state := newGuardState(guardRequest{Apps: []string{"com.example.chat", "not,a package"}})
-	if state == nil || state.all || !reflect.DeepEqual(state.apps, map[string]bool{"com.example.chat": true}) {
+	if state == nil || state.all || !reflect.DeepEqual(state.apps, map[string]purityLevel{"com.example.chat": purityGood}) {
 		t.Errorf("state = %+v, want only the app", state)
 	}
 }
@@ -166,7 +166,7 @@ func TestGuardRouteStopsEveryNodeThatIsNotKnownClean(t *testing.T) {
 }
 
 func TestGuardRouteLooksUpTheAppOnlyForAnUncleanNode(t *testing.T) {
-	useGuardedTunnel(t, &guardState{apps: map[string]bool{"com.guarded": true}})
+	useGuardedTunnel(t, &guardState{floor: purityGood, apps: map[string]purityLevel{"com.guarded": purityGood}})
 	lookups := 0
 	route := func(app, name string) string {
 		metadata := &constant.Metadata{}
@@ -192,7 +192,7 @@ func TestGuardRouteLooksUpTheAppOnlyForAnUncleanNode(t *testing.T) {
 }
 
 func TestBlockedByGuardJudgesTheNodeAConnectionLeftThrough(t *testing.T) {
-	useGuardedTunnel(t, &guardState{apps: map[string]bool{"com.guarded": true}})
+	useGuardedTunnel(t, &guardState{floor: purityGood, apps: map[string]purityLevel{"com.guarded": purityGood}})
 	state := currentGuard.Load()
 	info := func(app string, chain ...string) *statistic.TrackerInfo {
 		return &statistic.TrackerInfo{Chain: chain, Metadata: &constant.Metadata{Process: app}}
@@ -211,5 +211,59 @@ func TestBlockedByGuardJudgesTheNodeAConnectionLeftThrough(t *testing.T) {
 		if blockedByGuard(state, unblocked) {
 			t.Errorf("blocked %v of %s", unblocked.Chain, unblocked.Metadata.Process)
 		}
+	}
+}
+
+func TestGuardRouteLetsANormalNodeThroughWhereTheFloorIsNormal(t *testing.T) {
+	useGuardedTunnel(t, newGuardState(guardRequest{
+		All:        true,
+		Apps:       []string{"com.strict", "com.loose"},
+		NormalApps: []string{"com.loose"},
+	}))
+	route := func(app, name string) string {
+		return guardRoute(&constant.Metadata{Process: app}, constant.RuleMatchHelper{}, name)
+	}
+
+	if got := route("com.loose", "dirty"); got != "dirty" {
+		t.Errorf("an app taking normal nodes = %s, want it let through", got)
+	}
+	if got := route("com.loose", "unknown"); got != guardOutbound {
+		t.Errorf("an unchecked node = %s, want the guard whatever the floor", got)
+	}
+	if got := route("com.strict", "dirty"); got != guardOutbound {
+		t.Errorf("an app taking good nodes only = %s, want the guard", got)
+	}
+	if got := route("com.other", "dirty"); got != guardOutbound {
+		t.Errorf("an app under the switch for all = %s, want the guard", got)
+	}
+}
+
+func TestGuardFloorForAllAppliesToAppsWithoutTheirOwn(t *testing.T) {
+	useGuardedTunnel(t, newGuardState(guardRequest{All: true, Normal: true, Apps: []string{"com.strict"}}))
+	route := func(app string) string {
+		return guardRoute(&constant.Metadata{Process: app}, constant.RuleMatchHelper{}, "dirty")
+	}
+
+	if got := route("com.other"); got != "dirty" {
+		t.Errorf("under a normal floor for all = %s, want it let through", got)
+	}
+	if got := route("com.strict"); got != guardOutbound {
+		t.Errorf("an app keeping to good nodes = %s, want the guard", got)
+	}
+}
+
+func TestPickFloorFollowsTheGuardOfTheGroupsApp(t *testing.T) {
+	previous := currentGuard.Load()
+	t.Cleanup(func() { currentGuard.Store(previous) })
+	currentGuard.Store(newGuardState(guardRequest{Apps: []string{"Muse"}, NormalApps: []string{"Muse"}}))
+
+	if got := pickFloor(appPickGroupPrefix + "Muse"); got != purityNormal {
+		t.Errorf("floor = %v, want normal for an app that takes normal nodes", got)
+	}
+	if got := pickFloor(appPickGroupPrefix + "Other"); got != purityGood {
+		t.Errorf("floor = %v, want good for an app with no guard", got)
+	}
+	if got := pickFloor(slothPickGroup); got != purityGood {
+		t.Errorf("floor = %v, want good while the switch for all is off", got)
 	}
 }

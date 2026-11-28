@@ -9866,6 +9866,36 @@ class AppLocalizations {
     );
   }
 
+  /// `Also let “Normal” nodes through`
+  String get pureAllowNormal {
+    return Intl.message(
+      'Also let “Normal” nodes through',
+      name: 'pureAllowNormal',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Data-centre lines work too; risky and unchecked ones stay cut`
+  String get pureAllowNormalDesc {
+    return Intl.message(
+      'Data-centre lines work too; risky and unchecked ones stay cut',
+      name: 'pureAllowNormalDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `This app’s nodes`
+  String get appPickNodes {
+    return Intl.message(
+      'This app’s nodes',
+      name: 'appPickNodes',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Switch automatically`
   String get autoSwitch {
     return Intl.message(

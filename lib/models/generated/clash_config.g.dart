@@ -981,6 +981,12 @@ _PatchClashConfig _$PatchClashConfigFromJson(
         (k, e) => MapEntry(k, e as String),
       ) ??
       const {},
+  slothPureNormal: json['sloth-pure-normal'] as bool? ?? false,
+  slothAppPureNormal:
+      (json['sloth-app-pure-normal'] as List<dynamic>?)
+          ?.map((e) => e as String)
+          .toList() ??
+      const [],
 );
 
 Map<String, dynamic> _$PatchClashConfigToJson(_PatchClashConfig instance) =>
@@ -1039,6 +1045,8 @@ Map<String, dynamic> _$PatchClashConfigToJson(_PatchClashConfig instance) =>
       'sloth-app-pure-only': instance.slothAppPureOnly,
       'sloth-sites': instance.slothSites,
       'sloth-app-folders': instance.slothAppFolders,
+      'sloth-pure-normal': instance.slothPureNormal,
+      'sloth-app-pure-normal': instance.slothAppPureNormal,
     };
 
 const _$ModeEnumMap = {

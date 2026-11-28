@@ -323,6 +323,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "appAccessControl": MessageLookupByLibrary.simpleMessage("应用访问控制"),
     "appExits": MessageLookupByLibrary.simpleMessage("用过的 IP"),
     "appIconDesign": MessageLookupByLibrary.simpleMessage("应用图标设计"),
+    "appPickNodes": MessageLookupByLibrary.simpleMessage("这个软件的节点"),
     "appProxiesEmpty": MessageLookupByLibrary.simpleMessage("暂无本地代理"),
     "appPureOnlyDesc": MessageLookupByLibrary.simpleMessage(
       "节点不是「优」时，这个软件上不了网",
@@ -1364,6 +1365,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "proxyType": MessageLookupByLibrary.simpleMessage("代理类型"),
     "pruneCache": MessageLookupByLibrary.simpleMessage("修剪缓存"),
     "publicKey": MessageLookupByLibrary.simpleMessage("公钥"),
+    "pureAllowNormal": MessageLookupByLibrary.simpleMessage("也放行「普通」节点"),
+    "pureAllowNormalDesc": MessageLookupByLibrary.simpleMessage(
+      "机房线路也能上网，有风险和还没查清的照样断",
+    ),
     "pureBlack": MessageLookupByLibrary.simpleMessage("纯黑"),
     "pureBlackMode": MessageLookupByLibrary.simpleMessage("纯黑模式"),
     "pureOnly": MessageLookupByLibrary.simpleMessage("不纯净就断网"),

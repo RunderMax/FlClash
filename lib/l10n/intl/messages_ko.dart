@@ -332,6 +332,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "appAccessControl": MessageLookupByLibrary.simpleMessage("앱 접근 제어"),
     "appExits": MessageLookupByLibrary.simpleMessage("사용한 IP"),
     "appIconDesign": MessageLookupByLibrary.simpleMessage("앱 아이콘 디자인"),
+    "appPickNodes": MessageLookupByLibrary.simpleMessage("이 앱의 노드"),
     "appProxiesEmpty": MessageLookupByLibrary.simpleMessage("로컬 프록시 없음"),
     "appPureOnlyDesc": MessageLookupByLibrary.simpleMessage(
       "노드가 「양호」가 아니면 이 앱은 인터넷을 쓸 수 없어요",
@@ -1477,6 +1478,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "proxyType": MessageLookupByLibrary.simpleMessage("프록시 유형"),
     "pruneCache": MessageLookupByLibrary.simpleMessage("캐시 정리"),
     "publicKey": MessageLookupByLibrary.simpleMessage("공개 키"),
+    "pureAllowNormal": MessageLookupByLibrary.simpleMessage("「보통」 노드도 허용"),
+    "pureAllowNormalDesc": MessageLookupByLibrary.simpleMessage(
+      "데이터센터 회선도 사용, 위험·미확인 노드는 계속 차단",
+    ),
     "pureBlack": MessageLookupByLibrary.simpleMessage("퓨어 블랙"),
     "pureBlackMode": MessageLookupByLibrary.simpleMessage("퓨어 블랙 모드"),
     "pureOnly": MessageLookupByLibrary.simpleMessage("청정하지 않으면 차단"),
