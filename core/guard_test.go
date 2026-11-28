@@ -67,10 +67,10 @@ func TestReadGuardRequestLeavesTheRequestInTheConfig(t *testing.T) {
 }
 
 func TestNewGuardStateGuardsNothingWithoutASwitchOn(t *testing.T) {
-	if state := newGuardState(guardRequest{Apps: []string{"not a package"}}); state != nil {
+	if state := newGuardState(guardRequest{Apps: []string{"not,a package"}}); state != nil {
 		t.Errorf("state = %+v, want none", state)
 	}
-	state := newGuardState(guardRequest{Apps: []string{"com.example.chat", "not a package"}})
+	state := newGuardState(guardRequest{Apps: []string{"com.example.chat", "not,a package"}})
 	if state == nil || state.all || !reflect.DeepEqual(state.apps, map[string]bool{"com.example.chat": true}) {
 		t.Errorf("state = %+v, want only the app", state)
 	}

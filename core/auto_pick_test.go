@@ -31,7 +31,15 @@ func members(list ...stubMember) []constant.Proxy {
 	return proxies
 }
 
-func TestCleanestFastestTakesTheFastestCleanLiveMember(t *testing.T) {
+func useCountries(t *testing.T, countries map[string]string) {
+	t.Helper()
+	previous, previousRates := countryOf, failureRates
+	countryOf = func(ip string) string { return countries[ip] }
+	failureRates = func() map[string]float64 { return nil }
+	t.Cleanup(func() { countryOf, failureRates = previous, previousRates })
+}
+
+func TestNextPickStartsOnTheFastestCleanLiveMember(t *testing.T) {
 	test := useTestPurity(t)
 	for node, kind := range map[string]string{"slow": "residential", "fast": "mobile", "dc": "hosting", "dead": "business"} {
 		test.know(node, node+"-ip", time.Minute, ipVerdict{Type: kind})
@@ -43,64 +51,71 @@ func TestCleanestFastestTakesTheFastestCleanLiveMember(t *testing.T) {
 		stubMember{name: "dead", delay: 10, dead: true},
 	)
 
-	if got := cleanestFastest(group, "", ""); got != "fast" {
+	if got := nextPick(group, "", "", 0); got != "fast" {
 		t.Errorf("picked %q, want the fastest clean one", got)
 	}
-}
-
-func TestCleanestFastestKeepsTheOneInUseWhileItAnswers(t *testing.T) {
-	test := useTestPurity(t)
-	test.know("a", "1.1.1.1", time.Minute, ipVerdict{Type: "residential"})
-	test.know("b", "2.2.2.2", time.Minute, ipVerdict{Type: "residential"})
-	group := members(stubMember{name: "a", delay: 900}, stubMember{name: "b", delay: 10})
-
-	if got := cleanestFastest(group, "", "a"); got != "a" {
-		t.Errorf("picked %q, want the one in use kept however slow", got)
-	}
-	unchecked := members(stubMember{name: "new", delay: 900}, stubMember{name: "b", delay: 10})
-	if got := cleanestFastest(unchecked, "", "new"); got != "new" {
-		t.Errorf("picked %q, want no move while the one in use is being checked", got)
-	}
-}
-
-func TestCleanestFastestLeavesADeadOrUncleanMember(t *testing.T) {
-	test := useTestPurity(t)
-	test.know("a", "1.1.1.1", time.Minute, ipVerdict{Type: "residential"})
-	test.know("same", "1.1.1.1", time.Minute, ipVerdict{Type: "residential"})
-	test.know("other", "2.2.2.2", time.Minute, ipVerdict{Type: "residential"})
-	test.know("dc", "3.3.3.3", time.Minute, ipVerdict{Type: "hosting"})
-	dead := members(
-		stubMember{name: "a", delay: 900, dead: true},
-		stubMember{name: "same", delay: 300},
-		stubMember{name: "other", delay: 10},
-	)
-	if got := cleanestFastest(dead, "", "a"); got != "same" {
-		t.Errorf("picked %q, want the member on the same address first", got)
-	}
-	alone := members(stubMember{name: "a", dead: true}, stubMember{name: "other", delay: 10})
-	if got := cleanestFastest(alone, "", "a"); got != "other" {
-		t.Errorf("picked %q, want the fastest clean member on another address", got)
-	}
-	unclean := members(stubMember{name: "dc", delay: 5}, stubMember{name: "other", delay: 400})
-	if got := cleanestFastest(unclean, "", "dc"); got != "other" {
-		t.Errorf("picked %q, want the unclean member left", got)
-	}
-	if got := cleanestFastest(members(stubMember{name: "a", dead: true}), "", "a"); got != "" {
+	if got := nextPick(members(stubMember{name: "dc"}), "", "", 0); got != "" {
 		t.Errorf("picked %q, want the choice left to url-test", got)
 	}
 }
 
-func TestCleanestFastestLeavesTheChoiceWhileNoneIsKnownClean(t *testing.T) {
+func TestNextPickKeepsTheOneInUseThroughABriefOutage(t *testing.T) {
 	test := useTestPurity(t)
+	useCountries(t, map[string]string{"1.1.1.1": "US", "2.2.2.2": "US"})
+	test.know("a", "1.1.1.1", time.Minute, ipVerdict{Type: "residential"})
+	test.know("b", "2.2.2.2", time.Minute, ipVerdict{Type: "residential"})
 
-	got := cleanestFastest(members(stubMember{name: "x", delay: math.MaxUint16}), "", "")
-
-	if got != "" {
-		t.Errorf("picked %q, want none", got)
+	slow := members(stubMember{name: "a", delay: 900}, stubMember{name: "b", delay: 10})
+	if got := nextPick(slow, "", "a", 0); got != "a" {
+		t.Errorf("picked %q, want the one in use kept however slow", got)
 	}
-	test.settle(t)
-	if test.askedFor("x") != 1 {
-		t.Error("an unchecked member was not checked")
+	dead := members(stubMember{name: "a", dead: true}, stubMember{name: "b", delay: 10})
+	if got := nextPick(dead, "", "a", leaveDeadAfter-time.Second); got != "a" {
+		t.Errorf("picked %q, want no move on a brief outage", got)
+	}
+	if got := nextPick(dead, "", "a", leaveDeadAfter); got != "b" {
+		t.Errorf("picked %q, want the move once it stayed dead", got)
+	}
+}
+
+func TestNextPickMovesOnlyWithinTheCountry(t *testing.T) {
+	test := useTestPurity(t)
+	useCountries(t, map[string]string{"1.1.1.1": "US", "2.2.2.2": "US", "3.3.3.3": "JP", "4.4.4.4": "US"})
+	test.know("a", "1.1.1.1", time.Minute, ipVerdict{Type: "residential"})
+	test.know("same", "1.1.1.1", time.Minute, ipVerdict{Type: "residential"})
+	test.know("us", "2.2.2.2", time.Minute, ipVerdict{Type: "residential"})
+	test.know("jp", "3.3.3.3", time.Minute, ipVerdict{Type: "residential"})
+	test.know("dc", "4.4.4.4", time.Minute, ipVerdict{Type: "hosting"})
+	down := stubMember{name: "a", dead: true}
+
+	all := members(down, stubMember{name: "same", delay: 500}, stubMember{name: "us", delay: 50}, stubMember{name: "jp", delay: 5})
+	if got := nextPick(all, "", "a", leaveDeadAfter); got != "same" {
+		t.Errorf("picked %q, want the member on the same address first", got)
+	}
+	abroad := members(down, stubMember{name: "us", delay: 50}, stubMember{name: "jp", delay: 5}, stubMember{name: "dc", delay: 1})
+	if got := nextPick(abroad, "", "a", leaveDeadAfter); got != "us" {
+		t.Errorf("picked %q, want the clean member in the same country", got)
+	}
+	if got := nextPick(members(down, stubMember{name: "jp", delay: 5}), "", "a", leaveDeadAfter); got != "a" {
+		t.Errorf("picked %q, want it to stay with none in the country", got)
+	}
+	unclean := members(stubMember{name: "dc", delay: 1}, stubMember{name: "us", delay: 50})
+	if got := nextPick(unclean, "", "dc", 0); got != "us" {
+		t.Errorf("picked %q, want the unclean member left at once", got)
+	}
+}
+
+func TestNextPickPrefersTheSteadierMember(t *testing.T) {
+	test := useTestPurity(t)
+	useCountries(t, map[string]string{"1.1.1.1": "US", "2.2.2.2": "US", "3.3.3.3": "US"})
+	failureRates = func() map[string]float64 { return map[string]float64{"flaky": 0.4, "steady": 0.02} }
+	test.know("a", "1.1.1.1", time.Minute, ipVerdict{Type: "residential"})
+	test.know("flaky", "2.2.2.2", time.Minute, ipVerdict{Type: "residential"})
+	test.know("steady", "3.3.3.3", time.Minute, ipVerdict{Type: "residential"})
+	group := members(stubMember{name: "a", dead: true}, stubMember{name: "flaky", delay: 10}, stubMember{name: "steady", delay: 300})
+
+	if got := nextPick(group, "", "a", leaveDeadAfter); got != "steady" {
+		t.Errorf("picked %q, want the steadier one ahead of the faster", got)
 	}
 }
 
@@ -115,5 +130,19 @@ func TestAutoPickGroupsFindsTheHostsUrlTestGroups(t *testing.T) {
 	want := []string{slothPickGroup, appPickGroupPrefix + "com.example.a"}
 	if got := autoPickGroups(proxies); !reflect.DeepEqual(got, want) {
 		t.Errorf("groups = %v, want %v", got, want)
+	}
+}
+
+func TestNextPickChecksAMemberNotYetKnown(t *testing.T) {
+	test := useTestPurity(t)
+
+	got := nextPick(members(stubMember{name: "x", delay: math.MaxUint16}), "", "", 0)
+
+	if got != "" {
+		t.Errorf("picked %q, want none", got)
+	}
+	test.settle(t)
+	if test.askedFor("x") != 1 {
+		t.Error("an unchecked member was not checked")
 	}
 }

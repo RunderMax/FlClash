@@ -72,6 +72,26 @@ foreach ($app in $apps.Values) {
   }
   $out += [pscustomobject]@{ name = $app.name; icon = (Icon $app.main); exes = $exes }
 }
+try {
+  $shown = @{}
+  foreach ($entry in Get-StartApps) { $shown[($entry.AppID -split '!')[0].ToLower()] = $entry.Name }
+  foreach ($pkg in Get-AppxPackage) {
+    $name = $shown["$($pkg.PackageFamilyName)".ToLower()]
+    if (-not $name -or $pkg.IsFramework -or -not $pkg.InstallLocation) { continue }
+    $manifest = Join-Path $pkg.InstallLocation 'AppxManifest.xml'
+    if (-not (Test-Path -LiteralPath $manifest)) { continue }
+    $exes = @()
+    foreach ($entry in @(([xml](Get-Content -LiteralPath $manifest -Raw)).Package.Applications.Application)) {
+      $rel = "$($entry.Executable)" -replace '/', '\'
+      if (-not $rel.ToLower().EndsWith('.exe')) { continue }
+      $file = Join-Path $pkg.InstallLocation $rel
+      if ($claimed.ContainsKey($file.ToLower()) -or $file.StartsWith($sys, 'OrdinalIgnoreCase')) { continue }
+      $claimed[$file.ToLower()] = $true
+      $exes += Exe $file $running.ContainsKey($file.ToLower())
+    }
+    if ($exes.Count) { $out += [pscustomobject]@{ name = $name; icon = (Icon $exes[0].path); exes = $exes } }
+  }
+} catch {}
 foreach ($file in $running.Values) {
   if ($claimed.ContainsKey($file.ToLower()) -or $file.StartsWith($sys, 'OrdinalIgnoreCase')) { continue }
   $exe = Exe $file $true
@@ -104,7 +124,11 @@ function icon(bundle, d) {
   }
   return png;
 }
-function exe(bundle, d) { var e = key(d, 'CFBundleExecutable'); return e ? bundle + '/Contents/MacOS/' + e : null; }
+function exe(bundle, d) {
+  var e = key(d, 'CFBundleExecutable') || bundle.split('/').pop().replace(/\.app$/, '');
+  var file = bundle + '/Contents/MacOS/' + e;
+  return fm.fileExistsAtPath($(file)) ? file : null;
+}
 function label(bundle, d) { return key(d, 'CFBundleDisplayName') || key(d, 'CFBundleName') || bundle.split('/').pop().replace(/\.app$/, ''); }
 var running = {};
 lines('ps -axo comm=').forEach(function (p) { running[p] = true; });
@@ -113,6 +137,7 @@ var bundles = [];
   lines('find ' + q(dir) + ' -maxdepth 2 -name "*.app" -prune').forEach(function (b) { bundles.push(b); });
 });
 var claimed = {};
+var grouped = {};
 var out = [];
 function group(bundle) {
   var d = plist(bundle);
@@ -126,20 +151,26 @@ function group(bundle) {
     if (he) exes.push({ path: he, description: label(h, hd), running: !!running[he], icon: null });
   });
   exes.forEach(function (e) { claimed[e.path] = true; });
-  if (exes.length) out.push({ name: label(bundle, d), icon: icon(bundle, d), exes: exes });
+  if (exes.length) out.push(grouped[bundle] = { name: label(bundle, d), icon: icon(bundle, d), exes: exes });
 }
 bundles.forEach(group);
 Object.keys(running).forEach(function (p) {
   var m = p.match(/^(.*?\.app)\/Contents\/MacOS\//);
   if (!m || claimed[p] || /^\/System\//.test(p)) return;
-  group(m[1]);
+  if (!grouped[m[1]]) group(m[1]);
+  if (claimed[p]) return;
+  claimed[p] = true;
+  if (!grouped[m[1]]) out.push(grouped[m[1]] = { name: m[1].split('/').pop().replace(/\.app$/, ''), icon: null, exes: [] });
+  grouped[m[1]].exes.push({ path: p, description: p.split('/').pop(), running: true, icon: null });
 });
 JSON.stringify(out);
 """;
 
 /// Windows keeps no list of programs by the executable name a PROCESS-NAME
 /// rule matches, so the Start menu's entries and what runs stand for one; a
-/// Mac lists its apps' bundles and the helper apps inside them.
+/// Mac lists its apps' bundles and the helper apps inside them. A bundle may
+/// leave CFBundleExecutable out, and macOS then runs the file named after it.
+/// A packaged Windows app has no shortcut file; its manifest names what it runs.
 Future<List<ProgramGroup>> listPrograms(String iconDir) async {
   final mac = Platform.isMacOS;
   final result = await Process.run(

@@ -2,6 +2,7 @@ package core
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	"go.yaml.in/yaml/v3"
@@ -112,14 +113,19 @@ func fastestGroupNode(spec fastestGroupSpec, proxies []string) (*yaml.Node, erro
 	if tolerance <= 0 {
 		tolerance = defaultFastestTolerance
 	}
-	err := node.Encode(map[string]any{
+	group := map[string]any{
 		"name":      spec.Name,
 		"type":      "url-test",
 		"proxies":   proxies,
 		"url":       url,
 		"interval":  interval,
 		"tolerance": tolerance,
-	})
+	}
+	// A captive or error page answers too; only the empty 204 is the node working.
+	if strings.HasSuffix(url, "/generate_204") {
+		group["expected-status"] = "204"
+	}
+	err := node.Encode(group)
 	return &node, err
 }
 
